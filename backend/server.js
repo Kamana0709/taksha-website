@@ -226,6 +226,16 @@ app.post('/api/applications', async (req, res) => {
   }
 });
 
+app.get('/api/applications', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can view applications' });
+    const applications = await prisma.application.findMany({ orderBy: { createdAt: 'desc' } });
+    res.json(applications);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch applications' });
+  }
+});
+
 // All other GET requests not handled before will return our React app
 app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, '../dist', 'index.html'));

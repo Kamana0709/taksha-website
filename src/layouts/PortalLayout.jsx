@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   CheckSquare, Calendar, Info, User, Settings,
   Bell, Menu, X, LayoutDashboard, FolderKanban,
-  UploadCloud, Clock, Users, FileCheck, BarChart2
+  UploadCloud, Clock, Users, FileCheck, BarChart2, Briefcase
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './PortalLayout.css';
@@ -20,6 +20,7 @@ const INTERN_NAV_LINKS = [
 const MENTOR_NAV_LINKS = [
   { path: '/mentor/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/mentor/interns', label: 'My Interns', icon: Users },
+  { path: '/mentor/applications', label: 'Applications', icon: Briefcase },
   { path: '/mentor/tasks', label: 'Tasks', icon: CheckSquare },
   { path: '/mentor/kanban', label: 'Kanban Board', icon: FolderKanban },
   { path: '/mentor/submissions', label: 'Submissions', icon: UploadCloud },
