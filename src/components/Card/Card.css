@@ -1,0 +1,133 @@
+/* ==========================================================================
+   CARD — Neo-Brutalist surface container
+   ========================================================================== */
+
+.card {
+  background: var(--color-surface);
+  border: var(--border-thick) solid var(--color-ink);
+  border-radius: var(--radius-sm);
+  position: relative;
+  transition: 
+    transform 200ms var(--ease-out-quart),
+    box-shadow 200ms var(--ease-out-quart);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+/* Allow overflow for the dog-ear if it's placed outside, but we place it inside */
+.card--dog-ear {
+  overflow: visible;
+}
+
+.card:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card--clickable {
+  cursor: pointer;
+}
+
+.card--clickable:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+/* Solid black triangle at bottom right */
+.card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-bottom: 32px solid var(--color-ink);
+  border-left: 32px solid transparent;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.card__image {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  display: block;
+  border-bottom: var(--border-thick) solid var(--color-ink);
+}
+
+.card__body {
+  padding: var(--space-6);
+  position: relative;
+  z-index: 1;
+}
+
+.card__body--sm {
+  padding: var(--space-4);
+}
+
+/* Service card variant — left accent block */
+.card--service {
+  padding-left: 0;
+}
+
+.card--service::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 8px;
+  height: 100%;
+  background: var(--color-accent);
+  border-right: var(--border-thick) solid var(--color-ink);
+}
+
+/* Value card variant */
+.card--value {
+  text-align: left;
+  padding: var(--space-6);
+  background: var(--color-bg);
+}
+
+.card--value .card__icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--space-4);
+  color: var(--color-ink);
+  background: var(--color-accent);
+  border: var(--border-thick) solid var(--color-ink);
+  padding: 8px;
+  box-shadow: 2px 2px 0 0 var(--color-ink);
+}
+
+.card--value .card__title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-ink);
+  margin-bottom: var(--space-3);
+  letter-spacing: -0.5px;
+}
+
+.card--value .card__description {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  font-weight: 500;
+}
+
+/* No border variant */
+.card--borderless {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.card--borderless::after {
+  display: none;
+}
+
+.card--borderless:hover {
+  box-shadow: none;
+  transform: none;
+}

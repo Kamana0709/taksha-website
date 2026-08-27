@@ -1,0 +1,173 @@
+/* ==========================================================================
+   BUTTON — Neo-Brutalist Theme
+   Variants: primary, secondary, ghost, icon
+   Sizes: sm, md, lg
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-weight: 700;
+  border: var(--border-thick) solid var(--color-ink);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: 
+    transform 100ms var(--ease-out-quart), 
+    background-color var(--duration-fast) ease, 
+    color var(--duration-fast) ease,
+    box-shadow 100ms var(--ease-out-quart);
+  position: relative;
+  box-shadow: var(--shadow-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Sizes */
+.btn--sm {
+  padding: var(--space-2) var(--space-6);
+  font-size: var(--text-xs);
+}
+
+.btn--md {
+  padding: var(--space-3) var(--space-8);
+  font-size: var(--text-sm);
+}
+
+.btn--lg {
+  padding: var(--space-4) var(--space-12);
+  font-size: var(--text-base);
+}
+
+/* Primary variant */
+.btn--primary {
+  background: var(--color-accent);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-md);
+}
+
+.btn--primary:hover {
+  background: var(--color-accent-hover);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn--primary:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+
+/* Secondary variant */
+.btn--secondary {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn--secondary:hover {
+  background: var(--color-accent-soft);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn--secondary:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+/* Ghost variant (No shadow until hover in neo-brutalism) */
+.btn--ghost {
+  background: transparent;
+  color: var(--color-ink);
+  border-color: transparent;
+  box-shadow: none;
+  padding-inline: var(--space-4);
+}
+
+.btn--ghost:hover {
+  background: var(--color-accent-soft);
+  border-color: var(--color-ink);
+  box-shadow: var(--shadow-sm);
+  transform: translate(-2px, -2px);
+}
+
+.btn--ghost:active {
+  transform: translate(0, 0);
+  box-shadow: none;
+}
+
+/* Icon variant */
+.btn--icon {
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+}
+
+.btn--icon.btn--sm {
+  padding: var(--space-2);
+}
+
+.btn--icon.btn--lg {
+  padding: var(--space-4);
+}
+
+/* Focus state */
+.btn:focus-visible {
+  outline: 4px solid var(--color-accent-soft);
+  outline-offset: 2px;
+}
+
+/* Disabled state */
+.btn:disabled,
+.btn--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Loading state */
+.btn--loading {
+  color: transparent;
+  pointer-events: none;
+}
+
+.btn__spinner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: btn-spin 600ms linear infinite;
+}
+
+.btn--loading .btn__spinner {
+  color: var(--color-ink);
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Icon inside button */
+.btn__icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  stroke-width: 2.5px;
+}
+
+.btn--sm .btn__icon {
+  width: 14px;
+  height: 14px;
+}
+
+.btn--lg .btn__icon {
+  width: 20px;
+  height: 20px;
+}

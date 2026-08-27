@@ -1,0 +1,134 @@
+.process-page {
+  width: 100%;
+}
+
+.process-hero {
+  padding-top: calc(var(--space-24) + 64px);
+  padding-bottom: var(--space-16);
+}
+
+.timeline-container {
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--space-16) 0;
+}
+
+.timeline-line-bg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 24px;
+  width: 2px;
+  background: var(--color-border);
+  z-index: 1;
+}
+
+.timeline-line-active {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 24px;
+  width: 2px;
+  background: var(--color-accent);
+  z-index: 2;
+}
+
+.timeline-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  z-index: 3;
+}
+
+.timeline-item {
+  position: relative;
+  display: flex;
+  margin-bottom: var(--space-16);
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: 24px;
+  top: 0;
+  width: 48px;
+  height: 48px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border-radius: 50%;
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px var(--color-surface);
+}
+
+.timeline-content {
+  margin-left: 64px;
+  padding: var(--space-8);
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  flex: 1;
+}
+
+.timeline-number {
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-2);
+}
+
+.timeline-title {
+  margin-bottom: var(--space-4);
+  color: var(--color-text);
+}
+
+.timeline-description {
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+/* Desktop layout: alternating left/right */
+@media (min-width: 768px) {
+  .timeline-line-bg,
+  .timeline-line-active {
+    left: 50%;
+  }
+
+  .timeline-marker {
+    left: 50%;
+  }
+
+  .timeline-item {
+    justify-content: center;
+  }
+
+  .timeline-item--left {
+    justify-content: flex-start;
+  }
+
+  .timeline-item--right {
+    justify-content: flex-end;
+  }
+
+  .timeline-item--left .timeline-content {
+    margin-left: 0;
+    margin-right: calc(50% + 40px);
+  }
+
+  .timeline-item--right .timeline-content {
+    margin-left: calc(50% + 40px);
+  }
+}

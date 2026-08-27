@@ -1,0 +1,108 @@
+/**
+ * StructuredData — JSON-LD Schema.org renderer
+ * Renders <script type="application/ld+json"> for structured data
+ * PRD §21.8
+ */
+import { Helmet } from 'react-helmet-async';
+
+export default function StructuredData({ schema }) {
+  if (!schema) return null;
+
+  return (
+    <Helmet>
+      <script type="application/ld+json">
+        {JSON.stringify(schema)}
+      </script>
+    </Helmet>
+  );
+}
+
+/* -----------------------------------------------------------------------
+   Pre-built schema helpers
+   ----------------------------------------------------------------------- */
+
+export function organizationSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Taksha',
+    url: 'https://www.taksha.studio',
+    logo: 'https://www.taksha.studio/logo.png',
+    description: 'Taksha is a digital craft studio blending branding, design, engineering, and AI.',
+    sameAs: [
+      'https://www.linkedin.com/company/taksha',
+      'https://www.instagram.com/taksha.studio',
+    ],
+  };
+}
+
+export function breadcrumbSchema(items) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: `https://www.taksha.studio${item.path}`,
+    })),
+  };
+}
+
+export function faqSchema(faqs) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
+}
+
+export function localBusinessSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: 'Taksha',
+    image: 'https://www.taksha.studio/og-image.jpg',
+    url: 'https://www.taksha.studio',
+    priceRange: '$$$$',
+    address: {
+      '@type': 'PostalAddress',
+      addressCountry: 'US'
+    }
+  };
+}
+
+export function serviceSchema(serviceName, description, path) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: serviceName,
+    provider: {
+      '@type': 'Organization',
+      name: 'Taksha',
+    },
+    description: description,
+    url: `https://www.taksha.studio${path}`,
+  };
+}
+
+export function creativeWorkSchema(projectName, description, path) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: projectName,
+    creator: {
+      '@type': 'Organization',
+      name: 'Taksha',
+    },
+    description: description,
+    url: `https://www.taksha.studio${path}`,
+  };
+}

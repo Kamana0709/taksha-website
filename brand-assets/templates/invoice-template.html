@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Taksha Invoice Template</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    @page { size: A4; margin: 0; }
+    body { font-family: 'Inter', sans-serif; color: #334155; margin: 0; padding: 0; background: #fff; line-height: 1.5; }
+    .page { width: 210mm; min-height: 297mm; margin: 0 auto; padding: 40mm 25mm 25mm 25mm; box-sizing: border-box; position: relative; }
+    .top-bar { position: absolute; top: 0; left: 0; width: 100%; height: 20px; background: #0F172A; }
+    .top-accent { position: absolute; top: 20px; left: 0; width: 30%; height: 8px; background: #F59E0B; }
+    h1, h2, h3 { font-family: 'Outfit', sans-serif; color: #0F172A; margin: 0; font-weight: 600; }
+    h1 { font-size: 36px; letter-spacing: 1px; }
+    
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 60px; }
+    .logo { font-size: 28px; letter-spacing: 4px; }
+    .company-details { text-align: right; font-size: 12px; color: #64748B; }
+    .company-details p { margin: 2px 0; }
+
+    .invoice-meta { display: flex; justify-content: space-between; margin-bottom: 50px; }
+    .bill-to p { margin: 2px 0; font-size: 14px; }
+    .meta-details { text-align: right; }
+    .meta-details table { width: 100%; text-align: right; font-size: 14px; }
+    .meta-details td { padding: 4px 0 4px 16px; }
+    .meta-details td:first-child { color: #64748B; }
+
+    .line-items { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+    .line-items th { text-align: left; padding: 12px 16px; border-bottom: 2px solid #E2E8F0; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #94A3B8; font-weight: 500; }
+    .line-items td { padding: 16px; border-bottom: 1px solid #F1F5F9; font-size: 14px; }
+    .line-items th:last-child, .line-items td:last-child { text-align: right; }
+    
+    .totals { width: 300px; margin-left: auto; border-collapse: collapse; }
+    .totals td { padding: 8px 16px; font-size: 14px; }
+    .totals td:first-child { color: #64748B; }
+    .totals td:last-child { text-align: right; }
+    .totals .grand-total td { font-size: 20px; font-weight: 600; color: #0F172A; padding-top: 16px; border-top: 2px solid #E2E8F0; }
+
+    .notes { margin-top: 60px; font-size: 12px; color: #64748B; max-width: 60%; }
+    .footer { position: absolute; bottom: 25mm; left: 25mm; right: 25mm; font-size: 10px; color: #94A3B8; border-top: 1px solid #E2E8F0; padding-top: 16px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top-bar"></div>
+    <div class="top-accent"></div>
+    
+    <div class="header">
+      <div class="logo">
+        <h2 style="letter-spacing: 4px;">TAKSHA</h2>
+      </div>
+      <div class="company-details">
+        <p><strong>Taksha Digital Craft Studio</strong></p>
+        <p>123 Design District</p>
+        <p>Creative City, CA 90210</p>
+        <p>hello@taksha.studio</p>
+        <p>taksha.studio</p>
+      </div>
+    </div>
+
+    <h1>INVOICE</h1>
+    
+    <div class="invoice-meta" style="margin-top: 24px;">
+      <div class="bill-to">
+        <p style="color: #94A3B8; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Bill To</p>
+        <p><strong>Client Company Name</strong></p>
+        <p>Client Contact Name</p>
+        <p>456 Client Avenue</p>
+        <p>Business City, NY 10001</p>
+      </div>
+      <div class="meta-details">
+        <table>
+          <tr><td>Invoice Number:</td><td><strong>INV-2025-001</strong></td></tr>
+          <tr><td>Issue Date:</td><td><strong>Oct 01, 2025</strong></td></tr>
+          <tr><td>Due Date:</td><td><strong>Oct 15, 2025</strong></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <table class="line-items">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Qty / Hrs</th>
+          <th>Rate</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <strong>Brand Identity Design</strong><br>
+            <span style="color: #64748B; font-size: 13px;">Logo system, color palette, typography guidelines</span>
+          </td>
+          <td>1</td>
+          <td>$5,000.00</td>
+          <td>$5,000.00</td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Website Development</strong><br>
+            <span style="color: #64748B; font-size: 13px;">React front-end build and performance optimization</span>
+          </td>
+          <td>1</td>
+          <td>$8,000.00</td>
+          <td>$8,000.00</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="totals">
+      <tr>
+        <td>Subtotal</td>
+        <td>$13,000.00</td>
+      </tr>
+      <tr>
+        <td>Tax (0%)</td>
+        <td>$0.00</td>
+      </tr>
+      <tr class="grand-total">
+        <td>Total Due</td>
+        <td>$13,000.00</td>
+      </tr>
+    </table>
+
+    <div class="notes">
+      <p style="font-weight: 600; color: #0F172A; margin-bottom: 4px;">Payment Instructions</p>
+      <p>Please send wire transfer to the following account:<br>
+      Bank: Taksha Bank<br>
+      Routing: XXXXXX<br>
+      Account: XXXXXXXX</p>
+      <p style="margin-top: 16px;">Thank you for your business!</p>
+    </div>
+
+    <div class="footer">
+      Generated by Taksha Studio — Confidential
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,69 @@
+.intern-settings {
+  padding: var(--space-6);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.settings-section {
+  background: var(--color-surface);
+  border: 4px solid var(--color-ink);
+  box-shadow: 8px 8px 0 0 var(--color-ink);
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.settings-section-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.5rem;
+  margin-bottom: var(--space-4);
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--color-ink);
+  padding-bottom: var(--space-2);
+}
+
+.settings-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+  padding: var(--space-3);
+  border: 2px solid var(--color-ink);
+  background: var(--color-bg);
+}
+
+.settings-toggle-label {
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.toggle-switch {
+  width: 50px;
+  height: 26px;
+  background: var(--color-ink);
+  border-radius: 13px;
+  position: relative;
+  cursor: pointer;
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background: var(--color-surface);
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.toggle-switch--on {
+  background: var(--color-card-mint);
+  border: 2px solid var(--color-ink);
+}
+
+.toggle-switch--on::after {
+  left: 23px;
+  background: var(--color-ink);
+}

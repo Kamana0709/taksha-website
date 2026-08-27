@@ -1,0 +1,6 @@
+.services-list { display: flex; flex-direction: column; gap: var(--space-16); }
+.service-row { display: grid; grid-template-columns: 1fr; gap: var(--space-8); align-items: center; }
+@media (min-width: 768px) { .service-row { grid-template-columns: 1fr 1fr; } .service-row--reverse { direction: rtl; } .service-row--reverse > * { direction: ltr; } }
+.service-row__visual { aspect-ratio: 4/3; border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; }
+.service-row__content { display: flex; flex-direction: column; gap: var(--space-4); }
+.service-row__content h2 { margin-bottom: var(--space-2); }

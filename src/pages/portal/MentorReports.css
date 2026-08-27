@@ -1,0 +1,75 @@
+.mentor-reports {
+  padding: var(--space-6);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+}
+
+.report-card {
+  background: var(--color-surface);
+  border: 4px solid var(--color-ink);
+  box-shadow: 8px 8px 0 0 var(--color-ink);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+}
+
+.report-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+  border-bottom: 2px dashed var(--color-ink);
+  padding-bottom: var(--space-4);
+}
+
+.report-card__title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+/* Static Bar Chart for prototype */
+.mock-bar-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 200px;
+  border-left: 2px solid var(--color-ink);
+  border-bottom: 2px solid var(--color-ink);
+  padding: var(--space-2) 0;
+  margin-bottom: var(--space-4);
+}
+
+.mock-bar {
+  width: 40px;
+  background: var(--color-card-mint);
+  border: 2px solid var(--color-ink);
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.mock-bar:hover {
+  background: var(--color-accent);
+}
+
+.mock-bar span {
+  position: absolute;
+  bottom: -25px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.mock-bar strong {
+  position: absolute;
+  top: -25px;
+  font-size: 0.85rem;
+  font-weight: 900;
+}

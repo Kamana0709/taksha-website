@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taksha — Project Proposal</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS Variables matching Taksha Design System */
+        :root {
+            --color-bg: #FFFFFF;
+            --color-ink: #0F172A;
+            --color-text-secondary: #475569;
+            --color-text-tertiary: #94A3B8;
+            --color-border: #E2E8F0;
+            --color-accent: #F59E0B;
+            --color-surface: #F8FAFC;
+
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', -apple-system, sans-serif;
+        }
+
+        /* Reset & Base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: #f0f2f5;
+            color: var(--color-ink);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Page Layout for Print & Web Viewing */
+        .page {
+            background: var(--color-bg);
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 80px 100px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+            position: relative;
+            overflow: hidden;
+            min-height: 1100px; /* Approx A4 height */
+        }
+
+        /* Print Styles */
+        @media print {
+            body { background: none; }
+            .page {
+                margin: 0;
+                padding: 60px 80px;
+                box-shadow: none;
+                page-break-after: always;
+                min-height: auto;
+            }
+            .no-print { display: none; }
+        }
+
+        /* Typography */
+        h1, h2, h3, .display-text {
+            font-family: var(--font-display);
+            font-weight: 400;
+            color: var(--color-ink);
+        }
+
+        h1 { font-size: 48px; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 24px; }
+        h2 { font-size: 32px; line-height: 1.2; margin-bottom: 24px; border-bottom: 1px solid var(--color-border); padding-bottom: 16px; }
+        h3 { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
+        p { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 24px; }
+        
+        .eyebrow {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--color-accent);
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        /* Cover Page Specific */
+        .cover-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .logo-mark { color: var(--color-accent); }
+
+        .cover-content { margin-top: 200px; }
+        
+        .cover-meta {
+            margin-top: 100px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            border-top: 1px solid var(--color-border);
+            padding-top: 40px;
+        }
+        .meta-block strong {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-text-tertiary);
+            margin-bottom: 4px;
+        }
+        .meta-block span {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--color-ink);
+        }
+
+        /* Abstract Cover Shape */
+        .cover-shape {
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.02));
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Content Pages */
+        .content-wrap { position: relative; z-index: 1; }
+        
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+        }
+        th, td {
+            text-align: left;
+            padding: 16px;
+            border-bottom: 1px solid var(--color-border);
+            font-size: 14px;
+        }
+        th {
+            font-weight: 600;
+            color: var(--color-ink);
+            background: var(--color-surface);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        td { color: var(--color-text-secondary); }
+        .col-price { text-align: right; font-variant-numeric: tabular-nums; }
+        .row-total td {
+            font-weight: 600;
+            color: var(--color-ink);
+            border-bottom: none;
+            border-top: 2px solid var(--color-ink);
+        }
+
+        /* Grid Lists */
+        .phase-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        .phase-card {
+            background: var(--color-surface);
+            padding: 24px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+        }
+        .phase-card h3 { color: var(--color-accent); font-size: 16px; font-family: var(--font-body); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+        .phase-card h4 { font-family: var(--font-display); font-size: 24px; margin-bottom: 12px; font-weight: 400;}
+        .phase-card ul {
+            list-style: none;
+        }
+        .phase-card li {
+            position: relative;
+            padding-left: 20px;
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+        }
+        .phase-card li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--color-accent);
+        }
+
+        /* Footer */
+        .page-footer {
+            position: absolute;
+            bottom: 40px;
+            left: 100px;
+            right: 100px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--color-text-tertiary);
+            border-top: 1px solid var(--color-border);
+            padding-top: 16px;
+        }
+        
+        /* Utility */
+        .mb-2 { margin-bottom: 8px; }
+        .mb-4 { margin-bottom: 16px; }
+        .mb-8 { margin-bottom: 32px; }
+    </style>
+</head>
+<body>
+
+    <!-- PAGE 1: COVER -->
+    <div class="page cover-page">
+        <div class="cover-shape"></div>
+        
+        <div class="logo content-wrap">
+            <span class="logo-mark">T</span>aksha
+        </div>
+
+        <div class="cover-content content-wrap">
+            <span class="eyebrow">Project Proposal</span>
+            <h1>Digital Product Design & Development</h1>
+            <p style="font-size: 20px; max-width: 500px; color: var(--color-text-secondary);">
+                A comprehensive plan to design, architect, and engineer a best-in-class digital experience.
+            </p>
+        </div>
+
+        <div class="cover-meta content-wrap">
+            <div class="meta-block">
+                <strong>Prepared For</strong>
+                <span>[Client Name]<br>[Company Name]</span>
+            </div>
+            <div class="meta-block">
+                <strong>Prepared By</strong>
+                <span>Taksha Studio<br>hello@taksha.studio</span>
+            </div>
+            <div class="meta-block">
+                <strong>Date</strong>
+                <span>October 24, 2026</span>
+            </div>
+            <div class="meta-block">
+                <strong>Valid Until</strong>
+                <span>November 24, 2026</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 2: SUMMARY & APPROACH -->
+    <div class="page">
+        <div class="content-wrap">
+            <span class="eyebrow">01. Executive Summary</span>
+            <h2>The Objective</h2>
+            <p>
+                Based on our discovery conversations, [Company Name] is seeking to completely overhaul its digital presence. The current platform suffers from severe technical debt, outdated branding, and a user experience that creates friction during the conversion funnel.
+            </p>
+            <p>
+                Taksha will partner with your team to design and develop a premium, scalable web platform. Our goal is not just to refresh the aesthetics, but to rebuild the foundation using modern web architecture (React/Vite), ensuring blazing-fast performance, strict accessibility compliance, and a design language that positions you as an industry leader.
+            </p>
+
+            <span class="eyebrow" style="margin-top: 60px;">02. Our Approach</span>
+            <h2>How We Build</h2>
+            <div class="phase-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="phase-card" style="background: transparent;">
+                    <h4>Strategy First</h4>
+                    <p style="margin-bottom: 0;">We don't design in a vacuum. Every interface decision is backed by user research and your business goals.</p>
+                </div>
+                <div class="phase-card" style="background: transparent;">
+                    <h4>Premium Craft</h4>
+                    <p style="margin-bottom: 0;">We obsess over typography, spacing, and micro-interactions. The result is an experience that feels undeniably high-end.</p>
+                </div>
+                <div class="phase-card" style="background: transparent;">
+                    <h4>Engineering Rigor</h4>
+                    <p style="margin-bottom: 0;">Beautiful design means nothing if it's slow. We target 100/100 Lighthouse scores on every build.</p>
+                </div>
+                <div class="phase-card" style="background: transparent;">
+                    <h4>Transparent Process</h4>
+                    <p style="margin-bottom: 0;">No black boxes. You will have direct access to our Figma files and staging environments throughout the project.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="page-footer">
+            <span>Taksha Studio — Project Proposal</span>
+            <span>Page 2 of 4</span>
+        </div>
+    </div>
+
+    <!-- PAGE 3: SCOPE & TIMELINE -->
+    <div class="page">
+        <div class="content-wrap">
+            <span class="eyebrow">03. Scope of Work</span>
+            <h2>Project Phases</h2>
+            
+            <div class="phase-grid">
+                <div class="phase-card">
+                    <h3>Phase 1</h3>
+                    <h4>Discovery & Brand Alignment</h4>
+                    <ul>
+                        <li>Stakeholder interviews and competitor analysis</li>
+                        <li>Audience persona development</li>
+                        <li>Brand identity refinement (Typography, Color, Voice)</li>
+                        <li>Information Architecture (IA) and Sitemap</li>
+                    </ul>
+                </div>
+                <div class="phase-card">
+                    <h3>Phase 2</h3>
+                    <h4>UI/UX Design</h4>
+                    <ul>
+                        <li>Low-fidelity wireframes for core user flows</li>
+                        <li>High-fidelity interface design in Figma</li>
+                        <li>Interactive prototyping for stakeholder review</li>
+                        <li>Creation of a scalable Design System</li>
+                    </ul>
+                </div>
+                <div class="phase-card">
+                    <h3>Phase 3</h3>
+                    <h4>Frontend Engineering</h4>
+                    <ul>
+                        <li>Setup modern React/Vite architecture</li>
+                        <li>Pixel-perfect translation of Figma designs to code</li>
+                        <li>Implementation of GSAP/Framer Motion animations</li>
+                        <li>Performance optimization & WCAG AA Accessibility audit</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-footer">
+            <span>Taksha Studio — Project Proposal</span>
+            <span>Page 3 of 4</span>
+        </div>
+    </div>
+
+    <!-- PAGE 4: INVESTMENT & SIGN-OFF -->
+    <div class="page">
+        <div class="content-wrap">
+            <span class="eyebrow">04. Investment</span>
+            <h2>Pricing Estimate</h2>
+            <p>
+                This estimate covers the complete scope of work outlined in Phase 1 through 3. Any additional features or scope changes requested during the project will be estimated separately.
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Deliverable</th>
+                        <th>Timeline</th>
+                        <th class="col-price">Estimated Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Phase 1: Discovery & Strategy</strong><br>Research, IA, and Brand Alignment</td>
+                        <td>2 Weeks</td>
+                        <td class="col-price">$8,500</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phase 2: UI/UX Design</strong><br>Wireframes, High-Fidelity UI, Prototyping</td>
+                        <td>4 Weeks</td>
+                        <td class="col-price">$18,000</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phase 3: Frontend Engineering</strong><br>React/Vite build, Animations, QA</td>
+                        <td>5 Weeks</td>
+                        <td class="col-price">$24,500</td>
+                    </tr>
+                    <tr class="row-total">
+                        <td colspan="2" style="text-align: right;">Total Estimated Investment</td>
+                        <td class="col-price">$51,000</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <span class="eyebrow" style="margin-top: 60px;">05. Next Steps</span>
+            <h2>Approval & Kickoff</h2>
+            <p>
+                If this proposal aligns with your goals and budget, please sign below to indicate your approval. Upon signing, we will issue the Master Services Agreement (MSA) and an invoice for the 50% deposit to secure your spot in our production schedule.
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 60px;">
+                <div>
+                    <div style="border-bottom: 1px solid var(--color-border); height: 40px; margin-bottom: 8px;"></div>
+                    <span style="font-size: 12px; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.05em;">Authorized Signature (Client)</span>
+                </div>
+                <div>
+                    <div style="border-bottom: 1px solid var(--color-border); height: 40px; margin-bottom: 8px;"></div>
+                    <span style="font-size: 12px; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.05em;">Date</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-footer">
+            <span>Taksha Studio — Project Proposal</span>
+            <span>Page 4 of 4</span>
+        </div>
+    </div>
+
+</body>
+</html>

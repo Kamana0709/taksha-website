@@ -1,0 +1,207 @@
+/* ==========================================================================
+   GLOBAL STYLES — Layout utilities, containers, grid, accessibility
+   PRD §7.5, §7.12, §22.6
+   ========================================================================== */
+
+/* -----------------------------------------------------------------------
+   Skip Link (Accessibility — PRD §22.6)
+   First focusable element in the DOM
+   ----------------------------------------------------------------------- */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-4);
+  z-index: 9999;
+  padding: var(--space-3) var(--space-6);
+  background: var(--color-ink);
+  color: var(--color-bg);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: top var(--duration-fast) ease;
+}
+
+.skip-link:focus {
+  top: var(--space-4);
+}
+
+/* -----------------------------------------------------------------------
+   Container — PRD §7.5
+   ----------------------------------------------------------------------- */
+.container {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-padding-mobile);
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-inline: var(--container-padding-desktop);
+  }
+}
+
+/* -----------------------------------------------------------------------
+   12-Column Grid — PRD §7.5
+   ----------------------------------------------------------------------- */
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), 1fr);
+  gap: var(--grid-gap);
+}
+
+/* -----------------------------------------------------------------------
+   Section Spacing
+   ----------------------------------------------------------------------- */
+.section {
+  padding-block: var(--space-24);
+}
+
+.section--lg {
+  padding-block: var(--space-32);
+}
+
+.section--sm {
+  padding-block: var(--space-16);
+}
+
+@media (max-width: 767px) {
+  .section {
+    padding-block: var(--space-16);
+  }
+  .section--lg {
+    padding-block: var(--space-24);
+  }
+  .section--sm {
+    padding-block: var(--space-12);
+  }
+}
+
+/* -----------------------------------------------------------------------
+   Focus States — PRD §7.12
+   Every interactive element MUST have visible :focus-visible
+   ----------------------------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* For elements that use box-shadow focus instead */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* -----------------------------------------------------------------------
+   Utility Classes
+   ----------------------------------------------------------------------- */
+
+/* Visually hidden but accessible to screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Text alignment */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+/* Flex utilities */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-end { justify-content: flex-end; }
+.gap-1 { gap: var(--space-1); }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-6 { gap: var(--space-6); }
+.gap-8 { gap: var(--space-8); }
+
+/* Max-width content containers */
+.content-narrow {
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.content-medium {
+  max-width: 960px;
+  margin-inline: auto;
+}
+
+/* -----------------------------------------------------------------------
+   App Root
+   ----------------------------------------------------------------------- */
+body {
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image: radial-gradient(var(--color-border) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+  opacity: 0.2;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+/* -----------------------------------------------------------------------
+   Selection Color
+   ----------------------------------------------------------------------- */
+::selection {
+  background-color: var(--color-accent-soft);
+  color: var(--color-text-primary);
+}
+
+/* -----------------------------------------------------------------------
+   Scrollbar Styling (subtle, branded)
+   ----------------------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) var(--color-bg);
+}

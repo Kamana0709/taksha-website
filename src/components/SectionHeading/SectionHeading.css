@@ -1,0 +1,45 @@
+/* ==========================================================================
+   SECTION HEADING — Eyebrow + Heading + optional Subhead
+   PRD §7.9 — Used across all pages
+   ========================================================================== */
+
+.section-heading {
+  margin-bottom: var(--space-12);
+}
+
+.section-heading--center {
+  text-align: center;
+}
+
+.section-heading__eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: var(--space-4);
+  display: block;
+}
+
+.section-heading__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw + 0.5rem, 3rem);
+  line-height: var(--line-height-snug);
+  letter-spacing: var(--tracking-tight);
+  font-weight: 400;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.section-heading__subtitle {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-secondary);
+  max-width: 640px;
+}
+
+.section-heading--center .section-heading__subtitle {
+  margin-inline: auto;
+}

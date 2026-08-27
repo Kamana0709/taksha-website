@@ -1,0 +1,54 @@
+/* ==========================================================================
+   SKELETON — Shimmer loading placeholder
+   PRD §7.9, §8.4
+   ========================================================================== */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-border) 25%,
+    var(--color-surface) 50%,
+    var(--color-border) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+.skeleton--text {
+  height: 1em;
+  width: 100%;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton--title {
+  height: 1.5em;
+  width: 60%;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton--image {
+  aspect-ratio: 4/3;
+  width: 100%;
+}
+
+.skeleton--circle {
+  border-radius: 50%;
+}
+
+.skeleton--button {
+  height: 48px;
+  width: 160px;
+  border-radius: var(--radius-full);
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

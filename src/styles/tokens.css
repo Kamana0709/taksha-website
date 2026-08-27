@@ -1,0 +1,124 @@
+/* ==========================================================================
+   DESIGN TOKENS — Taksha Design System (Neo-Brutalist Theme)
+   Source of truth: PRD §7.2–7.8, §8.2
+   ========================================================================== */
+
+:root {
+  /* -----------------------------------------------------------------------
+     7.2 Color Tokens — Brand Theme (Neo-Brutalist)
+     ----------------------------------------------------------------------- */
+  --color-bg: #FAF9F6;
+  --color-surface: #FFFFFF;
+  --color-surface-translucent: rgba(250, 249, 246, 0.95);
+  --color-ink: #000000;
+  --color-text-primary: #000000;
+  --color-text-secondary: #333333;
+  --color-text-tertiary: #666666;
+  
+  /* Thick black borders are a hallmark of neo-brutalism */
+  --color-border: #000000;
+  --color-border-strong: #000000;
+
+  /* Accent — Bright Yellow */
+  --color-accent: #FFC107;
+  --color-accent-hover: #FFB300;
+  --color-accent-soft: #FFECB3;
+  
+  /* Pastel Card Backgrounds */
+  --color-card-mint: #A7E4D0;
+  --color-card-lilac: #C4B5FD;
+  --color-card-yellow: #FDE68A;
+  --color-card-blue: #93C5FD;
+
+  /* Semantic */
+  --color-success: #10B981;
+  --color-error: #EF4444;
+  --color-warning: #FFC107;
+
+  /* -----------------------------------------------------------------------
+     7.3 Typography Scale
+     ----------------------------------------------------------------------- */
+  --font-display: "Outfit", sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --text-xs: 0.6875rem;   /* 11px */
+  --text-sm: 0.8125rem;   /* 13px */
+  --text-base: 0.9375rem; /* 15px */
+  --text-md: 1rem;        /* 16px */
+  --text-lg: 1.125rem;    /* 18px */
+  --text-xl: 1.5rem;      /* 24px */
+  --text-2xl: 1.875rem;   /* 30px */
+  --text-3xl: 2.5rem;     /* 40px */
+  --text-4xl: 3.25rem;    /* 52px */
+  --text-5xl: 4.5rem;     /* 72px */
+
+  --line-height-tight: 1.1;
+  --line-height-snug: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.6;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.04em;
+
+  /* -----------------------------------------------------------------------
+     7.4 Spacing System (8px base grid)
+     ----------------------------------------------------------------------- */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.375rem;  /* 6px */
+  --space-3: 0.5rem;    /* 8px */
+  --space-4: 0.75rem;   /* 12px */
+  --space-6: 1.125rem;  /* 18px */
+  --space-8: 1.5rem;    /* 24px */
+  --space-12: 2.25rem;  /* 36px */
+  --space-16: 3rem;     /* 48px */
+  --space-24: 4.5rem;   /* 72px */
+  --space-32: 6rem;     /* 96px */
+  --space-48: 9rem;     /* 144px */
+
+  /* -----------------------------------------------------------------------
+     7.5 Grid System & Containers
+     ----------------------------------------------------------------------- */
+  --container-max: 1440px;
+  --container-padding-desktop: 5vw;
+  --container-padding-mobile: 24px;
+  --grid-columns: 12;
+  --grid-gap: 24px;
+
+  /* -----------------------------------------------------------------------
+     7.7 Elevation & Shadows (Neo-Brutalist Solid Shadows)
+     ----------------------------------------------------------------------- */
+  --shadow-sm: 2px 2px 0px 0px #000000;
+  --shadow-md: 4px 4px 0px 0px #000000;
+  --shadow-lg: 8px 8px 0px 0px #000000;
+  --shadow-focus: 0 0 0 3px #000000;
+  --shadow-glow: none;
+  
+  --border-width: 2px;
+  --border-thick: 3px;
+
+  /* -----------------------------------------------------------------------
+     7.8 Border Radius (Sharp for Brutalism)
+     ----------------------------------------------------------------------- */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-full: 999px; /* Only used for perfectly circular elements */
+
+  /* -----------------------------------------------------------------------
+     8.2 Motion Tokens
+     ----------------------------------------------------------------------- */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --duration-fast: 150ms;
+  --duration-base: 300ms;
+  --duration-slow: 500ms;
+  --duration-slower: 800ms;
+
+  --stagger-tight: 40ms;
+  --stagger-base: 80ms;
+  --stagger-loose: 120ms;
+}

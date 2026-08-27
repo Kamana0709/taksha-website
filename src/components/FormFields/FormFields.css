@@ -1,0 +1,158 @@
+/* ==========================================================================
+   FORM FIELDS — Input, Textarea, Select
+   PRD §7.11 — Forms detailed spec
+   ========================================================================== */
+
+/* Shared field wrapper */
+.field {
+  margin-bottom: var(--space-6);
+  position: relative;
+}
+
+.field__label {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2);
+  display: block;
+  transition: color var(--duration-fast) ease;
+}
+
+.field--focused .field__label {
+  color: var(--color-accent);
+}
+
+.field--error .field__label {
+  color: var(--color-error);
+}
+
+/* Required indicator */
+.field__required {
+  color: var(--color-error);
+  margin-left: var(--space-1);
+}
+
+/* Base input styles */
+.field__input,
+.field__textarea,
+.field__select {
+  width: 100%;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  transition: 
+    border-color var(--duration-fast) ease, 
+    box-shadow var(--duration-fast) ease;
+  appearance: none;
+}
+
+.field__input::placeholder,
+.field__textarea::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* Focus state */
+.field__input:focus,
+.field__textarea:focus,
+.field__select:focus {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-focus);
+  outline: none;
+}
+
+/* Error state */
+.field--error .field__input,
+.field--error .field__textarea,
+.field--error .field__select {
+  border-color: var(--color-error);
+  border-left-width: 3px;
+}
+
+.field--error .field__input:focus,
+.field--error .field__textarea:focus,
+.field--error .field__select:focus {
+  box-shadow: 0 0 0 3px rgba(176, 57, 47, 0.15);
+}
+
+/* Success state */
+.field--success .field__input,
+.field--success .field__textarea,
+.field--success .field__select {
+  border-color: var(--color-success);
+}
+
+/* Error text */
+.field__error {
+  color: var(--color-error);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  margin-top: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+/* Helper text */
+.field__helper {
+  color: var(--color-text-tertiary);
+  font-size: var(--text-xs);
+  margin-top: var(--space-2);
+}
+
+/* Textarea specific */
+.field__textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: var(--line-height-normal);
+}
+
+/* Select specific */
+.field__select-wrapper {
+  position: relative;
+}
+
+.field__select {
+  cursor: pointer;
+  padding-right: var(--space-12);
+}
+
+.field__select-icon {
+  position: absolute;
+  right: var(--space-4);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+}
+
+/* Character count for textarea */
+.field__char-count {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  text-align: right;
+  margin-top: var(--space-1);
+}
+
+.field__char-count--warning {
+  color: var(--color-warning);
+}
+
+.field__char-count--error {
+  color: var(--color-error);
+}
+
+/* Disabled state */
+.field__input:disabled,
+.field__textarea:disabled,
+.field__select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--color-bg);
+}

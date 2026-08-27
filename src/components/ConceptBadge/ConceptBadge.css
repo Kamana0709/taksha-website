@@ -1,0 +1,38 @@
+/* ==========================================================================
+   CONCEPT BADGE — Mandatory "Concept Project" pill
+   PRD §7.9 — Applied to every project reference sitewide
+   Non-removable, enforces transparency mandate (§2.13)
+   ========================================================================== */
+
+.concept-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.concept-badge--lg {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.concept-badge__icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.concept-badge--lg .concept-badge__icon {
+  width: 14px;
+  height: 14px;
+}

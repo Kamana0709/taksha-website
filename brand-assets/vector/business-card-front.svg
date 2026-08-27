@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 600" width="1050" height="600">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#0F172A" />
+      <stop offset="100%" stopColor="#0A0F1C" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#F59E0B" />
+      <stop offset="100%" stopColor="#D97706" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1050" height="600" fill="url(#bgGrad)" />
+
+  <!-- Abstract Mark (Carved Shape) -->
+  <g transform="translate(525, 300) scale(1.5)">
+    <!-- Outer -->
+    <polygon points="0,-45 40,20 -40,20" fill="none" stroke="url(#accentGrad)" stroke-width="2" opacity="0.8"/>
+    <!-- Inner -->
+    <polygon points="0,-20 20,10 -20,10" fill="url(#accentGrad)" opacity="1"/>
+    <!-- Bottom diamond -->
+    <polygon points="0,25 15,40 0,55 -15,40" fill="url(#accentGrad)" opacity="0.5"/>
+  </g>
+
+  <!-- Typography -->
+  <text x="525" y="440" font-family="'Fraunces', serif" font-size="32" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="4">TAKSHA</text>
+  <text x="525" y="480" font-family="'Inter', sans-serif" font-size="12" font-weight="400" fill="#94A3B8" text-anchor="middle" letter-spacing="6">DIGITAL CRAFT STUDIO</text>
+</svg>

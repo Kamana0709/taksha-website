@@ -1,0 +1,120 @@
+.service-detail {
+  width: 100%;
+}
+
+.service-hero {
+  padding-top: calc(var(--space-24) + 64px);
+  padding-bottom: var(--space-16);
+}
+
+.service-hero__content {
+  max-width: 800px;
+}
+
+.service-hero__tagline {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-4);
+  line-height: 1.4;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-12);
+}
+
+@media (min-width: 768px) {
+  .service-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-16);
+  }
+}
+
+.service-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-6) 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.service-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font-size: var(--font-size-md);
+  color: var(--color-text);
+}
+
+.service-list__icon {
+  color: var(--color-accent);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.service-list--bordered li {
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.service-list--bordered li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.timeline-card {
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-card__icon {
+  color: var(--color-accent);
+  margin-bottom: var(--space-6);
+}
+
+.timeline-card__note {
+  margin-top: auto;
+  padding-top: var(--space-6);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+.service-faqs-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.service-faqs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin-top: var(--space-12);
+}
+
+.faq-item__q {
+  margin-bottom: var(--space-2);
+  color: var(--color-text);
+}
+
+.faq-item__a {
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.service-cta {
+  background: linear-gradient(to bottom, transparent, var(--color-surface));
+}
+
+.text-center {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

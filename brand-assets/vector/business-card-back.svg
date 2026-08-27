@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 600" width="1050" height="600">
+  <defs>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#F59E0B" />
+      <stop offset="100%" stopColor="#D97706" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1050" height="600" fill="#FAFAF9" />
+  
+  <!-- Subtle Grid Pattern -->
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#E2E8F0" stroke-width="0.5"/>
+  </pattern>
+  <rect width="1050" height="600" fill="url(#grid)" />
+
+  <!-- Left Sidebar / Brand Bar -->
+  <rect width="20" height="600" fill="url(#accentGrad)" />
+
+  <!-- Name & Title -->
+  <text x="120" y="240" font-family="'Fraunces', serif" font-size="42" font-weight="600" fill="#0F172A" letter-spacing="1">Founder Name</text>
+  <text x="120" y="280" font-family="'Inter', sans-serif" font-size="16" font-weight="500" fill="#F59E0B" letter-spacing="3">CREATIVE DIRECTOR</text>
+
+  <!-- Contact Info Group -->
+  <g font-family="'Inter', sans-serif" font-size="14" fill="#64748B" transform="translate(120, 360)">
+    <!-- Email -->
+    <text x="0" y="0">E: hello@taksha.studio</text>
+    <!-- Web -->
+    <text x="0" y="30">W: taksha.studio</text>
+    <!-- Phone -->
+    <text x="0" y="60">P: +1 (555) 123-4567</text>
+    <!-- Social -->
+    <text x="0" y="90">S: @taksha.studio</text>
+  </g>
+
+  <!-- Minimal Logo on right -->
+  <g transform="translate(850, 260) scale(0.8)">
+    <polygon points="0,-45 40,20 -40,20" fill="none" stroke="#0F172A" stroke-width="2"/>
+    <polygon points="0,-20 20,10 -20,10" fill="#0F172A"/>
+    <text x="0" y="70" font-family="'Fraunces', serif" font-size="20" font-weight="600" fill="#0F172A" text-anchor="middle" letter-spacing="2">TAKSHA</text>
+  </g>
+</svg>

@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String
+  name          String
+  role          String   // 'INTERN' or 'MENTOR'
+  track         String?  // e.g., 'Frontend'
+  progress      Int?     @default(0)
+  status        String?  @default("On Track")
+  
+  // Relations
+  mentorId      String?
+  mentor        User?    @relation("MentorInterns", fields: [mentorId], references: [id])
+  interns       User[]   @relation("MentorInterns")
+  
+  assignedTasks Task[]   @relation("TaskAssignee")
+  createdTasks  Task[]   @relation("TaskAssigner")
+  announcements Announcement[]
+}
+
+model Task {
+  id             String   @id @default(uuid())
+  title          String
+  project        String
+  priority       String   @default("Medium")
+  status         String   @default("TODO") // TODO, IN_PROGRESS, REVIEW, DONE, CHANGES_REQUESTED
+  date           String   // Storing as string to match current frontend format
+  submissionLink String?
+  feedback       String?
+  
+  assigneeId     String
+  assignee       User     @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  
+  assignerId     String
+  assigner       User     @relation("TaskAssigner", fields: [assignerId], references: [id])
+}
+
+model Announcement {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  date      String
+  
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+}

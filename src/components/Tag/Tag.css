@@ -1,0 +1,89 @@
+/* ==========================================================================
+   TAG / FILTER PILL — Category filters on Work page
+   ========================================================================== */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: var(--border-thick) solid var(--color-ink);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  box-shadow: 2px 2px 0 0 var(--color-ink);
+  text-transform: uppercase;
+}
+
+/* Filter Pill — interactive variant */
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: var(--border-thick) solid var(--color-ink);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 2px 2px 0 0 var(--color-ink);
+  transition: 
+    background-color 100ms ease,
+    transform 100ms ease,
+    box-shadow 100ms ease;
+}
+
+.filter-pill:hover {
+  background: var(--color-accent-soft);
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 0 var(--color-ink);
+}
+
+.filter-pill[aria-pressed="true"],
+.filter-pill--active {
+  background: var(--color-accent);
+  color: var(--color-ink);
+}
+
+.filter-pill[aria-pressed="true"]:hover,
+.filter-pill--active:hover {
+  background: var(--color-accent-hover);
+}
+
+.filter-pill:focus-visible {
+  outline: 4px solid var(--color-accent-soft);
+}
+
+.filter-pill:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+/* Filter bar container */
+.filter-bar {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding-bottom: var(--space-8);
+}
+
+.filter-bar--scrollable {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: var(--space-4);
+}
+
+.filter-bar--scrollable::-webkit-scrollbar {
+  display: none;
+}

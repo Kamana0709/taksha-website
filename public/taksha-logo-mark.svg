@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" fill="none">
+  <!--
+    Taksha "T" Logo Mark — Accurate trace
+    The T consists of 3 dark segments (navy) separated by 2 diagonal white gaps,
+    plus 1 amber accent triangle in the upper-right notch.
+    
+    Structure:
+    - Piece 1: Top crossbar (trapezoid shape, diagonal left edge)
+    - Piece 2: Upper-left stem (parallelogram between the two diagonal cuts)
+    - Piece 3: Lower-left stem (parallelogram, extends to bottom)
+    - Accent: Amber right-triangle in the notch
+  -->
+
+  <!-- Piece 1: Top crossbar — wide bar across the top with left diagonal edge -->
+  <polygon points="28,0 98,0 98,28 50,28" fill="currentColor"/>
+
+  <!-- Piece 2: Upper-left portion — between the two diagonal slash gaps -->
+  <polygon points="4,18 28,0 50,28 50,56 28,34 4,34" fill="currentColor"/>
+
+  <!-- Piece 3: Lower stem — the bottom portion of the vertical stroke -->
+  <polygon points="4,50 28,38 50,60 50,120 28,98 4,98" fill="currentColor"/>
+
+  <!-- Accent triangle: Amber/Yellow triangle in the upper-right notch -->
+  <polygon points="54,28 98,28 54,72" fill="#F59E0B"/>
+</svg>

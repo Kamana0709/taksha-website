@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Taksha Proposal Template</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    @page { size: A4; margin: 0; }
+    body { font-family: 'Inter', sans-serif; color: #334155; margin: 0; padding: 0; background: #fff; line-height: 1.6; }
+    .page { width: 210mm; min-height: 297mm; margin: 0 auto; padding: 40mm 25mm 25mm 25mm; box-sizing: border-box; position: relative; page-break-after: always; }
+    .cover { background: #0F172A; color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 40mm; }
+    
+    .accent-bar { width: 80px; height: 8px; background: #F59E0B; margin-bottom: 40px; }
+    h1, h2, h3 { font-family: 'Outfit', sans-serif; margin: 0; font-weight: 600; }
+    .cover h1 { font-size: 56px; line-height: 1.1; margin-bottom: 24px; color: #fff; }
+    .cover p { font-size: 18px; color: #94A3B8; margin-bottom: 8px; }
+    
+    .top-bar { position: absolute; top: 0; left: 0; width: 100%; height: 20px; background: #0F172A; }
+    .top-accent { position: absolute; top: 20px; left: 0; width: 30%; height: 8px; background: #F59E0B; }
+    
+    .content h2 { font-size: 32px; color: #0F172A; margin-bottom: 24px; border-bottom: 2px solid #E2E8F0; padding-bottom: 12px; }
+    .content h3 { font-size: 20px; color: #F59E0B; margin-top: 32px; margin-bottom: 12px; }
+    .content p { margin-bottom: 16px; }
+    
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 32px; }
+    .card { background: #F8FAFC; padding: 24px; border-radius: 8px; border-left: 4px solid #F59E0B; }
+    .card h4 { margin: 0 0 12px 0; font-size: 16px; color: #0F172A; }
+    
+    .footer { position: absolute; bottom: 25mm; left: 25mm; right: 25mm; font-size: 10px; color: #94A3B8; border-top: 1px solid #E2E8F0; padding-top: 16px; display: flex; justify-content: space-between; }
+  </style>
+</head>
+<body>
+  
+  <!-- Cover Page -->
+  <div class="page cover">
+    <div class="accent-bar"></div>
+    <h1>Project<br>Proposal</h1>
+    <div style="margin-top: 60px;">
+      <p style="color: #fff; font-weight: 600;">Prepared for:</p>
+      <p>Client Company Name</p>
+    </div>
+    <div style="margin-top: 40px;">
+      <p style="color: #fff; font-weight: 600;">Prepared by:</p>
+      <p>Taksha Digital Craft Studio</p>
+      <p>October 2025</p>
+    </div>
+  </div>
+
+  <!-- Content Page -->
+  <div class="page content">
+    <div class="top-bar"></div>
+    <div class="top-accent"></div>
+    
+    <h2>Project Overview</h2>
+    <p>Based on our discovery calls, we understand that you are looking to elevate your digital presence through a complete brand refresh and a high-performance web application. Taksha will provide end-to-end design and engineering to achieve these goals.</p>
+    
+    <h3>The Challenge</h3>
+    <p>Your current platform lacks the premium aesthetic required to attract enterprise clients, and the frontend architecture is suffering from slow load times and accessibility issues.</p>
+    
+    <h3>Our Approach</h3>
+    <div class="grid">
+      <div class="card">
+        <h4>1. Brand Identity</h4>
+        <p>Developing a scalable visual system including typography, color tokens, and logo refinements that reflect a premium market position.</p>
+      </div>
+      <div class="card">
+        <h4>2. UI/UX Design</h4>
+        <p>Creating high-fidelity, interactive prototypes in Figma focusing on conversion-optimized user flows and WCAG AA accessibility.</p>
+      </div>
+      <div class="card">
+        <h4>3. Frontend Engineering</h4>
+        <p>Building the approved designs using React, Vite, and GSAP for fluid, performant animations targeting 95+ Lighthouse scores.</p>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <span>Taksha Studio — Project Proposal</span>
+      <span>Page 2</span>
+    </div>
+  </div>
+</body>
+</html>

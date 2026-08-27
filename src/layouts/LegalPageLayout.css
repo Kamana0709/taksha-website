@@ -1,0 +1,126 @@
+.legal-page {
+  width: 100%;
+}
+
+.legal-hero {
+  padding-top: calc(var(--space-24) + 64px);
+  padding-bottom: var(--space-12);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-12);
+}
+
+.legal-updated {
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-4);
+}
+
+.legal-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-12);
+}
+
+@media (min-width: 768px) {
+  .legal-layout {
+    grid-template-columns: 240px 1fr;
+    gap: var(--space-16);
+  }
+}
+
+.legal-sidebar {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .legal-sidebar {
+    display: block;
+  }
+}
+
+.legal-nav {
+  position: sticky;
+  top: 120px;
+}
+
+.legal-nav h3 {
+  margin-bottom: var(--space-4);
+  color: var(--color-text-secondary);
+}
+
+.legal-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.legal-nav-list a {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  font-size: var(--font-size-sm);
+  display: block;
+}
+
+.legal-nav-list a:hover {
+  color: var(--color-text);
+}
+
+.legal-nav-list a.is-active {
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+.legal-content {
+  max-width: 720px;
+}
+
+.legal-content h2 {
+  font-size: var(--font-size-xl);
+  margin-top: var(--space-12);
+  margin-bottom: var(--space-6);
+  color: var(--color-text);
+}
+
+.legal-content h2:first-child {
+  margin-top: 0;
+}
+
+.legal-content h3 {
+  font-size: var(--font-size-lg);
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-4);
+}
+
+.legal-content p {
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--space-4);
+}
+
+.legal-content ul,
+.legal-content ol {
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--space-6);
+  padding-left: var(--space-6);
+}
+
+.legal-content li {
+  margin-bottom: var(--space-2);
+}
+
+.legal-content a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.legal-content a:hover {
+  text-decoration-color: currentColor;
+}
