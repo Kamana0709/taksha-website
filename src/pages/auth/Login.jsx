@@ -32,64 +32,49 @@ export default function Login() {
   return (
     <>
       <SEO title="Taksha Workspace | Login" />
-      <div className="auth-page">
-        <div className="auth-page__left">
-          <h1 className="auth-page__title">
-            WELCOME TO <br />
-            <span className="auth-page__title-highlight">TAKSHA</span>
-          </h1>
-          <p className="auth-page__description">
-            Sign in to access your personalized workspace. Track your internship tasks, submit projects, and review feedback.
-          </p>
+      <div className="auth-card" style={{ padding: 0 }}>
+        <div className="auth-banner">
+          AUTHORIZED PERSONNEL ONLY
         </div>
-        
-        <div className="auth-page__right">
-          <div className="auth-card" style={{ padding: 0 }}>
-            
-            <div className="auth-banner">
-              AUTHORIZED PERSONNEL ONLY
+
+        <div style={{ padding: 'var(--space-8)' }}>
+          {error && <div style={{ color: 'var(--color-card-pink)', marginBottom: 'var(--space-4)', fontWeight: 800, textAlign: 'center' }}>{error}</div>}
+          <form className="auth-form" onSubmit={handleLogin}>
+            <div className="auth-form__group">
+              <label className="auth-form__label" htmlFor="email">EMAIL</label>
+              <input 
+                id="email"
+                type="text" 
+                className="auth-form__input" 
+                placeholder="you@taksha.in"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required 
+              />
             </div>
 
-            <div style={{ padding: 'var(--space-8)' }}>
-              {error && <div style={{ color: 'var(--color-card-pink)', marginBottom: 'var(--space-4)', fontWeight: 800, textAlign: 'center' }}>{error}</div>}
-              <form className="auth-form" onSubmit={handleLogin}>
-                <div className="auth-form__group">
-                  <label className="auth-form__label" htmlFor="email">EMAIL</label>
-                  <input 
-                    id="email"
-                    type="text" 
-                    className="auth-form__input" 
-                    placeholder="you@taksha.in"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required 
-                  />
-                </div>
-
-                <div className="auth-form__group" style={{ marginTop: 'var(--space-4)' }}>
-                  <label className="auth-form__label" htmlFor="password">PASSWORD</label>
-                  <input 
-                    id="password"
-                    type="password" 
-                    className="auth-form__input" 
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required 
-                  />
-                </div>
-
-                <button 
-                  type="submit" 
-                  className="auth-form__submit"
-                  disabled={isLoading}
-                  style={{ marginTop: 'var(--space-8)' }}
-                >
-                  {isLoading ? '...' : 'LOGIN'}
-                </button>
-              </form>
+            <div className="auth-form__group" style={{ marginTop: 'var(--space-4)' }}>
+              <label className="auth-form__label" htmlFor="password">PASSWORD</label>
+              <input 
+                id="password"
+                type="password" 
+                className="auth-form__input" 
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required 
+              />
             </div>
-          </div>
+
+            <button 
+              type="submit" 
+              className="auth-form__submit"
+              disabled={isLoading}
+              style={{ marginTop: 'var(--space-8)' }}
+            >
+              {isLoading ? '...' : 'LOGIN'}
+            </button>
+          </form>
         </div>
       </div>
     </>
