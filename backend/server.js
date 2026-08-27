@@ -4,12 +4,14 @@ const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { PrismaClient } = require('@prisma/client');
+const { Resend } = require('resend');
 const path = require('path');
 
 dotenv.config();
 
 const app = express();
 const prisma = new PrismaClient();
+const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_123');
 app.use(cors());
 app.use(express.json());
 
@@ -175,6 +177,52 @@ app.post('/api/announcements', authenticateToken, async (req, res) => {
     res.json(announcement);
   } catch (err) {
     res.status(500).json({ error: 'Failed to create announcement' });
+  }
+});
+
+// --- APPLICATIONS API ---
+app.post('/api/applications', async (req, res) => {
+  try {
+    const { name, email, portfolio, message, roleId, roleTitle } = req.body;
+    
+    // 1. Save to Database
+    const application = await prisma.application.create({
+      data: {
+        name,
+        email,
+        portfolio,
+        message,
+        roleId,
+        roleTitle,
+        date: new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })
+      }
+    });
+
+    // 2. Send Email Notification
+    const { data: emailData, error } = await resend.emails.send({
+      from: 'Taksha Careers <website@taksha.studio>',
+      to: 'takshadigital@gmail.com',
+      subject: `New Application: ${name} for ${roleTitle}`,
+      html: `
+        <h2>New Job Application</h2>
+        <p><strong>Role:</strong> ${roleTitle} (${roleId})</p>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+        <p><strong>Portfolio/LinkedIn:</strong> <a href="${portfolio}">${portfolio}</a></p>
+        <h3>Message/Cover Letter:</h3>
+        <p>${message.replace(/\n/g, '<br/>')}</p>
+      `
+    });
+
+    if (error) {
+      console.error('Email failed to send, but application was saved.', error);
+      // We still return success since it's in the DB
+    }
+
+    res.status(201).json({ success: true, application });
+  } catch (err) {
+    console.error('Failed to submit application:', err);
+    res.status(500).json({ error: 'Failed to submit application' });
   }
 });
 

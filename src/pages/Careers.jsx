@@ -112,6 +112,8 @@ const BENEFITS = [
 export default function Careers() {
   const [selectedRole, setSelectedRole] = React.useState(null);
   const [isApplied, setIsApplied] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [errorMsg, setErrorMsg] = React.useState('');
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 1, 0.5, 1] } }
@@ -312,13 +314,46 @@ export default function Careers() {
 
                   <div className="role-modal__apply">
                     <h3 className="apply-title">Apply Now</h3>
-                    <form className="apply-form" onSubmit={(e) => { e.preventDefault(); setIsApplied(true); }}>
-                      <input type="text" placeholder="Full Name" className="form-input" required />
-                      <input type="email" placeholder="Email Address" className="form-input" required />
-                      <input type="url" placeholder="Portfolio / LinkedIn URL" className="form-input" required />
-                      <textarea placeholder="Why are you a good fit?" className="form-textarea" rows="3" required></textarea>
-                      <button type="submit" className="btn btn--primary" style={{ background: 'var(--color-ink)', color: 'var(--color-bg)' }}>
-                        Submit Application <ArrowRight size={18} />
+                    <form className="apply-form" onSubmit={async (e) => { 
+                      e.preventDefault(); 
+                      setIsSubmitting(true);
+                      setErrorMsg('');
+                      
+                      const formData = new FormData(e.target);
+                      const data = {
+                        name: formData.get('name'),
+                        email: formData.get('email'),
+                        portfolio: formData.get('portfolio'),
+                        message: formData.get('message'),
+                        roleId: selectedRole.id,
+                        roleTitle: selectedRole.title
+                      };
+
+                      try {
+                        const response = await fetch('/api/applications', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify(data)
+                        });
+                        
+                        if (response.ok) {
+                          setIsApplied(true);
+                        } else {
+                          setErrorMsg('Failed to submit application. Please try again later.');
+                        }
+                      } catch (err) {
+                        setErrorMsg('Network error. Please try again.');
+                      } finally {
+                        setIsSubmitting(false);
+                      }
+                    }}>
+                      <input type="text" name="name" placeholder="Full Name" className="form-input" required />
+                      <input type="email" name="email" placeholder="Email Address" className="form-input" required />
+                      <input type="url" name="portfolio" placeholder="Portfolio / LinkedIn URL" className="form-input" required />
+                      <textarea name="message" placeholder="Why are you a good fit?" className="form-textarea" rows="3" required></textarea>
+                      {errorMsg && <p style={{ color: 'red', fontSize: '14px', margin: 0 }}>{errorMsg}</p>}
+                      <button type="submit" className="btn btn--primary" style={{ background: 'var(--color-ink)', color: 'var(--color-bg)' }} disabled={isSubmitting}>
+                        {isSubmitting ? 'Submitting...' : <>Submit Application <ArrowRight size={18} /></>}
                       </button>
                     </form>
                   </div>
