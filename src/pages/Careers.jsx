@@ -336,7 +336,7 @@ export default function Careers() {
             </div>
           </div>
         </div>
-      )}>
+      )}
       
       {/* Portal Access Section */}
       <section className="container section-padding" style={{ borderTop: '2px dashed var(--color-ink)', marginTop: 'var(--space-12)', textAlign: 'center' }}>
