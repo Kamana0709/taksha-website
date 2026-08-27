@@ -38,9 +38,31 @@ export default function PortalLayout({ role = 'intern' }) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isNotifOpen, setNotifOpen] = useState(false);
   const [isProfileOpen, setProfileOpen] = useState(false);
+  const [applications, setApplications] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+
+  useEffect(() => {
+    if (role === 'mentor') {
+      const fetchApps = async () => {
+        try {
+          const token = localStorage.getItem('taksha_token');
+          const res = await fetch('/api/applications', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setApplications(data);
+          }
+        } catch (e) {
+          console.error("Failed to fetch applications for notifications", e);
+        }
+      };
+      fetchApps();
+    }
+  }, [role, location.pathname]); // Refresh when navigating
+
 
   const NAV_LINKS = role === 'mentor' ? MENTOR_NAV_LINKS : INTERN_NAV_LINKS;
   
@@ -173,24 +195,40 @@ export default function PortalLayout({ role = 'intern' }) {
                 onClick={() => { setNotifOpen(!isNotifOpen); setProfileOpen(false); }}
               >
                 <Bell size={20} strokeWidth={2.5} />
-                <span className="portal-header__badge">3</span>
+                <span className="portal-header__badge">{role === 'mentor' ? applications.length : 3}</span>
               </button>
               
               {isNotifOpen && (
                 <div className="portal-dropdown">
                   <div className="portal-dropdown__header">Notifications</div>
-                  <div className="portal-dropdown__item">
-                    <span className="portal-dropdown__title">New Task Assigned</span>
-                    <span className="portal-dropdown__desc">Mentor Kamana assigned you "Responsive Navbar"</span>
-                  </div>
-                  <div className="portal-dropdown__item">
-                    <span className="portal-dropdown__title">Leave Approved</span>
-                    <span className="portal-dropdown__desc">Your sick leave for May 15 was approved.</span>
-                  </div>
-                  <div className="portal-dropdown__item">
-                    <span className="portal-dropdown__title">Company Meeting</span>
-                    <span className="portal-dropdown__desc">All hands meeting starts in 15 mins.</span>
-                  </div>
+                  
+                  {role === 'mentor' ? (
+                    applications.length === 0 ? (
+                      <div className="portal-dropdown__item"><span className="portal-dropdown__desc">No new notifications.</span></div>
+                    ) : (
+                      applications.slice(0, 5).map(app => (
+                        <div className="portal-dropdown__item" key={app.id}>
+                          <span className="portal-dropdown__title">New Application</span>
+                          <span className="portal-dropdown__desc">{app.name} applied for {app.roleTitle}</span>
+                        </div>
+                      ))
+                    )
+                  ) : (
+                    <>
+                      <div className="portal-dropdown__item">
+                        <span className="portal-dropdown__title">New Task Assigned</span>
+                        <span className="portal-dropdown__desc">Mentor Kamana assigned you "Responsive Navbar"</span>
+                      </div>
+                      <div className="portal-dropdown__item">
+                        <span className="portal-dropdown__title">Leave Approved</span>
+                        <span className="portal-dropdown__desc">Your sick leave for May 15 was approved.</span>
+                      </div>
+                      <div className="portal-dropdown__item">
+                        <span className="portal-dropdown__title">Company Meeting</span>
+                        <span className="portal-dropdown__desc">All hands meeting starts in 15 mins.</span>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>

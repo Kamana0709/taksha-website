@@ -46,6 +46,8 @@ const MentorKanban = lazy(() => import('./pages/portal/MentorKanban'));
 const MentorSubmissions = lazy(() => import('./pages/portal/MentorSubmissions'));
 const MentorReviews = lazy(() => import('./pages/portal/MentorReviews'));
 const MentorReports = lazy(() => import('./pages/portal/MentorReports'));
+const MentorProfile = lazy(() => import('./pages/portal/MentorProfile'));
+const MentorSettings = lazy(() => import('./pages/portal/MentorSettings'));
 
 // Suspense wrapper with minimal loading state
 function SuspenseWrapper({ children }) {
@@ -110,6 +112,8 @@ export const router = createBrowserRouter([
       { path: '/mentor/submissions', element: <SuspenseWrapper><MentorSubmissions /></SuspenseWrapper> },
       { path: '/mentor/reviews', element: <SuspenseWrapper><MentorReviews /></SuspenseWrapper> },
       { path: '/mentor/reports', element: <SuspenseWrapper><MentorReports /></SuspenseWrapper> },
+      { path: '/mentor/profile', element: <SuspenseWrapper><MentorProfile /></SuspenseWrapper> },
+      { path: '/mentor/settings', element: <SuspenseWrapper><MentorSettings /></SuspenseWrapper> },
     ],
   },
   {
