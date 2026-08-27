@@ -154,7 +154,40 @@ app.put('/api/tasks/:id/status', authenticateToken, async (req, res) => {
     });
     res.json({ ...task, assignee: task.assigneeId });
   } catch (err) {
+    res.status(500).json({ error: 'Failed to update task status' });
+  }
+});
+
+app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can edit tasks' });
+    const { id } = req.params;
+    const { title, project, priority, status, assignee } = req.body;
+    
+    const task = await prisma.task.update({
+      where: { id },
+      data: { 
+        title, 
+        project, 
+        priority, 
+        status,
+        ...(assignee && { assigneeId: assignee })
+      }
+    });
+    res.json({ ...task, assignee: task.assigneeId });
+  } catch (err) {
     res.status(500).json({ error: 'Failed to update task' });
+  }
+});
+
+app.delete('/api/tasks/:id', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can delete tasks' });
+    const { id } = req.params;
+    await prisma.task.delete({ where: { id } });
+    res.json({ success: true, id });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete task' });
   }
 });
 

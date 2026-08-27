@@ -61,6 +61,34 @@ export const WorkspaceProvider = ({ children }) => {
     }
   };
 
+  const updateTaskDetails = async (taskId, updatedData) => {
+    try {
+      const res = await axios.put(`${API_URL}/tasks/${taskId}`, updatedData);
+      setData(prev => ({
+        ...prev,
+        tasks: prev.tasks.map(t => t.id === taskId ? res.data : t)
+      }));
+      return { success: true };
+    } catch (err) {
+      console.error(err);
+      return { success: false, error: err.response?.data?.error || 'Failed to update task' };
+    }
+  };
+
+  const deleteTask = async (taskId) => {
+    try {
+      await axios.delete(`${API_URL}/tasks/${taskId}`);
+      setData(prev => ({
+        ...prev,
+        tasks: prev.tasks.filter(t => t.id !== taskId)
+      }));
+      return { success: true };
+    } catch (err) {
+      console.error(err);
+      return { success: false, error: err.response?.data?.error || 'Failed to delete task' };
+    }
+  };
+
   const createIntern = async (internData) => {
     try {
       const res = await axios.post(`${API_URL}/users/interns`, internData);
@@ -90,6 +118,8 @@ export const WorkspaceProvider = ({ children }) => {
       announcements: data.announcements || [],
       createTask, 
       updateTaskStatus,
+      updateTaskDetails,
+      deleteTask,
       createAnnouncement,
       createIntern
     }}>
