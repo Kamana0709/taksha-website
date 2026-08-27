@@ -68,10 +68,10 @@ export default function MentorTasks() {
           </div>
           
           <div className="intern-tasks__filters" style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'center' }}>
-            <button className={`filter-btn ${filter === 'ALL' ? 'filter-btn--active' : ''}`} onClick={() => setFilter('ALL')}>All Tasks</button>
-            <button className={`filter-btn ${filter === 'TODO' ? 'filter-btn--active' : ''}`} onClick={() => setFilter('TODO')}>To Do</button>
-            <button className={`filter-btn ${filter === 'REVIEW' ? 'filter-btn--active' : ''}`} onClick={() => setFilter('REVIEW')}>Needs Review</button>
-            <button className={`filter-btn ${filter === 'DONE' ? 'filter-btn--active' : ''}`} onClick={() => setFilter('DONE')}>Completed</button>
+            <button className="task-filter" style={filter === 'ALL' ? {background:'var(--color-ink)', color:'var(--color-bg)'} : {}} onClick={() => setFilter('ALL')}>All Tasks</button>
+            <button className="task-filter" style={filter === 'TODO' ? {background:'var(--color-ink)', color:'var(--color-bg)'} : {}} onClick={() => setFilter('TODO')}>To Do</button>
+            <button className="task-filter" style={filter === 'REVIEW' ? {background:'var(--color-ink)', color:'var(--color-bg)'} : {}} onClick={() => setFilter('REVIEW')}>Needs Review</button>
+            <button className="task-filter" style={filter === 'DONE' ? {background:'var(--color-ink)', color:'var(--color-bg)'} : {}} onClick={() => setFilter('DONE')}>Completed</button>
             
             {/* Added Create Task Button */}
             <button 
@@ -169,8 +169,8 @@ export default function MentorTasks() {
           </div>
         )}
 
-        <div className="tasks-table-container">
-          <table className="tasks-table">
+        <div className="task-table-container">
+          <table className="task-table">
             <thead>
               <tr>
                 <th>Task Title</th>
@@ -187,16 +187,16 @@ export default function MentorTasks() {
                 const assigneeName = interns.find(i => i.id === task.assignee)?.name || task.assignee;
                 return (
                   <tr key={task.id}>
-                    <td className="task-cell-title">{task.title}</td>
-                    <td>{task.project}</td>
+                    <td className="task-table__title">{task.title}</td>
+                    <td className="task-table__project">{task.project}</td>
                     <td style={{ fontWeight: 800 }}>{assigneeName}</td>
                     <td>
-                      <span className="task-status-badge" style={{ background: getStatusColor(task.status) }}>
+                      <span className="task-badge" style={{ background: getStatusColor(task.status) }}>
                         {task.status.replace('_', ' ')}
                       </span>
                     </td>
                     <td>
-                      <span className="task-priority-badge" style={{ 
+                      <span className="task-badge" style={{ 
                         color: task.priority === 'High' ? 'var(--color-card-pink)' : 'var(--color-ink)' 
                       }}>
                         {task.priority || 'Medium'}
