@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { 
   ArrowRight, MapPin, Clock, Code, Database, 
   PenTool, Megaphone, Users, Zap, Heart, 
-  Gift, TrendingUp, Globe
+  Gift, TrendingUp, Globe, X, CheckCircle
 } from 'lucide-react';
 import SEO from '../components/SEO/SEO';
 import SectionHeading from '../components/SectionHeading/SectionHeading';
@@ -19,7 +19,18 @@ const ROLES = [
     location: 'Remote',
     duration: '3 Months',
     icon: Code,
-    btnColor: 'var(--color-card-lilac)'
+    btnColor: 'var(--color-card-lilac)',
+    responsibilities: [
+      'Develop interactive and responsive user interfaces',
+      'Collaborate with designers to implement UI/UX designs',
+      'Optimize application for maximum speed and scalability'
+    ],
+    requirements: [
+      'Basic knowledge of React and JavaScript (ES6+)',
+      'Understanding of HTML5, CSS3, and responsive design',
+      'Familiarity with Git and version control',
+      'Strong problem-solving skills'
+    ]
   },
   {
     id: 'DEV002',
@@ -30,7 +41,18 @@ const ROLES = [
     location: 'Remote',
     duration: '3 Months',
     icon: Database,
-    btnColor: 'var(--color-accent)'
+    btnColor: 'var(--color-accent)',
+    responsibilities: [
+      'Design and develop RESTful APIs',
+      'Create dynamic frontend components',
+      'Manage database schemas and queries'
+    ],
+    requirements: [
+      'Experience with Node.js and Express',
+      'Familiarity with SQL or NoSQL databases',
+      'Knowledge of React on the frontend',
+      'Eagerness to learn cloud deployment'
+    ]
   },
   {
     id: 'DES001',
@@ -41,7 +63,18 @@ const ROLES = [
     location: 'Remote',
     duration: '3 Months',
     icon: PenTool,
-    btnColor: 'var(--color-card-mint)'
+    btnColor: 'var(--color-card-mint)',
+    responsibilities: [
+      'Create wireframes, prototypes, and high-fidelity mockups',
+      'Conduct user research and usability testing',
+      'Maintain and expand the design system'
+    ],
+    requirements: [
+      'Proficiency in Figma or Adobe XD',
+      'Strong portfolio demonstrating UI/UX principles',
+      'Good understanding of typography and color theory',
+      'Empathy for the end-user'
+    ]
   },
   {
     id: 'MKT001',
@@ -52,7 +85,18 @@ const ROLES = [
     location: 'Remote',
     duration: '3 Months',
     icon: Megaphone,
-    btnColor: 'var(--color-card-pink)'
+    btnColor: 'var(--color-card-pink)',
+    responsibilities: [
+      'Manage social media accounts and content calendars',
+      'Assist in SEO optimization and content writing',
+      'Track and report campaign performance'
+    ],
+    requirements: [
+      'Excellent written and verbal communication',
+      'Familiarity with social media analytics tools',
+      'Creative mindset with an eye for trends',
+      'Basic knowledge of SEO principles'
+    ]
   }
 ];
 
@@ -66,6 +110,8 @@ const BENEFITS = [
 ];
 
 export default function Careers() {
+  const [selectedRole, setSelectedRole] = React.useState(null);
+  const [isApplied, setIsApplied] = React.useState(false);
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 1, 0.5, 1] } }
@@ -184,7 +230,14 @@ export default function Careers() {
                 <span><Clock size={14} /> {role.duration}</span>
               </div>
 
-              <button className="role-card__btn" style={{ background: role.btnColor }}>
+              <button 
+                className="role-card__btn" 
+                style={{ background: role.btnColor }}
+                onClick={() => {
+                  setSelectedRole(role);
+                  setIsApplied(false);
+                }}
+              >
                 View Details & Apply <ArrowRight size={18} />
               </button>
             </motion.div>
@@ -219,56 +272,71 @@ export default function Careers() {
         </motion.div>
       </section>
 
-      {/* Application Form Section */}
-      <section className="careers-apply container section-padding">
-        <div className="apply-box">
-          <div className="apply-box__left">
-            <div className="badge badge--mint">BE PART OF OUR JOURNEY</div>
-            <h2 className="apply-box__title">Ready to Build Something Amazing?</h2>
-            <p className="apply-box__desc">Send us your details and we'll get in touch when the right opportunity opens up.</p>
-            <button className="btn btn--primary" style={{ marginTop: 'var(--space-6)' }}>
-              Send Your Profile <ArrowRight size={20} />
+      {/* Role Details & Application Modal */}
+      {selectedRole && (
+        <div className="role-modal-overlay" onClick={() => setSelectedRole(null)}>
+          <div className="role-modal" onClick={e => e.stopPropagation()}>
+            <button className="role-modal__close" onClick={() => setSelectedRole(null)}>
+              <X size={24} />
             </button>
-          </div>
-          
-          <div className="apply-box__right">
-            <form className="apply-form" onSubmit={(e) => e.preventDefault()}>
-              <div className="form-row">
-                <input type="text" placeholder="Full Name" className="form-input" required />
-                <input type="email" placeholder="Email Address" className="form-input" required />
+            
+            <div className="role-modal__header" style={{ background: selectedRole.categoryColor }}>
+              <div className="role-modal__badge">{selectedRole.category} • {selectedRole.id}</div>
+              <h2 className="role-modal__title">{selectedRole.title}</h2>
+              <div className="role-card__meta">
+                <span><MapPin size={14} /> {selectedRole.location}</span>
+                <span><Clock size={14} /> {selectedRole.duration}</span>
               </div>
-              <div className="form-row">
-                <select className="form-input form-select" required defaultValue="">
-                  <option value="" disabled>Role of Interest</option>
-                  <option value="frontend">Frontend Developer Intern</option>
-                  <option value="fullstack">Full-Stack Developer Intern</option>
-                  <option value="design">UI/UX Designer Intern</option>
-                  <option value="marketing">Digital Marketing Intern</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div className="form-row">
-                <textarea placeholder="Message" className="form-textarea" rows="4" required></textarea>
-              </div>
-              <button type="submit" className="btn btn--mint apply-form__submit">
-                Submit Application <ArrowRight size={20} />
-              </button>
-            </form>
-          </div>
-          
-          {/* Decorative steps */}
-          <div className="apply-deco apply-deco--steps">
-            <div className="step-block step-block--1" style={{ background: 'var(--color-accent)' }}></div>
-            <div className="step-block step-block--2" style={{ background: 'var(--color-accent)' }}></div>
-            <div className="step-block step-block--3" style={{ background: 'var(--color-accent)' }}></div>
-          </div>
-          <div className="apply-deco apply-deco--cross">
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-              <path d="M4 4 L28 28 M28 4 L4 28" stroke="var(--color-card-pink)" strokeWidth="6" strokeLinecap="square" />
-            </svg>
+            </div>
+
+            <div className="role-modal__content">
+              {!isApplied ? (
+                <div className="role-modal__split">
+                  <div className="role-modal__details">
+                    <p className="role-modal__desc">{selectedRole.desc}</p>
+                    
+                    <h4 className="role-modal__section-title">Key Responsibilities</h4>
+                    <ul className="role-modal__list">
+                      {selectedRole.responsibilities.map((req, i) => (
+                        <li key={i}>{req}</li>
+                      ))}
+                    </ul>
+
+                    <h4 className="role-modal__section-title">Requirements</h4>
+                    <ul className="role-modal__list">
+                      {selectedRole.requirements.map((req, i) => (
+                        <li key={i}>{req}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="role-modal__apply">
+                    <h3 className="apply-title">Apply Now</h3>
+                    <form className="apply-form" onSubmit={(e) => { e.preventDefault(); setIsApplied(true); }}>
+                      <input type="text" placeholder="Full Name" className="form-input" required />
+                      <input type="email" placeholder="Email Address" className="form-input" required />
+                      <input type="url" placeholder="Portfolio / LinkedIn URL" className="form-input" required />
+                      <textarea placeholder="Why are you a good fit?" className="form-textarea" rows="3" required></textarea>
+                      <button type="submit" className="btn btn--primary" style={{ background: 'var(--color-ink)', color: 'var(--color-bg)' }}>
+                        Submit Application <ArrowRight size={18} />
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              ) : (
+                <div className="role-modal__success">
+                  <CheckCircle size={64} color="var(--color-card-mint)" />
+                  <h3>Application Submitted!</h3>
+                  <p>Thank you for applying for the <strong>{selectedRole.title}</strong> role. Our team will review your application and get back to you shortly.</p>
+                  <button className="btn btn--secondary" onClick={() => setSelectedRole(null)}>
+                    Close Window
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </section>
+      )}>
       
       {/* Portal Access Section */}
       <section className="container section-padding" style={{ borderTop: '2px dashed var(--color-ink)', marginTop: 'var(--space-12)', textAlign: 'center' }}>
