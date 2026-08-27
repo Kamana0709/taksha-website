@@ -2,11 +2,13 @@ import React from 'react';
 import SEO from '../../components/SEO/SEO';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import './InternProjects.css';
 
 export default function InternProjects() {
   const { user } = useAuth();
   const { tasks } = useWorkspace();
+  const navigate = useNavigate();
 
   const myTasks = tasks.filter(t => t.assignee === user?.id);
   
@@ -25,6 +27,16 @@ export default function InternProjects() {
     projectsMap[t.project].totalTasks += 1;
     if (t.status === 'DONE') {
       projectsMap[t.project].completedTasks += 1;
+    }
+  });
+  
+  // Calculate final status and color based on completion
+  Object.values(projectsMap).forEach(proj => {
+    if (proj.totalTasks > 0 && proj.completedTasks === proj.totalTasks) {
+      proj.status = 'COMPLETED';
+      proj.color = 'var(--color-bg)';
+    } else if (proj.completedTasks > 0) {
+      proj.color = 'var(--color-card-purple)'; // IN_PROGRESS vibe
     }
   });
 
@@ -87,7 +99,7 @@ export default function InternProjects() {
                   </div>
                 </div>
 
-                <button className="project-action-btn">
+                <button className="project-action-btn" onClick={() => navigate('/intern/tasks')}>
                   VIEW ALL TASKS
                 </button>
               </div>
