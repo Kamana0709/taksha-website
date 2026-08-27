@@ -5,6 +5,7 @@ import SectionHeading from '../../components/SectionHeading/SectionHeading';
 export default function MentorApplications() {
   const [applications, setApplications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   useEffect(() => {
     fetchApplications();
@@ -19,9 +20,13 @@ export default function MentorApplications() {
       if (response.ok) {
         const data = await response.json();
         setApplications(data);
+      } else {
+        const errText = await response.text();
+        setErrorMsg(`Error ${response.status}: ${errText}`);
       }
     } catch (err) {
       console.error('Failed to fetch applications', err);
+      setErrorMsg(err.message);
     } finally {
       setIsLoading(false);
     }
@@ -39,6 +44,12 @@ export default function MentorApplications() {
       <div className="portal-card" style={{ padding: 'var(--space-6)', marginTop: 'var(--space-6)' }}>
         {isLoading ? (
           <p>Loading applications...</p>
+        ) : errorMsg ? (
+          <div style={{ textAlign: 'center', padding: 'var(--space-12)', color: 'red' }}>
+            <XCircle size={48} style={{ margin: '0 auto var(--space-4)' }} />
+            <h3>Failed to load applications</h3>
+            <p>{errorMsg}</p>
+          </div>
         ) : applications.length === 0 ? (
           <div style={{ textAlign: 'center', padding: 'var(--space-12)' }}>
             <Briefcase size={48} color="var(--color-text-secondary)" style={{ margin: '0 auto var(--space-4)' }} />
