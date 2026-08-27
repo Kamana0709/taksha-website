@@ -32,6 +32,29 @@ export default function MentorApplications() {
     }
   };
 
+  const updateStatus = async (id, newStatus) => {
+    try {
+      const token = localStorage.getItem('taksha_token');
+      const response = await fetch(`/api/applications/${id}/status`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (response.ok) {
+        setApplications(apps => apps.map(app => app.id === id ? { ...app, status: newStatus } : app));
+      } else {
+        const errText = await response.text();
+        alert(`Failed to update status: ${errText}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error updating status');
+    }
+  };
+
   return (
     <div className="portal-page">
       <SectionHeading 
@@ -66,6 +89,7 @@ export default function MentorApplications() {
                   <th style={{ padding: 'var(--space-3)' }}>Role</th>
                   <th style={{ padding: 'var(--space-3)' }}>Portfolio</th>
                   <th style={{ padding: 'var(--space-3)' }}>Status</th>
+                  <th style={{ padding: 'var(--space-3)' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -86,10 +110,34 @@ export default function MentorApplications() {
                       <span style={{ 
                         display: 'inline-flex', alignItems: 'center', gap: '4px',
                         padding: '4px 8px', borderRadius: '4px', fontSize: 'var(--text-xs)', fontWeight: 'bold',
-                        background: app.status === 'Pending' ? 'var(--color-bg-secondary)' : 'var(--color-card-mint)'
+                        background: app.status === 'Pending' ? 'var(--color-bg-secondary)' : app.status === 'Accepted' ? 'var(--color-card-mint)' : 'var(--color-card-pink)'
                       }}>
                         <Clock size={12} /> {app.status}
                       </span>
+                    </td>
+                    <td style={{ padding: 'var(--space-3)' }}>
+                      {app.status === 'Pending' && (
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button 
+                            onClick={() => updateStatus(app.id, 'Accepted')}
+                            style={{ background: 'var(--color-card-mint)', border: '2px solid var(--color-ink)', padding: '4px 8px', fontWeight: 'bold', cursor: 'pointer' }}
+                          >
+                            Accept
+                          </button>
+                          <button 
+                            onClick={() => updateStatus(app.id, 'Rejected')}
+                            style={{ background: 'var(--color-card-pink)', border: '2px solid var(--color-ink)', padding: '4px 8px', fontWeight: 'bold', cursor: 'pointer' }}
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
+                      {app.status === 'Accepted' && (
+                        <span style={{ fontSize: '12px', fontWeight: 'bold' }}>Candidate Accepted</span>
+                      )}
+                      {app.status === 'Rejected' && (
+                        <span style={{ fontSize: '12px', fontWeight: 'bold' }}>Candidate Rejected</span>
+                      )}
                     </td>
                   </tr>
                 ))}

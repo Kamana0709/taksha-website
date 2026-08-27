@@ -269,6 +269,22 @@ app.get('/api/applications', authenticateToken, async (req, res) => {
   }
 });
 
+app.put('/api/applications/:id/status', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can update applications' });
+    const { id } = req.params;
+    const { status } = req.body;
+    
+    const application = await prisma.application.update({
+      where: { id },
+      data: { status }
+    });
+    res.json(application);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update application status' });
+  }
+});
+
 // All other GET requests not handled before will return our React app
 app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, '../dist', 'index.html'));
