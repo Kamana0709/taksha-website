@@ -13,7 +13,7 @@ export default function MentorApplications() {
 
   const fetchApplications = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('taksha_token');
       const response = await fetch('/api/applications', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
