@@ -42,6 +42,11 @@ export const WorkspaceProvider = ({ children }) => {
     };
     
     fetchData();
+    
+    // Poll every 5 seconds for real-time updates across portals
+    const intervalId = setInterval(fetchData, 5000);
+    
+    return () => clearInterval(intervalId);
   }, [user]);
 
   const createProject = async (projectData) => {
