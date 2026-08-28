@@ -7,7 +7,7 @@ import './InternProjects.css';
 
 export default function InternProjects() {
   const { user } = useAuth();
-  const { projects, tasks } = useWorkspace();
+  const { projects, tasks, submissions } = useWorkspace();
   const navigate = useNavigate();
 
   const myTasks = tasks.filter(t => t.assignee === user?.id);
@@ -60,6 +60,7 @@ export default function InternProjects() {
             </div>
           ) : projectStats.map((proj, idx) => {
             const percent = proj.totalTasks > 0 ? Math.round((proj.completedTasks / proj.totalTasks) * 100) : 0;
+            const hasSubmission = submissions?.some(s => s.projectId === proj.id && s.internId === user?.id);
             return (
               <div key={idx} className="project-card">
                 <div className="project-card__header">
@@ -81,6 +82,16 @@ export default function InternProjects() {
                   <div className="project-progress-bar">
                     <div className="project-progress-fill" style={{ width: `${percent}%`, background: proj.status === 'COMPLETED' ? 'var(--color-text-secondary)' : 'var(--color-card-mint)' }}></div>
                   </div>
+                  {proj.status !== 'COMPLETED' && proj.daysRemaining > 0 && (
+                    <div style={{ marginTop: '12px', fontSize: '0.85rem', fontWeight: 800 }}>
+                      ⏳ {proj.daysRemaining} days left to submit
+                    </div>
+                  )}
+                  {proj.daysRemaining <= 0 && !hasSubmission && (
+                    <div style={{ marginTop: '12px', fontSize: '0.85rem', fontWeight: 800, background: 'var(--color-card-pink)', padding: '6px 10px', border: '2px solid var(--color-ink)', display: 'inline-block' }}>
+                      Deadline passed — auto-submitted
+                    </div>
+                  )}
                 </div>
 
                 <button className="project-action-btn" onClick={() => navigate('/intern/tasks')}>

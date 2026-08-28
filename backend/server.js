@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const { PrismaClient } = require('@prisma/client');
 const { Resend } = require('resend');
 const path = require('path');
+const { addDays, differenceInCalendarDays } = require('date-fns');
 
 dotenv.config();
 
@@ -148,7 +149,14 @@ app.get('/api/projects', authenticateToken, async (req, res) => {
       include: { tasks: true },
       orderBy: { createdAt: 'desc' }
     });
-    res.json(projects);
+    const enhancedProjects = projects.map(p => {
+      let daysRemaining = null;
+      if (p.deadlineAt) {
+        daysRemaining = differenceInCalendarDays(new Date(p.deadlineAt), new Date());
+      }
+      return { ...p, daysRemaining };
+    });
+    res.json(enhancedProjects);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch projects' });
   }
@@ -182,7 +190,16 @@ app.get('/api/tasks', authenticateToken, async (req, res) => {
       }); // Mentor sees all
     }
     // Map assigneeId to assignee for frontend compatibility
-    res.json(tasks.map(t => ({ ...t, assignee: t.assigneeId })));
+    res.json(tasks.map(t => {
+      let project = t.project;
+      if (project && project.deadlineAt) {
+        project = {
+          ...project,
+          daysRemaining: differenceInCalendarDays(new Date(project.deadlineAt), new Date())
+        };
+      }
+      return { ...t, assignee: t.assigneeId, project };
+    }));
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch tasks' });
   }
@@ -194,6 +211,18 @@ app.post('/api/tasks', authenticateToken, async (req, res) => {
     
     const { title, projectId, priority, assignee, status } = req.body;
     
+    const project = await prisma.project.findUnique({ where: { id: projectId } });
+    if (project && !project.assignedAt) {
+      const now = new Date();
+      await prisma.project.update({
+        where: { id: projectId },
+        data: {
+          assignedAt: now,
+          deadlineAt: addDays(now, project.deadlineDays)
+        }
+      });
+    }
+
     const task = await prisma.task.create({
       data: {
         title,
@@ -480,6 +509,45 @@ app.put('/api/applications/:id/status', authenticateToken, async (req, res) => {
 app.get(/.*/, (req, res) => {
   res.sendFile(path.join(__dirname, '../dist', 'index.html'));
 });
+
+const autoSubmitOverdueProjects = async () => {
+  try {
+    const now = new Date();
+    const overdueProjects = await prisma.project.findMany({
+      where: { deadlineAt: { lt: now } },
+      include: { tasks: true }
+    });
+
+    for (const project of overdueProjects) {
+      if (!project.tasks || project.tasks.length === 0) continue;
+      
+      const assignees = [...new Set(project.tasks.map(t => t.assigneeId))];
+      
+      for (const internId of assignees) {
+        const existingSubmission = await prisma.submission.findFirst({
+          where: { projectId: project.id, internId: internId }
+        });
+
+        if (!existingSubmission) {
+          await prisma.submission.create({
+            data: {
+              projectId: project.id,
+              internId: internId,
+              githubUrl: "",
+              description: "Automatically submitted after 7-day deadline.",
+              status: "Auto-Submitted"
+            }
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Failed to auto-submit overdue projects:', err);
+  }
+};
+
+autoSubmitOverdueProjects();
+setInterval(autoSubmitOverdueProjects, 60 * 60 * 1000);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
