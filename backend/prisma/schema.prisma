@@ -30,6 +30,7 @@ model User {
   submissions   Submission[] @relation("InternSubmissions")
   reviews       Submission[] @relation("MentorReviews")
   certificates  Certificate[] @relation("InternCertificates")
+  assignments   ProjectAssignment[] @relation("InternAssignments")
   
   sentMessages  Message[]    @relation("SentMessages")
   receivedMessages Message[] @relation("ReceivedMessages")
@@ -40,13 +41,28 @@ model Project {
   name        String
   description String?
   deadlineDays Int     @default(7)
-  assignedAt  DateTime?
-  deadlineAt  DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   tasks       Task[]
   submissions Submission[]
+  assignments ProjectAssignment[]
+}
+
+model ProjectAssignment {
+  id           String   @id @default(uuid())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  internId     String
+  intern       User     @relation("InternAssignments", fields: [internId], references: [id], onDelete: Cascade)
+  
+  assignedAt   DateTime @default(now())
+  deadlineDays Int      @default(7)
+  deadlineAt   DateTime
+  status       String   @default("IN_PROGRESS") // IN_PROGRESS, SUBMITTED, AUTO_SUBMITTED
+  
+  @@unique([projectId, internId])
 }
 
 model Task {

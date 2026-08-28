@@ -10,6 +10,7 @@ const PROJECT_TEMPLATES = [
   {
     key: "business-landing-page",
     name: "Project 1: Business Landing Page",
+    order: 1,
     description: "UI / Frontend Fundamentals — Turn a real business brief into a polished, responsive website.",
     stack: "HTML, CSS, JavaScript, Responsive Design, Git/GitHub, Figma → Code",
     checklist: [
@@ -29,6 +30,7 @@ const PROJECT_TEMPLATES = [
   {
     key: "internship-discovery-platform",
     name: "Project 2: Internship Discovery Platform",
+    order: 2,
     description: "JavaScript + API — Build a React app that consumes real (or mock) API data.",
     stack: "React, JavaScript, REST API, Git/GitHub",
     checklist: [
@@ -48,6 +50,7 @@ const PROJECT_TEMPLATES = [
   {
     key: "business-analytics-dashboard",
     name: "Project 3: Business Analytics Dashboard",
+    order: 3,
     description: "Final Industry Case Study — Turn an ambiguous business problem into a usable, decision-ready dashboard.",
     stack: "React, JavaScript, Tailwind CSS, API/Data Integration, Chart Library, Git/GitHub, Deployment",
     checklist: [

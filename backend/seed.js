@@ -57,15 +57,27 @@ async function main() {
   for (const intern of [intern1, intern2]) {
     for (const template of PROJECT_TEMPLATES) {
       const project = projectMap[template.key];
+      
+      const now = new Date();
+      await prisma.projectAssignment.create({
+        data: {
+          projectId: project.id,
+          internId: intern.id,
+          assignedAt: now,
+          deadlineDays: 7,
+          deadlineAt: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+        }
+      });
+      
       for (const title of template.checklist) {
         await prisma.task.create({
           data: {
-            title, 
-            projectId: project.id, 
-            assigneeId: intern.id, 
+            title,
+            projectId: project.id,
+            assigneeId: intern.id,
             assignerId: mentor.id,
-            priority: 'Medium', 
-            status: 'TODO', 
+            priority: 'Medium',
+            status: 'TODO',
             date: new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })
           }
         });
@@ -76,7 +88,7 @@ async function main() {
   console.log('Seeding complete! You can log in with:');
   console.log('Mentor: mentor@taksha.in / password123');
   console.log('Intern 1: charumandilwar@gmail.com / Taksha@2606');
-  console.log('Intern 2: intern@taksha.in / password123');
+  console.log('Intern 2: rishikat1321@gmail.com / Taksha@2601');
 }
 
 main()

@@ -11,6 +11,7 @@ const multer = require('multer');
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 const generateCertificateHtml = require('./certificateTemplate');
+const { PROJECT_TEMPLATES } = require('./projectTemplates');
 
 dotenv.config();
 
@@ -183,15 +184,23 @@ app.put('/api/users/profile', authenticateToken, async (req, res) => {
 app.get('/api/projects', authenticateToken, async (req, res) => {
   try {
     const projects = await prisma.project.findMany({
-      include: { tasks: true },
+      include: { 
+        tasks: true,
+        assignments: req.user.role === 'INTERN' ? { where: { internId: req.user.id } } : true
+      },
       orderBy: { createdAt: 'desc' }
     });
     const enhancedProjects = projects.map(p => {
       let daysRemaining = null;
-      if (p.deadlineAt) {
-        daysRemaining = differenceInCalendarDays(new Date(p.deadlineAt), new Date());
+      // If intern, grab their specific assignment
+      const assignment = req.user.role === 'INTERN' && p.assignments.length > 0 
+        ? p.assignments[0] 
+        : null;
+        
+      if (assignment && assignment.deadlineAt) {
+        daysRemaining = differenceInCalendarDays(new Date(assignment.deadlineAt), new Date());
       }
-      return { ...p, daysRemaining };
+      return { ...p, daysRemaining, assignments: undefined };
     });
     res.json(enhancedProjects);
   } catch (err) {
@@ -219,21 +228,27 @@ app.get('/api/tasks', authenticateToken, async (req, res) => {
     if (req.user.role === 'INTERN') {
       tasks = await prisma.task.findMany({ 
         where: { assigneeId: req.user.id },
-        include: { project: true }
+        include: { project: { include: { assignments: { where: { internId: req.user.id } } } } }
       });
     } else {
       tasks = await prisma.task.findMany({
-        include: { project: true }
+        include: { project: { include: { assignments: true } } }
       }); // Mentor sees all
     }
     // Map assigneeId to assignee for frontend compatibility
     res.json(tasks.map(t => {
       let project = t.project;
-      if (project && project.deadlineAt) {
-        project = {
-          ...project,
-          daysRemaining: differenceInCalendarDays(new Date(project.deadlineAt), new Date())
-        };
+      if (project) {
+        // Find assignment for this specific task's assignee
+        const assignment = project.assignments?.find(a => a.internId === t.assigneeId);
+        
+        if (assignment && assignment.deadlineAt) {
+          project = {
+            ...project,
+            daysRemaining: differenceInCalendarDays(new Date(assignment.deadlineAt), new Date())
+          };
+        }
+        delete project.assignments;
       }
       return { ...t, assignee: t.assigneeId, project };
     }));
@@ -249,12 +264,16 @@ app.post('/api/tasks', authenticateToken, async (req, res) => {
     const { title, projectId, priority, assignee, status } = req.body;
     
     const project = await prisma.project.findUnique({ where: { id: projectId } });
-    if (project && !project.assignedAt) {
+    if (project) {
       const now = new Date();
-      await prisma.project.update({
-        where: { id: projectId },
-        data: {
+      await prisma.projectAssignment.upsert({
+        where: { projectId_internId: { projectId, internId: assignee } },
+        update: {},
+        create: {
+          projectId,
+          internId: assignee,
           assignedAt: now,
+          deadlineDays: project.deadlineDays,
           deadlineAt: addDays(now, project.deadlineDays)
         }
       });
@@ -410,15 +429,27 @@ app.put('/api/submissions/:id/review', authenticateToken, async (req, res) => {
       }
     });
 
-    // Update the associated task status
-    const taskStatus = status === 'Approved' ? 'DONE' : 'CHANGES_REQUESTED';
-    await prisma.task.update({
-      where: { id: submission.taskId },
-      data: {
-        status: taskStatus,
-        feedback: mentorFeedback
+    // Note: If submission has a taskId (e.g. from a custom frontend flow), update it
+    if (submission.taskId) {
+      const taskStatus = status === 'Approved' ? 'DONE' : 'CHANGES_REQUESTED';
+      await prisma.task.update({
+        where: { id: submission.taskId },
+        data: {
+          status: taskStatus,
+          feedback: mentorFeedback
+        }
+      });
+    }
+
+    if (status === 'Approved') {
+      const proj = await prisma.project.findUnique({ where: { id: submission.projectId } });
+      if (proj) {
+        const officialTemplate = PROJECT_TEMPLATES.find(t => t.name === proj.name);
+        if (officialTemplate) {
+          await unlockNextProject(submission.internId, officialTemplate.key);
+        }
       }
-    });
+    }
 
     res.json(submission);
   } catch (err) {
@@ -849,6 +880,73 @@ app.get('/api/project-templates', authenticateToken, (req, res) => {
   res.json(PROJECT_TEMPLATES);
 });
 
+const unlockNextProject = async (internId, completedProjectKey) => {
+  try {
+    const completedTemplate = PROJECT_TEMPLATES.find(t => t.key === completedProjectKey);
+    if (!completedTemplate || !completedTemplate.order) return;
+    
+    const nextTemplate = PROJECT_TEMPLATES.find(t => t.order === completedTemplate.order + 1);
+    if (!nextTemplate) return; 
+    
+    const intern = await prisma.user.findUnique({ where: { id: internId } });
+    if (!intern || !intern.mentorId) return;
+
+    let project = await prisma.project.findFirst({
+      where: { name: nextTemplate.name }
+    });
+
+    if (!project) {
+      project = await prisma.project.create({
+        data: {
+          name: nextTemplate.name,
+          description: nextTemplate.description
+        }
+      });
+    }
+
+    const existingAssignment = await prisma.projectAssignment.findUnique({
+      where: { projectId_internId: { projectId: project.id, internId: intern.id } }
+    });
+
+    if (existingAssignment) return; // Already assigned
+
+    const now = new Date();
+    await prisma.projectAssignment.create({
+      data: {
+        projectId: project.id,
+        internId: intern.id,
+        assignedAt: now,
+        deadlineDays: 7,
+        deadlineAt: addDays(now, 7)
+      }
+    });
+
+    const today = new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    for (const title of nextTemplate.checklist) {
+      const existingTask = await prisma.task.findFirst({
+        where: { title, projectId: project.id, assigneeId: intern.id }
+      });
+
+      if (!existingTask) {
+        await prisma.task.create({
+          data: {
+            title,
+            projectId: project.id,
+            assigneeId: intern.id,
+            assignerId: intern.mentorId, 
+            priority: 'Medium',
+            status: 'TODO',
+            date: today
+          }
+        });
+      }
+    }
+  } catch (err) {
+    console.error('Failed to unlock next project:', err);
+  }
+};
+
 app.post('/api/project-templates/assign', authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== 'MENTOR') {
@@ -870,6 +968,44 @@ app.post('/api/project-templates/assign', authenticateToken, async (req, res) =>
       return res.status(403).json({ error: 'Invalid intern or unauthorized' });
     }
 
+    // Check unlocking constraint for manual assignments
+    if (template.order > 1) {
+      const prevTemplate = PROJECT_TEMPLATES.find(t => t.order === template.order - 1);
+      if (prevTemplate) {
+        const prevProject = await prisma.project.findFirst({ where: { name: prevTemplate.name } });
+        let prevCompleted = false;
+        
+        if (prevProject) {
+          const prevAssignment = await prisma.projectAssignment.findUnique({
+            where: { projectId_internId: { projectId: prevProject.id, internId: intern.id } }
+          });
+          
+          if (prevAssignment && prevAssignment.status === 'AUTO_SUBMITTED') {
+            prevCompleted = true;
+          } else {
+            const approvedSubmission = await prisma.submission.findFirst({
+              where: { projectId: prevProject.id, internId: intern.id, status: 'Approved' }
+            });
+            if (approvedSubmission) prevCompleted = true;
+          }
+        }
+        
+        // Also allow if this template is ALREADY assigned to the intern
+        const currentProject = await prisma.project.findFirst({ where: { name: template.name } });
+        let alreadyAssigned = false;
+        if (currentProject) {
+           const currentAssignment = await prisma.projectAssignment.findUnique({
+             where: { projectId_internId: { projectId: currentProject.id, internId: intern.id } }
+           });
+           if (currentAssignment) alreadyAssigned = true;
+        }
+
+        if (!prevCompleted && !alreadyAssigned) {
+          return res.status(400).json({ error: `Intern must complete Project ${template.order - 1} before starting Project ${template.order}` });
+        }
+      }
+    }
+
     let project = await prisma.project.findFirst({
       where: { name: template.name }
     });
@@ -885,6 +1021,19 @@ app.post('/api/project-templates/assign', authenticateToken, async (req, res) =>
 
     const today = new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
     const createdTasks = [];
+    
+    const now = new Date();
+    await prisma.projectAssignment.upsert({
+      where: { projectId_internId: { projectId: project.id, internId: intern.id } },
+      update: {},
+      create: {
+        projectId: project.id,
+        internId: intern.id,
+        assignedAt: now,
+        deadlineDays: project.deadlineDays || 7,
+        deadlineAt: addDays(now, project.deadlineDays || 7)
+      }
+    });
 
     for (const title of template.checklist) {
       const existingTask = await prisma.task.findFirst({
@@ -938,31 +1087,38 @@ app.get(/.*/, (req, res) => {
 const autoSubmitOverdueProjects = async () => {
   try {
     const now = new Date();
-    const overdueProjects = await prisma.project.findMany({
-      where: { deadlineAt: { lt: now } },
-      include: { tasks: true }
+    const overdueAssignments = await prisma.projectAssignment.findMany({
+      where: { deadlineAt: { lt: now }, status: 'IN_PROGRESS' },
+      include: { project: true }
     });
 
-    for (const project of overdueProjects) {
-      if (!project.tasks || project.tasks.length === 0) continue;
-      
-      const assignees = [...new Set(project.tasks.map(t => t.assigneeId))];
-      
-      for (const internId of assignees) {
-        const existingSubmission = await prisma.submission.findFirst({
-          where: { projectId: project.id, internId: internId }
-        });
+    for (const assignment of overdueAssignments) {
+      await prisma.projectAssignment.update({
+        where: { id: assignment.id },
+        data: { status: 'AUTO_SUBMITTED' }
+      });
 
-        if (!existingSubmission) {
-          await prisma.submission.create({
-            data: {
-              projectId: project.id,
-              internId: internId,
-              githubUrl: "",
-              description: "Automatically submitted after 7-day deadline.",
-              status: "Auto-Submitted"
-            }
-          });
+      const existingSubmission = await prisma.submission.findFirst({
+        where: { projectId: assignment.projectId, internId: assignment.internId }
+      });
+
+      if (!existingSubmission) {
+        await prisma.submission.create({
+          data: {
+            projectId: assignment.projectId,
+            internId: assignment.internId,
+            githubUrl: "",
+            description: "Automatically submitted after 7-day deadline.",
+            status: "Auto-Submitted"
+          }
+        });
+      }
+      
+      const proj = assignment.project;
+      if (proj) {
+        const officialTemplate = PROJECT_TEMPLATES.find(t => t.name === proj.name);
+        if (officialTemplate) {
+          await unlockNextProject(assignment.internId, officialTemplate.key);
         }
       }
     }
