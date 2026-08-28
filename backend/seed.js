@@ -41,6 +41,7 @@ async function main() {
       name: 'Charu Mandilwar',
       passwordHash: charuPassword,
       role: 'INTERN',
+      mentorId: mentor.id,
     },
   });
 
@@ -50,6 +51,7 @@ async function main() {
       name: 'Intern User',
       passwordHash: defaultPassword,
       role: 'INTERN',
+      mentorId: mentor.id,
     },
   });
 
