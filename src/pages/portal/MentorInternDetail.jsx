@@ -1,14 +1,39 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import SEO from '../../components/SEO/SEO';
 import { useWorkspace } from '../../context/WorkspaceContext';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Award } from 'lucide-react';
 import './MentorInternDetail.css';
 
 export default function MentorInternDetail() {
   const { internId } = useParams();
   const navigate = useNavigate();
-  const { interns, tasks } = useWorkspace();
+  const { interns, tasks, checkEligibility, generateCertificate } = useWorkspace();
+  const [certData, setCertData] = useState(null);
+  const [isGeneratingCert, setIsGeneratingCert] = useState(false);
+
+  useEffect(() => {
+    const fetchEligibility = async () => {
+      if (internId) {
+        const data = await checkEligibility(internId);
+        setCertData(data);
+      }
+    };
+    fetchEligibility();
+  }, [internId]);
+
+  const handleIssueCertificate = async () => {
+    setIsGeneratingCert(true);
+    const res = await generateCertificate(internId);
+    if (res.success) {
+      setCertData(prev => ({ ...prev, alreadyIssued: true, certificate: res.certificate }));
+      const backendUrl = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '');
+      window.open(`${backendUrl}/api/certificates/${res.certificate.id}/download`, '_blank');
+    } else {
+      alert(res.error || 'Failed to issue certificate');
+    }
+    setIsGeneratingCert(false);
+  };
 
   const intern = interns.find(i => i.id === internId);
 
@@ -78,6 +103,38 @@ export default function MentorInternDetail() {
                   fontWeight: 900
                 }}>
                   {intern.status || 'Active'}
+                </div>
+              </div>
+              <div className="profile-info-group">
+                <div className="profile-label">Certificate Status</div>
+                <div className="profile-value" style={{ marginTop: 'var(--space-2)' }}>
+                  {!certData ? (
+                    <span style={{ color: 'var(--color-text-secondary)' }}>Checking...</span>
+                  ) : certData.alreadyIssued ? (
+                    <div style={{ color: 'var(--color-card-mint)', fontWeight: 900 }}>
+                      Issued on {new Date(certData.certificate.issuedAt).toLocaleDateString()}
+                    </div>
+                  ) : certData.isEligible ? (
+                    <div style={{ color: 'var(--color-card-cyan)', fontWeight: 900 }}>
+                      Eligible for Issuance
+                    </div>
+                  ) : (
+                    <div style={{ color: 'var(--color-text-secondary)' }}>
+                      Not Eligible Yet
+                    </div>
+                  )}
+                  
+                  {certData && (
+                    <button 
+                      className="intern-btn intern-btn--assign" 
+                      onClick={handleIssueCertificate}
+                      disabled={isGeneratingCert || (certData.alreadyIssued)}
+                      style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'var(--space-3)' }}
+                    >
+                      <Award size={16} /> 
+                      {isGeneratingCert ? 'Processing...' : certData.alreadyIssued ? 'Download Certificate' : 'Issue Certificate'}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

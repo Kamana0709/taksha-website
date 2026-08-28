@@ -37,6 +37,7 @@ const InternLeave = lazy(() => import('./pages/portal/InternLeave'));
 const InternDetails = lazy(() => import('./pages/portal/InternDetails'));
 const InternProfile = lazy(() => import('./pages/portal/InternProfile'));
 const InternSettings = lazy(() => import('./pages/portal/InternSettings'));
+const InternMessages = lazy(() => import('./pages/portal/InternMessages'));
 
 const MentorDashboard = lazy(() => import('./pages/portal/MentorDashboard'));
 const MentorInterns = lazy(() => import('./pages/portal/MentorInterns'));
@@ -49,6 +50,7 @@ const MentorReviews = lazy(() => import('./pages/portal/MentorReviews'));
 const MentorReports = lazy(() => import('./pages/portal/MentorReports'));
 const MentorProfile = lazy(() => import('./pages/portal/MentorProfile'));
 const MentorSettings = lazy(() => import('./pages/portal/MentorSettings'));
+const MentorMessages = lazy(() => import('./pages/portal/MentorMessages'));
 
 // Suspense wrapper with minimal loading state
 function SuspenseWrapper({ children }) {
@@ -97,6 +99,7 @@ export const router = createBrowserRouter([
       { path: '/intern/details', element: <SuspenseWrapper><InternDetails /></SuspenseWrapper> },
       { path: '/intern/profile', element: <SuspenseWrapper><InternProfile /></SuspenseWrapper> },
       { path: '/intern/settings', element: <SuspenseWrapper><InternSettings /></SuspenseWrapper> },
+      { path: '/intern/messages', element: <SuspenseWrapper><InternMessages /></SuspenseWrapper> },
     ],
   },
   {
@@ -116,6 +119,7 @@ export const router = createBrowserRouter([
       { path: '/mentor/reports', element: <SuspenseWrapper><MentorReports /></SuspenseWrapper> },
       { path: '/mentor/profile', element: <SuspenseWrapper><MentorProfile /></SuspenseWrapper> },
       { path: '/mentor/settings', element: <SuspenseWrapper><MentorSettings /></SuspenseWrapper> },
+      { path: '/mentor/messages', element: <SuspenseWrapper><MentorMessages /></SuspenseWrapper> },
     ],
   },
   {

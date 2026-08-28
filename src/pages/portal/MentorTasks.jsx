@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import SEO from '../../components/SEO/SEO';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { Plus, X, ChevronRight, ChevronDown, FolderPlus } from 'lucide-react';
@@ -6,7 +7,7 @@ import './InternTasks.css';
 import './MentorTasks.css';
 
 export default function MentorTasks() {
-  const { projects, tasks, interns, createProject, createTask, updateTaskDetails, deleteTask } = useWorkspace();
+  const { projects, tasks, interns, createProject, assignProjectTemplate, createTask, updateTaskDetails, deleteTask } = useWorkspace();
   const [filter, setFilter] = useState('ALL');
   const [expandedProjects, setExpandedProjects] = useState({});
   
@@ -18,6 +19,24 @@ export default function MentorTasks() {
   const [editTaskData, setEditTaskData] = useState(null); // If not null, edit modal is open
   const [newTask, setNewTask] = useState({ title: '', projectId: '', priority: 'Medium', status: 'TODO', assignee: '' });
   const [error, setError] = useState('');
+  
+  const [isAssignTemplateOpen, setAssignTemplateOpen] = useState(false);
+  const [templates, setTemplates] = useState([]);
+  const [templateAssignData, setTemplateAssignData] = useState({ templateKey: '', internId: '' });
+
+  const fetchTemplates = async () => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || '/api';
+      const token = localStorage.getItem('taksha_token');
+      const res = await axios.get(`${API_URL}/project-templates`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setTemplates(res.data);
+      setAssignTemplateOpen(true);
+    } catch (err) {
+      console.error('Failed to fetch templates:', err);
+    }
+  };
 
   const getStatusColor = (status) => {
     switch(status) {
@@ -87,6 +106,23 @@ export default function MentorTasks() {
     }
   };
 
+  const handleAssignTemplateSubmit = async (e) => {
+    e.preventDefault();
+    if (!templateAssignData.templateKey || !templateAssignData.internId) {
+      setError('Please select both a template and an intern.');
+      return;
+    }
+    setError('');
+    const res = await assignProjectTemplate(templateAssignData.templateKey, templateAssignData.internId);
+    if (res.success) {
+      setAssignTemplateOpen(false);
+      setTemplateAssignData({ templateKey: '', internId: '' });
+      setExpandedProjects(prev => ({ ...prev, [res.project.id]: true }));
+    } else {
+      setError(res.error || 'Failed to assign project template');
+    }
+  };
+
   return (
     <>
       <SEO title="Task Masterlist | Taksha Workspace" />
@@ -110,7 +146,14 @@ export default function MentorTasks() {
                 style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', background: 'var(--color-bg-alt)' }}
                 onClick={() => setCreateProjectOpen(true)}
               >
-                <FolderPlus size={16} /> New Project
+                <FolderPlus size={16} /> Custom Project
+              </button>
+              <button 
+                className="intern-btn intern-btn--assign" 
+                style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
+                onClick={fetchTemplates}
+              >
+                <FolderPlus size={16} /> Official Project
               </button>
               <button 
                 className="intern-btn intern-btn--assign" 
@@ -141,6 +184,65 @@ export default function MentorTasks() {
                   <textarea rows="3" value={newProject.description} onChange={e => setNewProject({...newProject, description: e.target.value})} style={{ width: '100%', padding: '8px', border: '2px solid var(--color-ink)' }} />
                 </div>
                 <button type="submit" className="intern-btn intern-btn--assign" style={{ width: '100%' }}>Create Project</button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ASSIGN TEMPLATE MODAL */}
+        {isAssignTemplateOpen && (
+          <div className="modal-overlay">
+            <div className="modal-content" style={{ maxWidth: '600px' }}>
+              <button className="modal-close" onClick={() => setAssignTemplateOpen(false)}><X /></button>
+              <h2>Assign Official Project</h2>
+              <p style={{ color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
+                Select an official Taksha template to automatically generate the project and its complete checklist of tasks.
+              </p>
+              
+              {error && <div style={{ color: 'var(--color-card-pink)', marginBottom: 'var(--space-4)', fontWeight: 800 }}>{error}</div>}
+              
+              <form onSubmit={handleAssignTemplateSubmit}>
+                <div style={{ marginBottom: 'var(--space-4)' }}>
+                  <label style={{ display: 'block', fontWeight: 800, marginBottom: 'var(--space-2)' }}>Assign To Intern</label>
+                  <select 
+                    required 
+                    className="intern-select"
+                    value={templateAssignData.internId} 
+                    onChange={e => setTemplateAssignData({...templateAssignData, internId: e.target.value})}
+                    style={{ width: '100%', padding: '8px', border: '2px solid var(--color-ink)' }}
+                  >
+                    <option value="">-- Select Intern --</option>
+                    {interns.map(i => (
+                      <option key={i.id} value={i.id}>{i.name}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div style={{ marginBottom: 'var(--space-6)' }}>
+                  <label style={{ display: 'block', fontWeight: 800, marginBottom: 'var(--space-2)' }}>Select Template</label>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                    {templates.map(t => (
+                      <label key={t.key} style={{ display: 'flex', gap: 'var(--space-3)', padding: 'var(--space-3)', border: '2px solid var(--color-ink)', borderRadius: '4px', cursor: 'pointer', background: templateAssignData.templateKey === t.key ? 'var(--color-card-yellow)' : 'var(--color-bg-primary)' }}>
+                        <input 
+                          type="radio" 
+                          name="template" 
+                          value={t.key}
+                          checked={templateAssignData.templateKey === t.key}
+                          onChange={e => setTemplateAssignData({...templateAssignData, templateKey: e.target.value})}
+                          style={{ marginTop: '4px' }}
+                          required
+                        />
+                        <div>
+                          <div style={{ fontWeight: 800 }}>{t.name}</div>
+                          <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', marginTop: '4px' }}>{t.description}</div>
+                          <div style={{ fontSize: '0.8rem', marginTop: '6px', fontWeight: 600 }}>Stack: {t.stack}</div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                
+                <button type="submit" className="intern-btn intern-btn--assign" style={{ width: '100%' }}>Assign Project & Generate Tasks</button>
               </form>
             </div>
           </div>

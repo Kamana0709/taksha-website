@@ -94,6 +94,16 @@ export default function MentorReviews() {
                   </div>
                 )}
 
+                {sub.fileUrl && (
+                  <div style={{ marginBottom: 'var(--space-4)' }}>
+                    <p style={{ fontWeight: 800, marginBottom: 'var(--space-2)' }}>Attachment:</p>
+                    <a href={(import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '') + sub.fileUrl} target="_blank" rel="noreferrer" className="review-card__link" download>
+                      <Link2 size={16} />
+                      Download {sub.fileName || 'Attachment'}
+                    </a>
+                  </div>
+                )}
+
                 <div>
                   <label style={{ fontWeight: 800, display: 'block', marginBottom: 'var(--space-2)' }}>Feedback / Remarks:</label>
                   <textarea 

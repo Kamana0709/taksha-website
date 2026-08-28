@@ -13,7 +13,7 @@ export default function InternTasks() {
   
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const [activeProject, setActiveProject] = useState(null);
-  const [submissionData, setSubmissionData] = useState({ githubUrl: '', liveUrl: '', description: '' });
+  const [submissionData, setSubmissionData] = useState({ githubUrl: '', liveUrl: '', description: '', file: null });
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -47,7 +47,7 @@ export default function InternTasks() {
   const handleOpenSubmit = (e, project) => {
     e.stopPropagation();
     setActiveProject(project);
-    setSubmissionData({ githubUrl: '', liveUrl: '', description: '' });
+    setSubmissionData({ githubUrl: '', liveUrl: '', description: '', file: null });
     setSubmitError('');
     setSubmitModalOpen(true);
   };
@@ -139,6 +139,16 @@ export default function InternTasks() {
                     value={submissionData.description} 
                     onChange={e => setSubmissionData({...submissionData, description: e.target.value})} 
                     style={{ width: '100%', padding: '12px', border: '2px solid var(--color-ink)' }} 
+                  />
+                </div>
+                
+                <div style={{ marginBottom: 'var(--space-6)' }}>
+                  <label style={{ display: 'block', fontWeight: 800, marginBottom: 'var(--space-2)' }}>Attachment (Optional, max 10MB)</label>
+                  <input 
+                    type="file" 
+                    onChange={e => setSubmissionData({...submissionData, file: e.target.files[0]})} 
+                    style={{ width: '100%', padding: '12px', border: '2px solid var(--color-ink)', background: 'var(--color-bg)' }}
+                    accept=".pdf,.zip,.png,.jpg,.jpeg,.fig"
                   />
                 </div>
                 

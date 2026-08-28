@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SEO from '../../components/SEO/SEO';
 import { useAuth } from '../../context/AuthContext';
-import { Pencil, Save, X } from 'lucide-react';
+import { useWorkspace } from '../../context/WorkspaceContext';
+import { Pencil, Save, X, Download } from 'lucide-react';
 import './InternProfile.css';
 
 export default function InternProfile() {
   const { user, updateProfile } = useAuth();
+  const { checkEligibility, generateCertificate } = useWorkspace();
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     phone: user?.phone || '',
@@ -13,6 +15,37 @@ export default function InternProfile() {
   });
   const [error, setError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [certData, setCertData] = useState(null);
+  const [isGeneratingCert, setIsGeneratingCert] = useState(false);
+
+  useEffect(() => {
+    const fetchEligibility = async () => {
+      const data = await checkEligibility(user.id);
+      setCertData(data);
+    };
+    if (user?.id) fetchEligibility();
+  }, [user]);
+
+  const handleDownloadCertificate = async () => {
+    setIsGeneratingCert(true);
+    let certId = certData?.certificate?.id;
+    
+    if (!certData?.alreadyIssued) {
+      const res = await generateCertificate(user.id);
+      if (res.success) {
+        certId = res.certificate.id;
+        setCertData(prev => ({ ...prev, alreadyIssued: true, certificate: res.certificate }));
+      } else {
+        alert(res.error || 'Failed to generate certificate');
+        setIsGeneratingCert(false);
+        return;
+      }
+    }
+    
+    const backendUrl = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '');
+    window.open(`${backendUrl}/api/certificates/${certId}/download`, '_blank');
+    setIsGeneratingCert(false);
+  };
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -126,6 +159,30 @@ export default function InternProfile() {
               <div className="profile-info-group">
                 <div className="profile-label">Start Date</div>
                 <div className="profile-value">01 May 2026</div>
+              </div>
+            </div>
+            
+            <div style={{ marginTop: 'var(--space-8)' }}>
+              <div className="profile-info-group">
+                <div className="profile-label">Internship Certificate</div>
+                <div style={{ marginTop: 'var(--space-2)' }}>
+                  {!certData ? (
+                    <span style={{ color: 'var(--color-text-secondary)' }}>Checking eligibility...</span>
+                  ) : certData.isEligible || certData.alreadyIssued ? (
+                    <button 
+                      className="intern-btn intern-btn--assign" 
+                      onClick={handleDownloadCertificate}
+                      disabled={isGeneratingCert}
+                      style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
+                    >
+                      <Download size={16} /> {isGeneratingCert ? 'Generating...' : 'Download Certificate'}
+                    </button>
+                  ) : (
+                    <span style={{ color: 'var(--color-text-secondary)' }}>
+                      Complete all assigned tasks and get all project submissions approved to unlock your certificate.
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>

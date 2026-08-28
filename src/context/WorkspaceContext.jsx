@@ -60,6 +60,31 @@ export const WorkspaceProvider = ({ children }) => {
     }
   };
 
+  const assignProjectTemplate = async (templateKey, internId) => {
+    try {
+      const res = await axios.post(`${API_URL}/project-templates/assign`, { templateKey, internId });
+      const newTasks = res.data.tasks;
+      const project = res.data.project;
+      
+      setData(prev => {
+        let updatedProjects = [...prev.projects];
+        if (!updatedProjects.find(p => p.id === project.id)) {
+          updatedProjects.push(project);
+        }
+        
+        return {
+          ...prev,
+          projects: updatedProjects,
+          tasks: [...prev.tasks, ...newTasks]
+        };
+      });
+      return { success: true, project: res.data.project, tasks: res.data.tasks };
+    } catch (err) {
+      console.error(err);
+      return { success: false, error: err.response?.data?.error || 'Failed to assign project template' };
+    }
+  };
+
   const createTask = async (task) => {
     try {
       const res = await axios.post(`${API_URL}/tasks`, task);
@@ -151,7 +176,21 @@ export const WorkspaceProvider = ({ children }) => {
 
   const submitProjectWork = async (submissionData) => {
     try {
-      const res = await axios.post(`${API_URL}/submissions`, submissionData);
+      let res;
+      if (submissionData.file) {
+        const formData = new FormData();
+        Object.keys(submissionData).forEach(key => {
+          if (submissionData[key] !== undefined && submissionData[key] !== null) {
+            formData.append(key, submissionData[key]);
+          }
+        });
+        res = await axios.post(`${API_URL}/submissions`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      } else {
+        res = await axios.post(`${API_URL}/submissions`, submissionData);
+      }
+      
       setData(prev => ({
         ...prev,
         submissions: [res.data, ...prev.submissions]
@@ -179,6 +218,26 @@ export const WorkspaceProvider = ({ children }) => {
     }
   };
 
+  const checkEligibility = async (internId) => {
+    try {
+      const res = await axios.get(`${API_URL}/certificates/${internId}/eligible`);
+      return res.data;
+    } catch (err) {
+      console.error(err);
+      return { isEligible: false };
+    }
+  };
+
+  const generateCertificate = async (internId) => {
+    try {
+      const res = await axios.post(`${API_URL}/certificates/generate`, { internId });
+      return res.data;
+    } catch (err) {
+      console.error(err);
+      return { success: false, error: err.response?.data?.error || 'Failed to generate certificate' };
+    }
+  };
+
   if (loading && user) return null; // Loading
 
   return (
@@ -189,6 +248,7 @@ export const WorkspaceProvider = ({ children }) => {
       announcements: data.announcements || [],
       submissions: data.submissions || [],
       createProject,
+      assignProjectTemplate,
       createTask, 
       updateTaskStatus,
       updateTaskDetails,
@@ -197,7 +257,9 @@ export const WorkspaceProvider = ({ children }) => {
       createIntern,
       deleteIntern,
       submitProjectWork,
-      reviewSubmission
+      reviewSubmission,
+      checkEligibility,
+      generateCertificate
     }}>
       {children}
     </WorkspaceContext.Provider>

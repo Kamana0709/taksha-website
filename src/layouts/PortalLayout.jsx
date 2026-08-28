@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   CheckSquare, Calendar, Info, User, Settings,
   Bell, Menu, X, LayoutDashboard, FolderKanban,
-  UploadCloud, Clock, Users, FileCheck, BarChart2, Briefcase
+  UploadCloud, Clock, Users, FileCheck, BarChart2, Briefcase, MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './PortalLayout.css';
@@ -14,7 +14,8 @@ const INTERN_NAV_LINKS = [
   { path: '/intern/projects', label: 'My Projects', icon: FolderKanban },
   { path: '/intern/submissions', label: 'Submissions', icon: UploadCloud },
   { path: '/intern/calendar', label: 'Calendar', icon: Calendar },
-  { path: '/intern/leave', label: 'Leave', icon: Clock }
+  { path: '/intern/leave', label: 'Leave', icon: Clock },
+  { path: '/intern/messages', label: 'Messages', icon: MessageSquare }
 ];
 
 const MENTOR_NAV_LINKS = [
@@ -25,6 +26,7 @@ const MENTOR_NAV_LINKS = [
   { path: '/mentor/kanban', label: 'Kanban Board', icon: FolderKanban },
   { path: '/mentor/submissions', label: 'Submissions', icon: UploadCloud },
   { path: '/mentor/reviews', label: 'Reviews', icon: FileCheck },
+  { path: '/mentor/messages', label: 'Messages', icon: MessageSquare },
   { path: '/mentor/reports', label: 'Reports', icon: BarChart2 }
 ];
 
@@ -39,11 +41,29 @@ export default function PortalLayout({ role = 'intern' }) {
   const [isNotifOpen, setNotifOpen] = useState(false);
   const [isProfileOpen, setProfileOpen] = useState(false);
   const [applications, setApplications] = useState([]);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
   useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        const token = localStorage.getItem('taksha_token');
+        if (!token) return;
+        const res = await fetch('/api/messages/unread-count', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUnreadMessages(data.unreadCount || 0);
+        }
+      } catch (e) {
+        console.error("Failed to fetch unread messages", e);
+      }
+    };
+    fetchUnread();
+
     if (role === 'mentor') {
       const fetchApps = async () => {
         try {
@@ -195,7 +215,7 @@ export default function PortalLayout({ role = 'intern' }) {
                 onClick={() => { setNotifOpen(!isNotifOpen); setProfileOpen(false); }}
               >
                 <Bell size={20} strokeWidth={2.5} />
-                <span className="portal-header__badge">{role === 'mentor' ? applications.length : 3}</span>
+                <span className="portal-header__badge">{role === 'mentor' ? applications.length + unreadMessages : 3 + unreadMessages}</span>
               </button>
               
               {isNotifOpen && (
@@ -203,18 +223,32 @@ export default function PortalLayout({ role = 'intern' }) {
                   <div className="portal-dropdown__header">Notifications</div>
                   
                   {role === 'mentor' ? (
-                    applications.length === 0 ? (
-                      <div className="portal-dropdown__item"><span className="portal-dropdown__desc">No new notifications.</span></div>
-                    ) : (
-                      applications.slice(0, 5).map(app => (
-                        <div className="portal-dropdown__item" key={app.id}>
-                          <span className="portal-dropdown__title">New Application</span>
-                          <span className="portal-dropdown__desc">{app.name} applied for {app.roleTitle}</span>
-                        </div>
-                      ))
-                    )
+                    <>
+                      {unreadMessages > 0 && (
+                        <Link to="/mentor/messages" className="portal-dropdown__item" style={{ textDecoration: 'none' }}>
+                          <span className="portal-dropdown__title">New Messages</span>
+                          <span className="portal-dropdown__desc">You have {unreadMessages} unread messages</span>
+                        </Link>
+                      )}
+                      {applications.length === 0 ? (
+                        <div className="portal-dropdown__item"><span className="portal-dropdown__desc">No new applications.</span></div>
+                      ) : (
+                        applications.slice(0, 5).map(app => (
+                          <div className="portal-dropdown__item" key={app.id}>
+                            <span className="portal-dropdown__title">New Application</span>
+                            <span className="portal-dropdown__desc">{app.name} applied for {app.roleTitle}</span>
+                          </div>
+                        ))
+                      )}
+                    </>
                   ) : (
                     <>
+                      {unreadMessages > 0 && (
+                        <Link to="/intern/messages" className="portal-dropdown__item" style={{ textDecoration: 'none' }}>
+                          <span className="portal-dropdown__title">New Messages</span>
+                          <span className="portal-dropdown__desc">You have {unreadMessages} unread messages</span>
+                        </Link>
+                      )}
                       <div className="portal-dropdown__item">
                         <span className="portal-dropdown__title">New Task Assigned</span>
                         <span className="portal-dropdown__desc">Mentor Kamana assigned you "Responsive Navbar"</span>

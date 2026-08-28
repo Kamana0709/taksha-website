@@ -29,6 +29,10 @@ model User {
   announcements Announcement[]
   submissions   Submission[] @relation("InternSubmissions")
   reviews       Submission[] @relation("MentorReviews")
+  certificates  Certificate[] @relation("InternCertificates")
+  
+  sentMessages  Message[]    @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
 }
 
 model Project {
@@ -92,6 +96,8 @@ model Submission {
   githubUrl      String
   liveUrl        String?
   description    String?
+  fileUrl        String?
+  fileName       String?
   status         String   @default("Submitted") // Submitted, Under Review, Approved, Changes Requested
   mentorFeedback String?
   reviewedAt     DateTime?
@@ -106,4 +112,29 @@ model Submission {
   
   reviewedById   String?
   reviewedBy     User?    @relation("MentorReviews", fields: [reviewedById], references: [id])
+}
+
+model Certificate {
+  id                String   @id @default(uuid())
+  certificateNumber String   @unique
+  role              String
+  startDate         String
+  endDate           String
+  issuedAt          DateTime @default(now())
+  
+  internId          String
+  intern            User     @relation("InternCertificates", fields: [internId], references: [id])
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  content    String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  
+  senderId   String
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  
+  receiverId String
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
 }

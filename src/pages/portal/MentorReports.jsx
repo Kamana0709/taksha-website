@@ -1,26 +1,84 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import SEO from '../../components/SEO/SEO';
-import { Download } from 'lucide-react';
-import { useWorkspace } from '../../context/WorkspaceContext';
+import { Download, Loader } from 'lucide-react';
 import './MentorReports.css';
 
 export default function MentorReports() {
-  const { interns, tasks } = useWorkspace();
-  
-  const totalTasks = tasks.length || 1;
-  const todoTasks = tasks.filter(t => t.status === 'TODO').length;
-  const inProgressTasks = tasks.filter(t => t.status === 'IN_PROGRESS').length;
-  const reviewTasks = tasks.filter(t => t.status === 'REVIEW').length;
-  const doneTasks = tasks.filter(t => t.status === 'DONE').length;
+  const [summary, setSummary] = useState(null);
+  const [weeklyProgress, setWeeklyProgress] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const totalInterns = interns.length || 1;
-  const onTrackInterns = interns.filter(i => i.status === 'On Track').length;
-  const behindInterns = interns.filter(i => i.status === 'Behind').length;
-  const atRiskInterns = interns.filter(i => i.status === 'At Risk').length;
+  const API_URL = import.meta.env.VITE_API_URL || '/api';
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem('taksha_token');
+        const headers = { 'Authorization': `Bearer ${token}` };
+        
+        const [sumRes, weekRes] = await Promise.all([
+          axios.get(`${API_URL}/reports/summary`, { headers }),
+          axios.get(`${API_URL}/reports/weekly-progress`, { headers })
+        ]);
+        
+        setSummary(sumRes.data);
+        setWeeklyProgress(weekRes.data);
+      } catch (err) {
+        console.error("Failed to fetch reports", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleExportCSV = () => {
+    if (!summary) return;
+    
+    const rows = [
+      ['Category', 'Metric', 'Value'],
+      ['Tasks', 'Total', summary.tasks.total],
+      ['Tasks', 'To Do', summary.tasks.todo],
+      ['Tasks', 'In Progress', summary.tasks.inProgress],
+      ['Tasks', 'Review', summary.tasks.review],
+      ['Tasks', 'Done', summary.tasks.done],
+      ['Interns', 'Total', summary.interns.total],
+      ['Interns', 'On Track', summary.interns.onTrack],
+      ['Interns', 'Behind', summary.interns.behind],
+      ['Interns', 'At Risk', summary.interns.atRisk],
+      ['Submissions', 'Total', summary.submissions.total],
+      ['Submissions', 'Approved', summary.submissions.approved],
+      ['Submissions', 'Pending', summary.submissions.pending],
+    ];
+
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + rows.map(e => e.join(",")).join("\n");
+      
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "taksha-report.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  if (loading || !summary) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Loader className="spin" size={40} />
+      </div>
+    );
+  }
+
+  const { tasks, interns } = summary;
   
-  const onTrackPct = Math.round((onTrackInterns / totalInterns) * 100);
-  const behindPct = Math.round((behindInterns / totalInterns) * 100);
-  const atRiskPct = Math.round((atRiskInterns / totalInterns) * 100);
+  const onTrackPct = Math.round((interns.onTrack / interns.total) * 100) || 0;
+  const behindPct = Math.round((interns.behind / interns.total) * 100) || 0;
+  const atRiskPct = Math.round((interns.atRisk / interns.total) * 100) || 0;
+
+  const maxWeeklyTasks = weeklyProgress ? Math.max(...weeklyProgress.map(w => w.count), 1) : 1;
 
   return (
     <>
@@ -33,7 +91,11 @@ export default function MentorReports() {
           </div>
           
           <div>
-            <button className="intern-btn intern-btn--assign" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            <button 
+              className="intern-btn intern-btn--assign" 
+              style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
+              onClick={handleExportCSV}
+            >
               <Download size={18} />
               Export CSV
             </button>
@@ -48,10 +110,10 @@ export default function MentorReports() {
             </div>
             
             <div className="mock-bar-chart">
-              <div className="mock-bar" style={{ height: `${(todoTasks / totalTasks) * 100}%` }}><strong>{todoTasks}</strong><span>To Do</span></div>
-              <div className="mock-bar" style={{ height: `${(inProgressTasks / totalTasks) * 100}%`, background: 'var(--color-card-purple)' }}><strong>{inProgressTasks}</strong><span>Working</span></div>
-              <div className="mock-bar" style={{ height: `${(reviewTasks / totalTasks) * 100}%`, background: 'var(--color-accent)' }}><strong>{reviewTasks}</strong><span>Review</span></div>
-              <div className="mock-bar" style={{ height: `${(doneTasks / totalTasks) * 100}%`, background: 'var(--color-card-pink)' }}><strong>{doneTasks}</strong><span>Done</span></div>
+              <div className="mock-bar" style={{ height: `${(tasks.todo / tasks.total) * 100}%` }}><strong>{tasks.todo}</strong><span>To Do</span></div>
+              <div className="mock-bar" style={{ height: `${(tasks.inProgress / tasks.total) * 100}%`, background: 'var(--color-card-purple)' }}><strong>{tasks.inProgress}</strong><span>Working</span></div>
+              <div className="mock-bar" style={{ height: `${(tasks.review / tasks.total) * 100}%`, background: 'var(--color-accent)' }}><strong>{tasks.review}</strong><span>Review</span></div>
+              <div className="mock-bar" style={{ height: `${(tasks.done / tasks.total) * 100}%`, background: 'var(--color-card-pink)' }}><strong>{tasks.done}</strong><span>Done</span></div>
             </div>
           </div>
 
@@ -91,6 +153,30 @@ export default function MentorReports() {
                   <div style={{ width: `${atRiskPct}%`, height: '100%', background: 'var(--color-card-purple)', borderRight: '2px solid var(--color-ink)' }}></div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div className="report-card" style={{ gridColumn: '1 / -1' }}>
+            <div className="report-card__header">
+              <h2 className="report-card__title">Completed Tasks Velocity</h2>
+              <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-text-secondary)' }}>Last 8 Weeks</span>
+            </div>
+            
+            <div className="mock-bar-chart" style={{ height: '200px' }}>
+              {weeklyProgress && weeklyProgress.map((week, idx) => (
+                <div 
+                  key={idx} 
+                  className="mock-bar" 
+                  style={{ 
+                    height: `${(week.count / maxWeeklyTasks) * 100}%`, 
+                    background: 'var(--color-card-cyan)',
+                    minHeight: week.count > 0 ? '20px' : '0px'
+                  }}
+                >
+                  <strong>{week.count}</strong>
+                  <span>{week.label}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
