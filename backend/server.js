@@ -824,7 +824,7 @@ app.get('/api/reports/weekly-progress', authenticateToken, async (req, res) => {
       const d = new Date(now);
       d.setDate(d.getDate() - (i * 7));
       return { 
-        label: \`W\${8 - i}\`, 
+        label: `W${8 - i}`, 
         weekStart: startOfWeek(d), 
         count: 0 
       };
