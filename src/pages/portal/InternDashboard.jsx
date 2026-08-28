@@ -124,7 +124,7 @@ export default function InternDashboard() {
                           <h4 className="kanban-task__title">{task.title}</h4>
                           {task.status === 'CHANGES_REQUESTED' && <span style={{fontSize: '9px', background: 'var(--color-card-pink)', padding: '2px', border: '1px solid black'}}>CHANGES REQ</span>}
                         </div>
-                        <p className="kanban-task__project">{task.project}</p>
+                        <p className="kanban-task__project">{task.project?.name || 'No Project'}</p>
                         <div className="kanban-task__bottom">
                           <span className="kanban-task__priority" style={{ color: task.priority === 'High' ? 'var(--color-card-pink)' : 'var(--color-ink)', borderColor: 'var(--color-ink)', background: 'var(--color-bg)' }}>
                             {task.priority || 'Medium'}

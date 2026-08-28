@@ -46,7 +46,7 @@ export default function MentorKanban() {
                             <h4 className="kanban-task__title">{task.title}</h4>
                             <button className="kanban-task__more"><MoreHorizontal size={16} /></button>
                           </div>
-                          <span className="kanban-task__project">{task.project}</span>
+                          <span className="kanban-task__project">{task.project?.name || 'No Project'}</span>
                           <span className="kanban-task__project" style={{ fontWeight: 800 }}>Assigned to: {assigneeName}</span>
                           <div className="kanban-task__bottom">
                             <span className="kanban-task__priority" style={{ 
