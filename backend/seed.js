@@ -31,8 +31,41 @@ async function main() {
     },
   });
 
+  const intern1 = await prisma.user.create({
+    data: {
+      email: 'charu@taksha.in',
+      name: 'Charu Mandilwar',
+      passwordHash: defaultPassword,
+      role: 'INTERN',
+    },
+  });
+
+  const intern2 = await prisma.user.create({
+    data: {
+      email: 'intern@taksha.in',
+      name: 'Intern User',
+      passwordHash: defaultPassword,
+      role: 'INTERN',
+    },
+  });
+
+  // Create a task for Charu in project1
+  await prisma.task.create({
+    data: {
+      title: 'Initial Setup & Onboarding',
+      projectId: project1.id,
+      priority: 'High',
+      status: 'TODO',
+      date: new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }),
+      assigneeId: intern1.id,
+      assignerId: mentor.id,
+    }
+  });
+
   console.log('Seeding complete! You can log in with:');
   console.log('Mentor: mentor@taksha.in / password123');
+  console.log('Intern 1: charu@taksha.in / password123');
+  console.log('Intern 2: intern@taksha.in / password123');
 }
 
 main()
