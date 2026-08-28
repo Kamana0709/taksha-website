@@ -10,7 +10,7 @@ export const useWorkspace = () => useContext(WorkspaceContext);
 // Default data removed, fetching from backend instead
 
 export const WorkspaceProvider = ({ children }) => {
-  const [data, setData] = useState({ tasks: [], interns: [], announcements: [], submissions: [] });
+  const [data, setData] = useState({ projects: [], tasks: [], interns: [], announcements: [], submissions: [] });
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
 
@@ -19,7 +19,8 @@ export const WorkspaceProvider = ({ children }) => {
 
     const fetchData = async () => {
       try {
-        const [tasksRes, internsRes, announcementsRes, submissionsRes] = await Promise.all([
+        const [projectsRes, tasksRes, internsRes, announcementsRes, submissionsRes] = await Promise.all([
+          axios.get(`${API_URL}/projects`),
           axios.get(`${API_URL}/tasks`),
           user.role === 'MENTOR' ? axios.get(`${API_URL}/users/interns`) : Promise.resolve({ data: [] }),
           axios.get(`${API_URL}/announcements`),
@@ -27,6 +28,7 @@ export const WorkspaceProvider = ({ children }) => {
         ]);
 
         setData({
+          projects: projectsRes.data,
           tasks: tasksRes.data,
           interns: internsRes.data,
           announcements: announcementsRes.data,
@@ -42,10 +44,25 @@ export const WorkspaceProvider = ({ children }) => {
     fetchData();
   }, [user]);
 
+  const createProject = async (projectData) => {
+    try {
+      const res = await axios.post(`${API_URL}/projects`, projectData);
+      setData(prev => ({ ...prev, projects: [res.data, ...prev.projects] }));
+      return { success: true, project: res.data };
+    } catch (err) {
+      console.error(err);
+      return { success: false, error: err.response?.data?.error || 'Failed to create project' };
+    }
+  };
+
   const createTask = async (task) => {
     try {
       const res = await axios.post(`${API_URL}/tasks`, task);
-      setData(prev => ({ ...prev, tasks: [...prev.tasks, res.data] }));
+      setData(prev => ({ 
+        ...prev, 
+        tasks: [...prev.tasks, res.data],
+        projects: prev.projects.map(p => p.id === task.projectId ? { ...p, tasks: [...(p.tasks || []), res.data] } : p)
+      }));
     } catch (err) {
       console.error(err);
     }
@@ -148,10 +165,12 @@ export const WorkspaceProvider = ({ children }) => {
 
   return (
     <WorkspaceContext.Provider value={{ 
+      projects: data.projects,
       tasks: data.tasks, 
       interns: data.interns, 
       announcements: data.announcements || [],
       submissions: data.submissions || [],
+      createProject,
       createTask, 
       updateTaskStatus,
       updateTaskDetails,

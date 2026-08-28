@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import SEO from '../../components/SEO/SEO';
 import { useWorkspace } from '../../context/WorkspaceContext';
-import { Plus, X } from 'lucide-react';
-import './InternTasks.css'; // Missing import fixed
+import { Plus, X, ChevronRight, ChevronDown, FolderPlus } from 'lucide-react';
+import './InternTasks.css';
 import './MentorTasks.css';
 
 export default function MentorTasks() {
-  const { tasks, interns, createTask, updateTaskDetails, deleteTask } = useWorkspace();
+  const { projects, tasks, interns, createProject, createTask, updateTaskDetails, deleteTask } = useWorkspace();
   const [filter, setFilter] = useState('ALL');
+  const [expandedProjects, setExpandedProjects] = useState({});
   
   // Modals state
-  const [isCreateModalOpen, setCreateModalOpen] = useState(false);
+  const [isCreateProjectOpen, setCreateProjectOpen] = useState(false);
+  const [newProject, setNewProject] = useState({ name: '', description: '' });
+  
+  const [isCreateTaskOpen, setCreateTaskOpen] = useState(false);
   const [editTaskData, setEditTaskData] = useState(null); // If not null, edit modal is open
-  const [newTask, setNewTask] = useState({ title: '', project: '', priority: 'Medium', status: 'TODO', assignee: '' });
+  const [newTask, setNewTask] = useState({ title: '', projectId: '', priority: 'Medium', status: 'TODO', assignee: '' });
   const [error, setError] = useState('');
 
   const getStatusColor = (status) => {
@@ -28,7 +32,29 @@ export default function MentorTasks() {
 
   const filteredTasks = filter === 'ALL' ? tasks : tasks.filter(t => t.status === filter);
 
-  const handleCreateSubmit = async (e) => {
+  const toggleProject = (projectId) => {
+    setExpandedProjects(prev => ({
+      ...prev,
+      [projectId]: !prev[projectId]
+    }));
+  };
+
+  const handleCreateProjectSubmit = async (e) => {
+    e.preventDefault();
+    if (!newProject.name) return;
+    setError('');
+    const res = await createProject(newProject);
+    if (res.success) {
+      setCreateProjectOpen(false);
+      setNewProject({ name: '', description: '' });
+      // auto expand new project
+      setExpandedProjects(prev => ({ ...prev, [res.project.id]: true }));
+    } else {
+      setError(res.error || 'Failed to create project');
+    }
+  };
+
+  const handleCreateTaskSubmit = async (e) => {
     e.preventDefault();
     if (!newTask.assignee) {
       setError('Please select an intern to assign this task to.');
@@ -36,8 +62,12 @@ export default function MentorTasks() {
     }
     setError('');
     await createTask(newTask);
-    setCreateModalOpen(false);
-    setNewTask({ title: '', project: '', priority: 'Medium', status: 'TODO', assignee: '' });
+    setCreateTaskOpen(false);
+    setNewTask({ title: '', projectId: '', priority: 'Medium', status: 'TODO', assignee: '' });
+    // auto expand the project
+    if (newTask.projectId) {
+      setExpandedProjects(prev => ({ ...prev, [newTask.projectId]: true }));
+    }
   };
 
   const handleEditSubmit = async (e) => {
@@ -73,22 +103,54 @@ export default function MentorTasks() {
             <button className="task-filter" style={filter === 'REVIEW' ? {background:'var(--color-ink)', color:'var(--color-bg)'} : {}} onClick={() => setFilter('REVIEW')}>Needs Review</button>
             <button className="task-filter" style={filter === 'DONE' ? {background:'var(--color-ink)', color:'var(--color-bg)'} : {}} onClick={() => setFilter('DONE')}>Completed</button>
             
-            {/* Added Create Task Button */}
-            <button 
-              className="intern-btn intern-btn--assign" 
-              style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
-              onClick={() => setCreateModalOpen(true)}
-            >
-              <Plus size={16} /> Assign Task
-            </button>
+            {/* Added Create Buttons */}
+            <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+              <button 
+                className="intern-btn intern-btn--view" 
+                style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', background: 'var(--color-bg-alt)' }}
+                onClick={() => setCreateProjectOpen(true)}
+              >
+                <FolderPlus size={16} /> New Project
+              </button>
+              <button 
+                className="intern-btn intern-btn--assign" 
+                style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
+                onClick={() => setCreateTaskOpen(true)}
+              >
+                <Plus size={16} /> Assign Task
+              </button>
+            </div>
           </div>
         </header>
 
-        {/* CREATE TASK MODAL */}
-        {isCreateModalOpen && (
+        {/* CREATE PROJECT MODAL */}
+        {isCreateProjectOpen && (
           <div className="modal-overlay">
             <div className="modal-content" style={{ maxWidth: '500px' }}>
-              <button className="modal-close" onClick={() => setCreateModalOpen(false)}><X /></button>
+              <button className="modal-close" onClick={() => setCreateProjectOpen(false)}><X /></button>
+              <h2>Create New Project</h2>
+              {error && <div style={{ color: 'var(--color-card-pink)', marginBottom: 'var(--space-4)', fontWeight: 800 }}>{error}</div>}
+              
+              <form onSubmit={handleCreateProjectSubmit}>
+                <div style={{ marginBottom: 'var(--space-4)' }}>
+                  <label style={{ display: 'block', fontWeight: 800, marginBottom: 'var(--space-2)' }}>Project Name</label>
+                  <input required type="text" value={newProject.name} onChange={e => setNewProject({...newProject, name: e.target.value})} style={{ width: '100%', padding: '8px', border: '2px solid var(--color-ink)' }} />
+                </div>
+                <div style={{ marginBottom: 'var(--space-4)' }}>
+                  <label style={{ display: 'block', fontWeight: 800, marginBottom: 'var(--space-2)' }}>Description</label>
+                  <textarea rows="3" value={newProject.description} onChange={e => setNewProject({...newProject, description: e.target.value})} style={{ width: '100%', padding: '8px', border: '2px solid var(--color-ink)' }} />
+                </div>
+                <button type="submit" className="intern-btn intern-btn--assign" style={{ width: '100%' }}>Create Project</button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* CREATE TASK MODAL */}
+        {isCreateTaskOpen && (
+          <div className="modal-overlay">
+            <div className="modal-content" style={{ maxWidth: '500px' }}>
+              <button className="modal-close" onClick={() => setCreateTaskOpen(false)}><X /></button>
               <h2>Assign New Task</h2>
               {error && <div style={{ color: 'var(--color-card-pink)', marginBottom: 'var(--space-4)', fontWeight: 800 }}>{error}</div>}
               
@@ -98,8 +160,11 @@ export default function MentorTasks() {
                   <input required type="text" value={newTask.title} onChange={e => setNewTask({...newTask, title: e.target.value})} style={{ width: '100%', padding: '8px', border: '2px solid var(--color-ink)' }} />
                 </div>
                 <div style={{ marginBottom: 'var(--space-4)' }}>
-                  <label style={{ display: 'block', fontWeight: 800, marginBottom: 'var(--space-2)' }}>Project Category</label>
-                  <input required type="text" placeholder="e.g. Project 1" value={newTask.project} onChange={e => setNewTask({...newTask, project: e.target.value})} style={{ width: '100%', padding: '8px', border: '2px solid var(--color-ink)' }} />
+                  <label style={{ display: 'block', fontWeight: 800, marginBottom: 'var(--space-2)' }}>Project</label>
+                  <select required value={newTask.projectId} onChange={e => setNewTask({...newTask, projectId: e.target.value})} style={{ width: '100%', padding: '8px', border: '2px solid var(--color-ink)' }}>
+                    <option value="" disabled>Select Project...</option>
+                    {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
                 </div>
                 <div style={{ marginBottom: 'var(--space-4)', display: 'flex', gap: 'var(--space-4)' }}>
                   <div style={{ flex: 1 }}>
@@ -140,8 +205,11 @@ export default function MentorTasks() {
                   <input required type="text" value={editTaskData.title} onChange={e => setEditTaskData({...editTaskData, title: e.target.value})} style={{ width: '100%', padding: '8px', border: '2px solid var(--color-ink)' }} />
                 </div>
                 <div style={{ marginBottom: 'var(--space-4)' }}>
-                  <label style={{ display: 'block', fontWeight: 800, marginBottom: 'var(--space-2)' }}>Project Category</label>
-                  <input required type="text" value={editTaskData.project} onChange={e => setEditTaskData({...editTaskData, project: e.target.value})} style={{ width: '100%', padding: '8px', border: '2px solid var(--color-ink)' }} />
+                  <label style={{ display: 'block', fontWeight: 800, marginBottom: 'var(--space-2)' }}>Project</label>
+                  <select required value={editTaskData.projectId} onChange={e => setEditTaskData({...editTaskData, projectId: e.target.value})} style={{ width: '100%', padding: '8px', border: '2px solid var(--color-ink)' }}>
+                    <option value="" disabled>Select Project...</option>
+                    {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
                 </div>
                 <div style={{ marginBottom: 'var(--space-4)', display: 'flex', gap: 'var(--space-4)' }}>
                   <div style={{ flex: 1 }}>
@@ -173,8 +241,7 @@ export default function MentorTasks() {
           <table className="task-table">
             <thead>
               <tr>
-                <th>Task Title</th>
-                <th>Project</th>
+                <th>Project / Task</th>
                 <th>Assignee</th>
                 <th>Status</th>
                 <th>Priority</th>
@@ -183,39 +250,75 @@ export default function MentorTasks() {
               </tr>
             </thead>
             <tbody>
-              {filteredTasks.map(task => {
-                const assigneeName = interns.find(i => i.id === task.assignee)?.name || task.assignee;
-                return (
-                  <tr key={task.id}>
-                    <td className="task-table__title">{task.title}</td>
-                    <td className="task-table__project">{task.project}</td>
-                    <td style={{ fontWeight: 800 }}>{assigneeName}</td>
-                    <td>
-                      <span className="task-badge" style={{ background: getStatusColor(task.status) }}>
-                        {task.status.replace('_', ' ')}
-                      </span>
-                    </td>
-                    <td>
-                      <span className="task-badge" style={{ 
-                        color: task.priority === 'High' ? 'var(--color-card-pink)' : 'var(--color-ink)' 
-                      }}>
-                        {task.priority || 'Medium'}
-                      </span>
-                    </td>
-                    <td>{task.date}</td>
-                    <td>
-                      <div className="mentor-task-actions">
-                        <button className="mentor-task-btn" onClick={() => setEditTaskData(task)}>Edit</button>
-                        <button className="mentor-task-btn mentor-task-btn--delete" onClick={() => handleDropTask(task.id)}>Drop</button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-              {filteredTasks.length === 0 && (
+              {projects.length === 0 ? (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: 'center', padding: 'var(--space-6)' }}>No tasks found for this filter.</td>
+                  <td colSpan="6" style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
+                    <h3>No Projects Created</h3>
+                    <p>Create a project first before assigning tasks.</p>
+                  </td>
                 </tr>
+              ) : (
+                projects.map(project => {
+                  const projectTasks = filteredTasks.filter(t => t.projectId === project.id);
+                  const isExpanded = expandedProjects[project.id];
+                  
+                  return (
+                    <React.Fragment key={project.id}>
+                      {/* Project Header Row */}
+                      <tr className="project-row" onClick={() => toggleProject(project.id)} style={{ cursor: 'pointer', background: 'var(--color-bg-alt)' }}>
+                        <td colSpan="6" style={{ padding: 'var(--space-3) var(--space-4)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontWeight: 900 }}>
+                              {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                              <span style={{ fontSize: '1.1rem' }}>{project.name}</span>
+                            </div>
+                            <div style={{ fontWeight: 800, color: 'var(--color-text-secondary)' }}>
+                              {projectTasks.length} {projectTasks.length === 1 ? 'Task' : 'Tasks'}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      
+                      {/* Task Rows (if expanded) */}
+                      {isExpanded && projectTasks.length === 0 ? (
+                        <tr>
+                          <td colSpan="6" style={{ textAlign: 'center', padding: 'var(--space-4)', fontStyle: 'italic', color: 'var(--color-text-secondary)' }}>
+                            No tasks found in this project.
+                          </td>
+                        </tr>
+                      ) : isExpanded && projectTasks.map(task => {
+                        const assigneeName = interns.find(i => i.id === task.assignee)?.name || task.assignee;
+                        return (
+                          <tr key={task.id} className="task-row">
+                            <td className="task-table__title" style={{ paddingLeft: 'var(--space-8)' }}>
+                              ↳ {task.title}
+                            </td>
+                            <td style={{ fontWeight: 800 }}>{assigneeName}</td>
+                            <td>
+                              <span className="task-badge" style={{ background: getStatusColor(task.status) }}>
+                                {task.status.replace('_', ' ')}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="task-badge" style={{ 
+                                color: task.priority === 'High' ? 'var(--color-card-pink)' : 'var(--color-ink)' 
+                              }}>
+                                {task.priority || 'Medium'}
+                              </span>
+                            </td>
+                            <td>{task.date}</td>
+                            <td>
+                              <div className="mentor-task-actions">
+                                <button className="mentor-task-btn" onClick={(e) => { e.stopPropagation(); setEditTaskData(task); }}>Edit</button>
+                                <button className="mentor-task-btn mentor-task-btn--delete" onClick={(e) => { e.stopPropagation(); handleDropTask(task.id); }}>Drop</button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </React.Fragment>
+                  );
+                })
               )}
             </tbody>
           </table>

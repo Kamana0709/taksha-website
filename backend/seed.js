@@ -5,9 +5,19 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('Clearing database...');
+  await prisma.submission.deleteMany();
   await prisma.announcement.deleteMany();
   await prisma.task.deleteMany();
+  await prisma.project.deleteMany();
   await prisma.user.deleteMany();
+
+  console.log('Seeding projects...');
+  const project1 = await prisma.project.create({
+    data: { name: 'Finora Project', description: 'Banking application frontend.' }
+  });
+  const project2 = await prisma.project.create({
+    data: { name: 'NovaCare App', description: 'Healthcare appointment system.' }
+  });
 
   console.log('Seeding users...');
   const defaultPassword = await bcrypt.hash('password123', 10);

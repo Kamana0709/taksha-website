@@ -29,15 +29,29 @@ model User {
   reviews       Submission[] @relation("MentorReviews")
 }
 
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  tasks       Task[]
+}
+
 model Task {
   id             String   @id @default(uuid())
   title          String
-  project        String
   priority       String   @default("Medium")
   status         String   @default("TODO") // TODO, IN_PROGRESS, REVIEW, DONE, CHANGES_REQUESTED
   date           String   // Storing as string to match current frontend format
   submissionLink String?
   feedback       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  projectId      String
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   
   assigneeId     String
   assignee       User     @relation("TaskAssignee", fields: [assigneeId], references: [id])

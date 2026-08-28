@@ -103,14 +103,45 @@ app.post('/api/users/interns', authenticateToken, async (req, res) => {
   }
 });
 
-// --- TASKS API ---
+// --- TASKS & PROJECTS API ---
+app.get('/api/projects', authenticateToken, async (req, res) => {
+  try {
+    const projects = await prisma.project.findMany({
+      include: { tasks: true },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(projects);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch projects' });
+  }
+});
+
+app.post('/api/projects', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can create projects' });
+    const { name, description } = req.body;
+    const project = await prisma.project.create({
+      data: { name, description }
+    });
+    // Add empty tasks array for immediate frontend state
+    res.json({ ...project, tasks: [] });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to create project' });
+  }
+});
+
 app.get('/api/tasks', authenticateToken, async (req, res) => {
   try {
     let tasks;
     if (req.user.role === 'INTERN') {
-      tasks = await prisma.task.findMany({ where: { assigneeId: req.user.id } });
+      tasks = await prisma.task.findMany({ 
+        where: { assigneeId: req.user.id },
+        include: { project: true }
+      });
     } else {
-      tasks = await prisma.task.findMany(); // Mentor sees all
+      tasks = await prisma.task.findMany({
+        include: { project: true }
+      }); // Mentor sees all
     }
     // Map assigneeId to assignee for frontend compatibility
     res.json(tasks.map(t => ({ ...t, assignee: t.assigneeId })));
@@ -123,18 +154,19 @@ app.post('/api/tasks', authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can assign tasks' });
     
-    const { title, project, priority, assignee, status } = req.body;
+    const { title, projectId, priority, assignee, status } = req.body;
     
     const task = await prisma.task.create({
       data: {
         title,
-        project,
+        projectId,
         priority: priority || 'Medium',
         status: status || 'TODO',
         date: new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }),
         assigneeId: assignee,
         assignerId: req.user.id
-      }
+      },
+      include: { project: true }
     });
     res.json({ ...task, assignee: task.assigneeId });
   } catch (err) {
@@ -150,7 +182,8 @@ app.put('/api/tasks/:id/status', authenticateToken, async (req, res) => {
     
     const task = await prisma.task.update({
       where: { id },
-      data: { status, submissionLink, feedback }
+      data: { status, submissionLink, feedback },
+      include: { project: true }
     });
     res.json({ ...task, assignee: task.assigneeId });
   } catch (err) {
@@ -162,17 +195,18 @@ app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can edit tasks' });
     const { id } = req.params;
-    const { title, project, priority, status, assignee } = req.body;
+    const { title, projectId, priority, status, assignee } = req.body;
     
     const task = await prisma.task.update({
       where: { id },
       data: { 
         title, 
-        project, 
+        ...(projectId && { projectId }), 
         priority, 
         status,
         ...(assignee && { assigneeId: assignee })
-      }
+      },
+      include: { project: true }
     });
     res.json({ ...task, assignee: task.assigneeId });
   } catch (err) {
@@ -236,12 +270,12 @@ app.get('/api/submissions', authenticateToken, async (req, res) => {
     if (req.user.role === 'INTERN') {
       submissions = await prisma.submission.findMany({
         where: { internId: req.user.id },
-        include: { task: true, intern: true, reviewedBy: true },
+        include: { task: { include: { project: true } }, intern: true, reviewedBy: true },
         orderBy: { createdAt: 'desc' }
       });
     } else {
       submissions = await prisma.submission.findMany({
-        include: { task: true, intern: true, reviewedBy: true },
+        include: { task: { include: { project: true } }, intern: true, reviewedBy: true },
         orderBy: { createdAt: 'desc' }
       });
     }
@@ -268,7 +302,7 @@ app.put('/api/submissions/:id/review', authenticateToken, async (req, res) => {
         reviewedById: req.user.id
       },
       include: {
-        task: true
+        task: { include: { project: true } }
       }
     });
 

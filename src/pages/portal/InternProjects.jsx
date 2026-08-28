@@ -7,60 +7,39 @@ import './InternProjects.css';
 
 export default function InternProjects() {
   const { user } = useAuth();
-  const { tasks } = useWorkspace();
+  const { projects, tasks } = useWorkspace();
   const navigate = useNavigate();
 
   const myTasks = tasks.filter(t => t.assignee === user?.id);
   
-  // Group tasks by project
-  const projectsMap = {};
-  myTasks.forEach(t => {
-    if (!projectsMap[t.project]) {
-      projectsMap[t.project] = {
-        name: t.project,
-        totalTasks: 0,
-        completedTasks: 0,
-        status: 'ACTIVE',
-        color: 'var(--color-card-lilac)' // Default
-      };
-    }
-    projectsMap[t.project].totalTasks += 1;
-    if (t.status === 'DONE') {
-      projectsMap[t.project].completedTasks += 1;
-    }
-  });
+  // Filter projects where intern has tasks
+  const internProjects = projects.filter(p => myTasks.some(t => t.projectId === p.id));
   
-  // Calculate final status and color based on completion
-  Object.values(projectsMap).forEach(proj => {
-    if (proj.totalTasks > 0 && proj.completedTasks === proj.totalTasks) {
-      proj.status = 'COMPLETED';
-      proj.color = 'var(--color-bg)';
-    } else if (proj.completedTasks > 0) {
-      proj.color = 'var(--color-card-purple)'; // IN_PROGRESS vibe
+  // Attach task stats to each project
+  const projectStats = internProjects.map(proj => {
+    const projTasks = myTasks.filter(t => t.projectId === proj.id);
+    const completedTasks = projTasks.filter(t => t.status === 'DONE').length;
+    const totalTasks = projTasks.length;
+    
+    let status = 'ACTIVE';
+    let color = 'var(--color-card-lilac)';
+    
+    if (totalTasks > 0 && completedTasks === totalTasks) {
+      status = 'COMPLETED';
+      color = 'var(--color-bg)';
+    } else if (completedTasks > 0) {
+      color = 'var(--color-card-purple)'; // IN_PROGRESS vibe
     }
+    
+    return {
+      ...proj,
+      totalTasks,
+      completedTasks,
+      status,
+      color,
+      desc: proj.description
+    };
   });
-
-  const projects = Object.values(projectsMap);
-
-  // If no projects, render some dummies so the UI is visible
-  if (projects.length === 0) {
-    projects.push({
-      name: 'Finora Project',
-      totalTasks: 12,
-      completedTasks: 5,
-      status: 'ACTIVE',
-      color: 'var(--color-card-mint)',
-      desc: 'Building out the frontend dashboard for the Finora banking application. Focus on responsive design and accessibility.'
-    });
-    projects.push({
-      name: 'NovaCare App',
-      totalTasks: 8,
-      completedTasks: 8,
-      status: 'COMPLETED',
-      color: 'var(--color-card-pink)',
-      desc: 'Healthcare appointment booking system interface.'
-    });
-  }
 
   return (
     <>
@@ -74,7 +53,12 @@ export default function InternProjects() {
         </header>
 
         <div className="projects-grid">
-          {projects.map((proj, idx) => {
+          {projectStats.length === 0 ? (
+            <div style={{ gridColumn: '1 / -1', padding: 'var(--space-8)', textAlign: 'center', background: 'var(--color-surface)', border: '4px solid var(--color-ink)', boxShadow: '8px 8px 0 0 var(--color-ink)' }}>
+              <h2 style={{ marginBottom: 'var(--space-2)' }}>No Projects Assigned</h2>
+              <p style={{ color: 'var(--color-text-secondary)' }}>You don't have tasks assigned to any projects yet.</p>
+            </div>
+          ) : projectStats.map((proj, idx) => {
             const percent = proj.totalTasks > 0 ? Math.round((proj.completedTasks / proj.totalTasks) * 100) : 0;
             return (
               <div key={idx} className="project-card">

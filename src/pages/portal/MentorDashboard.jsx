@@ -10,14 +10,14 @@ import './MentorDashboard.css';
 
 export default function MentorDashboard() {
   const { user } = useAuth();
-  const { tasks, interns, createTask, updateTaskStatus, createAnnouncement } = useWorkspace();
+  const { projects, tasks, interns, createTask, updateTaskStatus, createAnnouncement } = useWorkspace();
   const navigate = useNavigate();
   const [isTaskModalOpen, setIsTaskModalOpen] = React.useState(false);
   const [isAnnouncementModalOpen, setIsAnnouncementModalOpen] = React.useState(false);
   const [newAnnouncement, setNewAnnouncement] = React.useState({ title: '', content: '' });
 
   // Form state
-  const [newTask, setNewTask] = React.useState({ title: '', project: '', assignee: interns[0]?.id, priority: 'Medium' });
+  const [newTask, setNewTask] = React.useState({ title: '', projectId: '', assignee: interns[0]?.id, priority: 'Medium' });
 
   const currentDate = new Date().toLocaleDateString('en-US', { 
     weekday: 'long', 
@@ -35,7 +35,7 @@ export default function MentorDashboard() {
   const totalInterns = interns.length || 1; // avoid division by zero
 
   const stats = [
-    { label: 'Total Interns', value: interns.length, icon: Users, color: 'var(--color-card-lilac)' },
+    { label: 'Projects', value: projects.length, icon: FileCheck, color: 'var(--color-bg-alt)' },
     { label: 'Total Tasks', value: tasks.length, icon: CheckSquare, color: 'var(--color-card-mint)' },
     { label: 'Completed', value: completedTasks.length, icon: FileCheck, color: 'var(--color-card-pink)' },
     { label: 'Pending Reviews', value: pendingReviews.length, icon: Clock, color: 'var(--color-accent)' },
@@ -46,7 +46,7 @@ export default function MentorDashboard() {
     e.preventDefault();
     createTask({ ...newTask, date: new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short' }) });
     setIsTaskModalOpen(false);
-    setNewTask({ title: '', project: '', assignee: interns[0]?.id, priority: 'Medium' });
+    setNewTask({ title: '', projectId: '', assignee: interns[0]?.id, priority: 'Medium' });
   };
 
   const handleCreateAnnouncement = (e) => {
@@ -216,7 +216,7 @@ export default function MentorDashboard() {
                     <div className="review-item__meta">
                       <span className="review-intern">{interns.find(i => i.id === sub.assignee)?.name || sub.assignee}</span>
                       <span className="dot">•</span>
-                      <span className="review-project">{sub.project}</span>
+                      <span className="review-project">{sub.project?.name || 'Unknown Project'}</span>
                     </div>
                     <div style={{ marginTop: 'var(--space-2)' }}>
                       <a href={sub.submissionLink} target="_blank" rel="noreferrer" style={{ fontSize: '10px', color: 'var(--color-accent-hover)', textDecoration: 'underline' }}>View Submission</a>
@@ -274,8 +274,11 @@ export default function MentorDashboard() {
                 <input required value={newTask.title} onChange={e => setNewTask({...newTask, title: e.target.value})} style={{ width: '100%', padding: '8px', border: '2px solid var(--color-ink)' }} />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, marginBottom: '4px' }}>PROJECT NAME</label>
-                <input required value={newTask.project} onChange={e => setNewTask({...newTask, project: e.target.value})} style={{ width: '100%', padding: '8px', border: '2px solid var(--color-ink)' }} />
+                <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, marginBottom: '4px' }}>PROJECT</label>
+                <select required value={newTask.projectId} onChange={e => setNewTask({...newTask, projectId: e.target.value})} style={{ width: '100%', padding: '8px', border: '2px solid var(--color-ink)' }}>
+                  <option value="" disabled>Select a project...</option>
+                  {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </select>
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, marginBottom: '4px' }}>ASSIGNEE</label>

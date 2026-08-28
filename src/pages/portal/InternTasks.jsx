@@ -2,15 +2,17 @@ import React, { useState } from 'react';
 import SEO from '../../components/SEO/SEO';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { useAuth } from '../../context/AuthContext';
-import { Filter, Search, CheckSquare, X } from 'lucide-react';
+import { Filter, Search, CheckSquare, X, ChevronRight, ChevronDown } from 'lucide-react';
 import './InternTasks.css';
 
 export default function InternTasks() {
   const { user } = useAuth();
-  const { tasks, updateTaskStatus, submitTaskWork } = useWorkspace();
+  const { projects, tasks, updateTaskStatus, submitTaskWork } = useWorkspace();
   const [filter, setFilter] = useState('ALL');
+  const [expandedProjects, setExpandedProjects] = useState({});
   
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [activeTask, setActiveTask] = useState(null);
   const [submissionData, setSubmissionData] = useState({ githubUrl: '', liveUrl: '', description: '' });
   const [submitError, setSubmitError] = useState('');
@@ -36,11 +38,24 @@ export default function InternTasks() {
     }
   };
 
-  const handleOpenSubmit = (task) => {
+  const toggleProject = (projectId) => {
+    setExpandedProjects(prev => ({
+      ...prev,
+      [projectId]: !prev[projectId]
+    }));
+  };
+
+  const handleOpenSubmit = (e, task) => {
+    e.stopPropagation();
     setActiveTask(task);
     setSubmissionData({ githubUrl: '', liveUrl: '', description: '' });
     setSubmitError('');
     setSubmitModalOpen(true);
+  };
+
+  const handleOpenDetails = (task) => {
+    setActiveTask(task);
+    setDetailsModalOpen(true);
   };
 
   const handleFormSubmit = async (e) => {
@@ -61,6 +76,8 @@ export default function InternTasks() {
     
     if (res.success) {
       setSubmitModalOpen(false);
+      // Close details modal if it's open, as we just submitted from it potentially
+      setDetailsModalOpen(false);
       setActiveTask(null);
     } else {
       setSubmitError(res.error || 'Failed to submit work. Please try again.');
@@ -146,11 +163,59 @@ export default function InternTasks() {
           </div>
         )}
 
+        {/* TASK DETAILS MODAL */}
+        {detailsModalOpen && activeTask && (
+          <div className="modal-overlay">
+            <div className="modal-content" style={{ maxWidth: '600px' }}>
+              <button className="modal-close" onClick={() => setDetailsModalOpen(false)}><X /></button>
+              <h2 style={{ marginBottom: 'var(--space-2)' }}>{activeTask.title}</h2>
+              <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-6)', flexWrap: 'wrap' }}>
+                <span className="task-badge" style={{ background: 'var(--color-ink)', color: 'var(--color-bg)' }}>Project: {activeTask.project?.name || 'N/A'}</span>
+                <span className="task-badge" style={{ background: getStatusColor(activeTask.status) }}>{getStatusLabel(activeTask.status)}</span>
+                <span className="task-badge" style={{ color: activeTask.priority === 'High' ? 'var(--color-card-pink)' : 'var(--color-ink)', border: '2px solid' }}>Priority: {activeTask.priority || 'Medium'}</span>
+              </div>
+              
+              <div style={{ marginBottom: 'var(--space-6)' }}>
+                <h3 style={{ marginBottom: 'var(--space-2)', fontWeight: 800 }}>Dates</h3>
+                <p><strong>Assigned:</strong> {activeTask.date}</p>
+                <p><strong>Due:</strong> {activeTask.date} (End of Day)</p>
+              </div>
+
+              {activeTask.submissionLink && (
+                <div style={{ marginBottom: 'var(--space-6)' }}>
+                  <h3 style={{ marginBottom: 'var(--space-2)', fontWeight: 800 }}>Submission</h3>
+                  <p><a href={activeTask.submissionLink} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline', color: 'var(--color-accent-hover)' }}>View GitHub Repository</a></p>
+                </div>
+              )}
+
+              {activeTask.feedback && (
+                <div style={{ marginBottom: 'var(--space-6)', padding: 'var(--space-4)', background: 'var(--color-bg-alt)', borderLeft: '4px solid var(--color-card-pink)' }}>
+                  <h3 style={{ marginBottom: 'var(--space-2)', fontWeight: 800 }}>Mentor Feedback</h3>
+                  <p style={{ fontStyle: 'italic' }}>{activeTask.feedback}</p>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-8)' }}>
+                {activeTask.status === 'TODO' && (
+                  <button className="intern-btn intern-btn--assign" style={{ flex: 1 }} onClick={() => { updateTaskStatus(activeTask.id, 'IN_PROGRESS'); setDetailsModalOpen(false); }}>
+                    Start Task
+                  </button>
+                )}
+                {(activeTask.status === 'IN_PROGRESS' || activeTask.status === 'CHANGES_REQUESTED') && (
+                  <button className="intern-btn intern-btn--assign" style={{ flex: 1, background: 'var(--color-card-purple)' }} onClick={() => { setDetailsModalOpen(false); handleOpenSubmit({ stopPropagation: () => {} }, activeTask); }}>
+                    Submit Work
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="task-table-container">
           <table className="task-table">
             <thead>
               <tr>
-                <th>Task & Project</th>
+                <th>Project / Task</th>
                 <th>Priority</th>
                 <th>Due Date</th>
                 <th>Status</th>
@@ -158,50 +223,86 @@ export default function InternTasks() {
               </tr>
             </thead>
             <tbody>
-              {filteredTasks.length === 0 ? (
+              {projects.length === 0 ? (
                 <tr>
                   <td colSpan="5" style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
-                    No tasks found.
+                    No projects found.
                   </td>
                 </tr>
               ) : (
-                filteredTasks.map(task => (
-                  <tr key={task.id}>
-                    <td>
-                      <div className="task-table__title">{task.title}</div>
-                      <div className="task-table__project">{task.project}</div>
-                    </td>
-                    <td>
-                      <span style={{ fontWeight: 800, color: task.priority === 'High' ? 'var(--color-card-pink)' : 'inherit' }}>
-                        {task.priority || 'Medium'}
-                      </span>
-                    </td>
-                    <td>{task.date}</td>
-                    <td>
-                      <span className={`task-badge task-badge--${task.status}`}>
-                        {getStatusLabel(task.status)}
-                      </span>
-                    </td>
-                    <td>
-                      {task.status === 'TODO' && (
-                        <button className="task-table__action" style={{ background: 'var(--color-accent)' }} onClick={() => updateTaskStatus(task.id, 'IN_PROGRESS')}>
-                          START
-                        </button>
-                      )}
-                      {(task.status === 'IN_PROGRESS' || task.status === 'CHANGES_REQUESTED') && (
-                        <button className="task-table__action" style={{ background: 'var(--color-card-purple)' }} onClick={() => handleOpenSubmit(task)}>
-                          SUBMIT WORK
-                        </button>
-                      )}
-                      {task.status === 'REVIEW' && (
-                        <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>Awaiting Mentor</span>
-                      )}
-                      {task.status === 'DONE' && (
-                        <CheckSquare color="var(--color-card-mint)" size={24} />
-                      )}
-                    </td>
-                  </tr>
-                ))
+                projects.map(project => {
+                  const projectTasks = filteredTasks.filter(t => t.projectId === project.id);
+                  if (projectTasks.length === 0 && filter !== 'ALL') return null; // Don't show empty projects if filtering
+                  
+                  // For intern, only show projects they have tasks in
+                  const internProjectTasks = myTasks.filter(t => t.projectId === project.id);
+                  if (internProjectTasks.length === 0) return null;
+
+                  const isExpanded = expandedProjects[project.id];
+
+                  return (
+                    <React.Fragment key={project.id}>
+                      {/* Project Header Row */}
+                      <tr className="project-row" onClick={() => toggleProject(project.id)} style={{ cursor: 'pointer', background: 'var(--color-bg-alt)' }}>
+                        <td colSpan="5" style={{ padding: 'var(--space-3) var(--space-4)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontWeight: 900 }}>
+                              {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                              <span style={{ fontSize: '1.1rem' }}>{project.name}</span>
+                            </div>
+                            <div style={{ fontWeight: 800, color: 'var(--color-text-secondary)' }}>
+                              {internProjectTasks.length} {internProjectTasks.length === 1 ? 'Task' : 'Tasks'}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      
+                      {/* Task Rows (if expanded) */}
+                      {isExpanded && internProjectTasks.length === 0 ? (
+                        <tr>
+                          <td colSpan="5" style={{ textAlign: 'center', padding: 'var(--space-4)', fontStyle: 'italic', color: 'var(--color-text-secondary)' }}>
+                            No tasks found matching filter in this project.
+                          </td>
+                        </tr>
+                      ) : isExpanded && internProjectTasks.map(task => (
+                        <tr key={task.id} onClick={() => handleOpenDetails(task)} style={{ cursor: 'pointer' }} className="task-row">
+                          <td style={{ paddingLeft: 'var(--space-8)' }}>
+                            <div className="task-table__title">↳ {task.title}</div>
+                          </td>
+                          <td>
+                            <span style={{ fontWeight: 800, color: task.priority === 'High' ? 'var(--color-card-pink)' : 'inherit' }}>
+                              {task.priority || 'Medium'}
+                            </span>
+                          </td>
+                          <td>{task.date}</td>
+                          <td>
+                            <span className={`task-badge task-badge--${task.status}`}>
+                              {getStatusLabel(task.status)}
+                            </span>
+                          </td>
+                          <td onClick={e => e.stopPropagation()}>
+                            {task.status === 'TODO' && (
+                              <button className="task-table__action" style={{ background: 'var(--color-accent)' }} onClick={() => updateTaskStatus(task.id, 'IN_PROGRESS')}>
+                                START
+                              </button>
+                            )}
+                            {(task.status === 'IN_PROGRESS' || task.status === 'CHANGES_REQUESTED') && (
+                              <button className="task-table__action" style={{ background: 'var(--color-card-purple)' }} onClick={(e) => handleOpenSubmit(e, task)}>
+                                SUBMIT WORK
+                              </button>
+                            )}
+                            {task.status === 'REVIEW' && (
+                              <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', fontWeight: 600 }}>Awaiting Mentor</span>
+                            )}
+                            {task.status === 'DONE' && (
+                              <CheckSquare color="var(--color-card-mint)" size={24} />
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </React.Fragment>
+                  );
+                })
               )}
             </tbody>
           </table>
