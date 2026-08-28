@@ -39,8 +39,6 @@ export default function InternDashboard() {
 
   const KANBAN_DATA = {
     TODO: { color: 'var(--color-accent)', tasks: myTasks.filter(t => t.status === 'TODO') },
-    IN_PROGRESS: { color: 'var(--color-card-purple)', tasks: myTasks.filter(t => t.status === 'IN_PROGRESS' || t.status === 'CHANGES_REQUESTED') },
-    REVIEW: { color: 'var(--color-card-mint)', tasks: myTasks.filter(t => t.status === 'REVIEW') },
     DONE: { color: 'var(--color-card-pink)', tasks: myTasks.filter(t => t.status === 'DONE') }
   };
 
@@ -140,10 +138,7 @@ export default function InternDashboard() {
                           )}
                         </div>
                         {task.status === 'TODO' && (
-                          <button onClick={() => updateTaskStatus(task.id, 'IN_PROGRESS')} style={{ marginTop: '8px', width: '100%', padding: '4px', background: 'var(--color-accent)', border: '2px solid var(--color-ink)', cursor: 'pointer', fontWeight: 800, fontSize: '10px' }}>START TASK</button>
-                        )}
-                        {(task.status === 'IN_PROGRESS' || task.status === 'CHANGES_REQUESTED') && (
-                          <button onClick={() => { setActiveTaskToSubmit(task); setSubmitModalOpen(true); }} style={{ marginTop: '8px', width: '100%', padding: '4px', background: 'var(--color-card-purple)', border: '2px solid var(--color-ink)', cursor: 'pointer', fontWeight: 800, fontSize: '10px' }}>SUBMIT</button>
+                          <button onClick={() => updateTaskStatus(task.id, 'DONE')} style={{ marginTop: '8px', width: '100%', padding: '4px', background: 'var(--color-accent)', border: '2px solid var(--color-ink)', cursor: 'pointer', fontWeight: 800, fontSize: '10px' }}>MARK DONE</button>
                         )}
                       </div>
                     ))}

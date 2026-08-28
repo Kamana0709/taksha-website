@@ -178,11 +178,11 @@ app.post('/api/tasks', authenticateToken, async (req, res) => {
 app.put('/api/tasks/:id/status', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, submissionLink, feedback } = req.body;
+    const { status } = req.body;
     
     const task = await prisma.task.update({
       where: { id },
-      data: { status, submissionLink, feedback },
+      data: { status },
       include: { project: true }
     });
     res.json({ ...task, assignee: task.assigneeId });
@@ -230,12 +230,12 @@ app.post('/api/submissions', authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== 'INTERN') return res.status(403).json({ error: 'Only interns can submit work' });
     
-    const { taskId, githubUrl, liveUrl, description } = req.body;
+    const { projectId, githubUrl, liveUrl, description } = req.body;
     
     // Create the submission
     const submission = await prisma.submission.create({
       data: {
-        taskId,
+        projectId,
         internId: req.user.id,
         githubUrl,
         liveUrl,
@@ -243,17 +243,8 @@ app.post('/api/submissions', authenticateToken, async (req, res) => {
         status: 'Submitted'
       },
       include: {
-        task: true,
+        project: true,
         intern: true
-      }
-    });
-
-    // Update the task status to REVIEW
-    await prisma.task.update({
-      where: { id: taskId },
-      data: { 
-        status: 'REVIEW',
-        submissionLink: githubUrl // keeping this for backwards compatibility
       }
     });
 
@@ -270,12 +261,12 @@ app.get('/api/submissions', authenticateToken, async (req, res) => {
     if (req.user.role === 'INTERN') {
       submissions = await prisma.submission.findMany({
         where: { internId: req.user.id },
-        include: { task: { include: { project: true } }, intern: true, reviewedBy: true },
+        include: { project: true, intern: true, reviewedBy: true },
         orderBy: { createdAt: 'desc' }
       });
     } else {
       submissions = await prisma.submission.findMany({
-        include: { task: { include: { project: true } }, intern: true, reviewedBy: true },
+        include: { project: true, intern: true, reviewedBy: true },
         orderBy: { createdAt: 'desc' }
       });
     }

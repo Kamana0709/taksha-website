@@ -11,8 +11,6 @@ export default function MentorKanban() {
   // Similar logic to InternDashboard Kanban, but without filtering by assignee.
   const KANBAN_DATA = {
     TODO: { title: 'To Do', items: tasks.filter(t => t.status === 'TODO'), color: 'var(--color-accent)' },
-    IN_PROGRESS: { title: 'In Progress', items: tasks.filter(t => t.status === 'IN_PROGRESS'), color: 'var(--color-card-purple)' },
-    REVIEW: { title: 'Review', items: tasks.filter(t => t.status === 'REVIEW'), color: 'var(--color-card-mint)' },
     DONE: { title: 'Done', items: tasks.filter(t => t.status === 'DONE'), color: 'var(--color-card-pink)' }
   };
 
@@ -60,14 +58,7 @@ export default function MentorKanban() {
                             </span>
                           </div>
                           
-                          {status === 'REVIEW' && (
-                            <button 
-                              style={{ marginTop: 'var(--space-2)', padding: '4px', border: '2px solid var(--color-ink)', background: 'var(--color-card-mint)', fontWeight: 900, fontSize: '10px', cursor: 'pointer' }}
-                              onClick={() => navigate('/mentor/reviews')}
-                            >
-                              GRADE NOW
-                            </button>
-                          )}
+
                         </div>
                        );
                     })}

@@ -133,13 +133,12 @@ export const WorkspaceProvider = ({ children }) => {
     }
   };
 
-  const submitTaskWork = async (submissionData) => {
+  const submitProjectWork = async (submissionData) => {
     try {
       const res = await axios.post(`${API_URL}/submissions`, submissionData);
       setData(prev => ({
         ...prev,
-        submissions: [res.data, ...prev.submissions],
-        tasks: prev.tasks.map(t => t.id === submissionData.taskId ? { ...t, status: 'REVIEW', submissionLink: submissionData.githubUrl } : t)
+        submissions: [res.data, ...prev.submissions]
       }));
       return { success: true };
     } catch (err) {
@@ -152,12 +151,10 @@ export const WorkspaceProvider = ({ children }) => {
     try {
       const res = await axios.put(`${API_URL}/submissions/${submissionId}/review`, reviewData);
       const updatedSubmission = res.data;
-      const taskStatus = reviewData.status === 'Approved' ? 'DONE' : 'CHANGES_REQUESTED';
       
       setData(prev => ({
         ...prev,
-        submissions: prev.submissions.map(s => s.id === submissionId ? updatedSubmission : s),
-        tasks: prev.tasks.map(t => t.id === updatedSubmission.taskId ? { ...t, status: taskStatus, feedback: reviewData.mentorFeedback } : t)
+        submissions: prev.submissions.map(s => s.id === submissionId ? updatedSubmission : s)
       }));
       return { success: true };
     } catch (err) {
@@ -182,7 +179,7 @@ export const WorkspaceProvider = ({ children }) => {
       deleteTask,
       createAnnouncement,
       createIntern,
-      submitTaskWork,
+      submitProjectWork,
       reviewSubmission
     }}>
       {children}

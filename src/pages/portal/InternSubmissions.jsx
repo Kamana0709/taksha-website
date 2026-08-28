@@ -51,11 +51,9 @@ export default function InternSubmissions() {
               <div className="timeline-item__dot" style={{ borderColor: getStatusColor(sub.status) }}></div>
               <div className="timeline-item__content">
                 <div className="timeline-header">
-                  <h3 className="timeline-title">{sub.task?.title || 'Unknown Task'}</h3>
+                  <h3 className="timeline-title">Project: {sub.project?.name || 'Unknown Project'}</h3>
                   <span className="timeline-date">{new Date(sub.createdAt).toLocaleDateString()}</span>
                 </div>
-                
-                <span className="timeline-project">{sub.task?.project || 'Unknown Project'}</span>
                 
                 {sub.description && (
                   <p style={{ margin: 'var(--space-2) 0', fontStyle: 'italic', color: 'var(--color-text-secondary)' }}>

@@ -52,17 +52,15 @@ export default function MentorReviews() {
           </div>
         ) : (
           pendingSubmissions.map(sub => {
-            const taskTitle = sub.task?.title || 'Unknown Task';
-            const project = sub.task?.project || 'Unknown Project';
+            const projectName = sub.project?.name || 'Unknown Project';
             const assigneeName = sub.intern?.name || 'Unknown Intern';
             
             return (
               <div key={sub.id} className="review-card">
                 <div className="review-card__header">
                   <div>
-                    <h2 className="review-card__title">{taskTitle}</h2>
+                    <h2 className="review-card__title">Project: {projectName}</h2>
                     <div className="review-card__meta">
-                      <span>Project: {project}</span>
                       <span>Intern: {assigneeName}</span>
                       <span>Submitted: {new Date(sub.createdAt).toLocaleDateString()}</span>
                     </div>
@@ -109,7 +107,7 @@ export default function MentorReviews() {
 
                 <div className="review-card__actions">
                   <button className="review-btn review-btn--reject" disabled={isSubmitting} onClick={() => handleReject(sub.id)}>Request Changes</button>
-                  <button className="review-btn review-btn--approve" disabled={isSubmitting} onClick={() => handleApprove(sub.id)}>Approve Task</button>
+                  <button className="review-btn review-btn--approve" disabled={isSubmitting} onClick={() => handleApprove(sub.id)}>Approve Project</button>
                 </div>
               </div>
             );
