@@ -40,6 +40,7 @@ const InternSettings = lazy(() => import('./pages/portal/InternSettings'));
 
 const MentorDashboard = lazy(() => import('./pages/portal/MentorDashboard'));
 const MentorInterns = lazy(() => import('./pages/portal/MentorInterns'));
+const MentorInternDetail = lazy(() => import('./pages/portal/MentorInternDetail'));
 const MentorApplications = lazy(() => import('./pages/portal/MentorApplications'));
 const MentorTasks = lazy(() => import('./pages/portal/MentorTasks'));
 const MentorKanban = lazy(() => import('./pages/portal/MentorKanban'));
@@ -106,6 +107,7 @@ export const router = createBrowserRouter([
         element: <SuspenseWrapper><MentorDashboard /></SuspenseWrapper>,
       },
       { path: '/mentor/interns', element: <SuspenseWrapper><MentorInterns /></SuspenseWrapper> },
+      { path: '/mentor/interns/:internId', element: <SuspenseWrapper><MentorInternDetail /></SuspenseWrapper> },
       { path: '/mentor/applications', element: <SuspenseWrapper><MentorApplications /></SuspenseWrapper> },
       { path: '/mentor/tasks', element: <SuspenseWrapper><MentorTasks /></SuspenseWrapper> },
       { path: '/mentor/kanban', element: <SuspenseWrapper><MentorKanban /></SuspenseWrapper> },

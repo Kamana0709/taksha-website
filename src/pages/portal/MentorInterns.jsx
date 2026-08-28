@@ -2,13 +2,21 @@ import React, { useState } from 'react';
 import SEO from '../../components/SEO/SEO';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { Plus, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import './MentorInterns.css';
 
 export default function MentorInterns() {
-  const { interns, tasks, createIntern } = useWorkspace();
+  const { interns, tasks, createIntern, deleteIntern } = useWorkspace();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newIntern, setNewIntern] = useState({ name: '', email: '', password: '', track: 'Frontend' });
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleDelete = async (internId, internName) => {
+    if (window.confirm(`Are you sure you want to delete ${internName}? This will permanently remove them and all their assigned tasks.`)) {
+      await deleteIntern(internId);
+    }
+  };
 
   return (
     <>
@@ -125,8 +133,15 @@ export default function MentorInterns() {
                 </div>
                 
                 <div className="intern-full-card__footer">
-                  <button className="intern-btn intern-btn--view">View Profile</button>
+                  <button className="intern-btn intern-btn--view" onClick={() => navigate(`/mentor/interns/${intern.id}`)}>View Profile</button>
                   <button className="intern-btn intern-btn--assign">Assign Task</button>
+                  <button 
+                    className="intern-btn" 
+                    style={{ background: 'var(--color-card-pink)' }}
+                    onClick={() => handleDelete(intern.id, intern.name)}
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             );

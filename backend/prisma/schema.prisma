@@ -16,6 +16,8 @@ model User {
   track         String?  // e.g., 'Frontend'
   progress      Int?     @default(0)
   status        String?  @default("On Track")
+  phone         String?
+  location      String?
   
   // Relations
   mentorId      String?

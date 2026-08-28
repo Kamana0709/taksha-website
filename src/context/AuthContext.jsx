@@ -43,6 +43,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateProfile = async (profileData) => {
+    try {
+      const res = await axios.put(`${API_URL}/users/profile`, profileData);
+      const updatedUser = res.data;
+      
+      setUser(updatedUser);
+      localStorage.setItem('taksha_user', JSON.stringify(updatedUser));
+      
+      return { success: true, user: updatedUser };
+    } catch (err) {
+      console.error('Update profile failed', err.response?.data?.error || err.message);
+      return { success: false, error: err.response?.data?.error || 'Failed to update profile' };
+    }
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('taksha_user');
@@ -51,7 +66,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, logout, updateProfile, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

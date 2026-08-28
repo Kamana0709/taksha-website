@@ -124,6 +124,22 @@ export const WorkspaceProvider = ({ children }) => {
     }
   };
 
+  const deleteIntern = async (internId) => {
+    try {
+      await axios.delete(`${API_URL}/users/interns/${internId}`);
+      setData(prev => ({
+        ...prev,
+        interns: prev.interns.filter(i => i.id !== internId),
+        tasks: prev.tasks.filter(t => t.assigneeId !== internId && t.assignee !== internId),
+        submissions: prev.submissions.filter(s => s.internId !== internId)
+      }));
+      return { success: true };
+    } catch (err) {
+      console.error(err);
+      return { success: false, error: err.response?.data?.error || 'Failed to delete intern' };
+    }
+  };
+
   const createAnnouncement = async (announcement) => {
     try {
       const res = await axios.post(`${API_URL}/announcements`, announcement);
@@ -179,6 +195,7 @@ export const WorkspaceProvider = ({ children }) => {
       deleteTask,
       createAnnouncement,
       createIntern,
+      deleteIntern,
       submitProjectWork,
       reviewSubmission
     }}>

@@ -94,12 +94,50 @@ app.post('/api/users/interns', authenticateToken, async (req, res) => {
       }
     });
     
-    // Don't send password hash back
     const { passwordHash: _, ...internData } = intern;
     res.json(internData);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to create intern (email might exist)' });
+  }
+});
+
+app.delete('/api/users/interns/:id', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can delete interns' });
+    const { id } = req.params;
+    
+    // Perform cascading delete manually in a transaction
+    await prisma.$transaction([
+      prisma.task.deleteMany({ where: { assigneeId: id } }),
+      prisma.submission.deleteMany({ where: { internId: id } }),
+      prisma.user.delete({ where: { id } })
+    ]);
+    
+    res.json({ success: true, id });
+  } catch (err) {
+    console.error('Failed to delete intern:', err);
+    res.status(500).json({ error: 'Failed to delete intern' });
+  }
+});
+
+app.put('/api/users/profile', authenticateToken, async (req, res) => {
+  try {
+    const { phone, location } = req.body;
+    const user = await prisma.user.update({
+      where: { id: req.user.id },
+      data: { phone, location }
+    });
+    
+    // Return sanitized user object
+    const { passwordHash: _, ...userData } = user;
+    res.json({
+      ...userData,
+      initials: userData.name.substring(0, 2).toUpperCase()
+    });
+  } catch (err) {
+    console.error('Failed to update profile:', err);
+    res.status(500).json({ error: 'Failed to update profile' });
   }
 });
 
@@ -398,12 +436,42 @@ app.put('/api/applications/:id/status', authenticateToken, async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     
-    const application = await prisma.application.update({
-      where: { id },
-      data: { status }
+    const application = await prisma.$transaction(async (tx) => {
+      const app = await tx.application.update({
+        where: { id },
+        data: { status }
+      });
+      
+      if (status === 'Accepted') {
+        const existingUser = await tx.user.findUnique({ where: { email: app.email } });
+        if (!existingUser) {
+          const defaultPassword = Math.random().toString(36).slice(-8); // Random password for new interns
+          const passwordHash = await bcrypt.hash(defaultPassword, 10);
+          
+          let track = 'Frontend';
+          if (app.roleTitle.toLowerCase().includes('design')) track = 'Design';
+          else if (app.roleTitle.toLowerCase().includes('backend')) track = 'Backend';
+          
+          await tx.user.create({
+            data: {
+              name: app.name,
+              email: app.email,
+              passwordHash,
+              role: 'INTERN',
+              track,
+              progress: 0,
+              status: 'On Track',
+              mentorId: req.user.id
+            }
+          });
+        }
+      }
+      return app;
     });
+    
     res.json(application);
   } catch (err) {
+    console.error('Failed to update application status:', err);
     res.status(500).json({ error: 'Failed to update application status' });
   }
 });

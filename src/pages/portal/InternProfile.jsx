@@ -1,10 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SEO from '../../components/SEO/SEO';
 import { useAuth } from '../../context/AuthContext';
+import { Pencil, Save, X } from 'lucide-react';
 import './InternProfile.css';
 
 export default function InternProfile() {
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({
+    phone: user?.phone || '',
+    location: user?.location || ''
+  });
+  const [error, setError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+    setEditData({
+      phone: user?.phone || '',
+      location: user?.location || ''
+    });
+    setError('');
+  };
+
+  const handleCancelClick = () => {
+    setIsEditing(false);
+    setError('');
+  };
+
+  const handleSaveClick = async () => {
+    setIsSaving(true);
+    setError('');
+    const res = await updateProfile(editData);
+    if (res.success) {
+      setIsEditing(false);
+    } else {
+      setError(res.error || 'Failed to save changes.');
+    }
+    setIsSaving(false);
+  };
 
   return (
     <>
@@ -15,7 +49,25 @@ export default function InternProfile() {
             <h1 className="intern-tasks__title">My Profile</h1>
             <p className="intern-tasks__subtitle">Your official Taksha intern record.</p>
           </div>
+          <div>
+             {!isEditing ? (
+               <button className="intern-btn intern-btn--view" onClick={handleEditClick} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                 <Pencil size={16} /> Edit Profile
+               </button>
+             ) : (
+               <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                 <button className="intern-btn intern-btn--view" onClick={handleCancelClick} disabled={isSaving} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', background: 'var(--color-bg)' }}>
+                   <X size={16} /> Cancel
+                 </button>
+                 <button className="intern-btn intern-btn--assign" onClick={handleSaveClick} disabled={isSaving} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                   <Save size={16} /> {isSaving ? 'Saving...' : 'Save'}
+                 </button>
+               </div>
+             )}
+          </div>
         </header>
+
+        {error && <div style={{ color: 'var(--color-card-pink)', marginBottom: 'var(--space-4)', fontWeight: 800 }}>{error}</div>}
 
         <div className="profile-card">
           <div className="profile-header">
@@ -34,11 +86,31 @@ export default function InternProfile() {
               </div>
               <div className="profile-info-group">
                 <div className="profile-label">Phone Number</div>
-                <div className="profile-value">+91 98765 43210</div>
+                {isEditing ? (
+                  <input 
+                    type="text" 
+                    className="profile-input" 
+                    value={editData.phone} 
+                    onChange={e => setEditData({...editData, phone: e.target.value})} 
+                    placeholder="+91 98765 43210"
+                  />
+                ) : (
+                  <div className="profile-value">{user?.phone || '+91 98765 43210'}</div>
+                )}
               </div>
               <div className="profile-info-group">
                 <div className="profile-label">Location</div>
-                <div className="profile-value">Remote (India)</div>
+                {isEditing ? (
+                  <input 
+                    type="text" 
+                    className="profile-input" 
+                    value={editData.location} 
+                    onChange={e => setEditData({...editData, location: e.target.value})} 
+                    placeholder="Remote (India)"
+                  />
+                ) : (
+                  <div className="profile-value">{user?.location || 'Remote (India)'}</div>
+                )}
               </div>
             </div>
             

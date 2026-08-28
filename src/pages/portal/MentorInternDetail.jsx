@@ -1,0 +1,118 @@
+import React from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import SEO from '../../components/SEO/SEO';
+import { useWorkspace } from '../../context/WorkspaceContext';
+import { ArrowLeft } from 'lucide-react';
+import './MentorInternDetail.css';
+
+export default function MentorInternDetail() {
+  const { internId } = useParams();
+  const navigate = useNavigate();
+  const { interns, tasks } = useWorkspace();
+
+  const intern = interns.find(i => i.id === internId);
+
+  if (!intern) {
+    return (
+      <>
+        <SEO title="Intern Not Found | Taksha Workspace" />
+        <div className="mentor-intern-detail not-found">
+          <div className="details-card" style={{ padding: 'var(--space-8)', textAlign: 'center' }}>
+            <h2 className="profile-title" style={{ marginBottom: 'var(--space-4)' }}>Intern Not Found</h2>
+            <p style={{ marginBottom: 'var(--space-6)', fontSize: '1.2rem' }}>The intern you are looking for does not exist.</p>
+            <button className="intern-btn intern-btn--view" onClick={() => navigate('/mentor/interns')}>
+              Back to My Interns
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  const internTasks = tasks.filter(t => t.assignee === internId);
+  const taskBreakdown = {
+    total: internTasks.length,
+    todo: internTasks.filter(t => t.status === 'TODO').length,
+    inProgress: internTasks.filter(t => t.status === 'IN_PROGRESS').length,
+    review: internTasks.filter(t => t.status === 'IN_REVIEW').length,
+    done: internTasks.filter(t => t.status === 'DONE').length,
+  };
+
+  return (
+    <>
+      <SEO title={`${intern.name}'s Profile | Taksha Workspace`} />
+      <div className="mentor-intern-detail">
+        <header className="intern-tasks__header" style={{ marginBottom: 'var(--space-6)' }}>
+          <div>
+            <Link to="/mentor/interns" className="back-link">
+              <ArrowLeft size={16} /> Back to My Interns
+            </Link>
+            <h1 className="intern-tasks__title">{intern.name}'s Profile</h1>
+            <p className="intern-tasks__subtitle">Detailed view of intern progress and tasks.</p>
+          </div>
+        </header>
+
+        <div className="details-card">
+          <div className="profile-header">
+             <div className="profile-avatar">{intern.name.charAt(0)}</div>
+             <div>
+               <h2 className="profile-title">{intern.name}</h2>
+               <div className="profile-role">{intern.track} Track Intern</div>
+             </div>
+          </div>
+
+          <div className="profile-body">
+            <div>
+              <div className="profile-info-group">
+                <div className="profile-label">Email Address</div>
+                <div className="profile-value">{intern.email}</div>
+              </div>
+              <div className="profile-info-group">
+                <div className="profile-label">Intern ID</div>
+                <div className="profile-value">{intern.id}</div>
+              </div>
+              <div className="profile-info-group">
+                <div className="profile-label">Current Status</div>
+                <div className="profile-value" style={{ 
+                  color: intern.progress > 50 ? 'var(--color-card-mint)' : 'var(--color-card-pink)',
+                  fontWeight: 900
+                }}>
+                  {intern.status || 'Active'}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="profile-info-group">
+                <div className="profile-label">Overall Progress</div>
+                <div className="profile-value">{intern.progress}%</div>
+              </div>
+              
+              <div className="profile-info-group">
+                <div className="profile-label">Task Breakdown</div>
+                <div className="task-breakdown">
+                  <div className="kpi-box" style={{ background: 'var(--color-card-lilac)' }}>
+                    <span className="kpi-val">{taskBreakdown.todo}</span>
+                    <span className="kpi-lbl">To Do</span>
+                  </div>
+                  <div className="kpi-box" style={{ background: 'var(--color-card-yellow)' }}>
+                    <span className="kpi-val">{taskBreakdown.inProgress}</span>
+                    <span className="kpi-lbl">In Progress</span>
+                  </div>
+                  <div className="kpi-box" style={{ background: 'var(--color-card-cyan)' }}>
+                    <span className="kpi-val">{taskBreakdown.review}</span>
+                    <span className="kpi-lbl">Review</span>
+                  </div>
+                  <div className="kpi-box" style={{ background: 'var(--color-card-mint)' }}>
+                    <span className="kpi-val">{taskBreakdown.done}</span>
+                    <span className="kpi-lbl">Done</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

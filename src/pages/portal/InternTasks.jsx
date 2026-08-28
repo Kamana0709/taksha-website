@@ -184,6 +184,7 @@ export default function InternTasks() {
 
                   const isExpanded = expandedProjects[project.id];
                   const projectSub = submissions?.find(s => s.projectId === project.id && s.internId === user?.id);
+                  const allTasksDone = internProjectTasks.length > 0 && internProjectTasks.every(t => t.status === 'DONE');
 
                   return (
                     <React.Fragment key={project.id}>
@@ -239,18 +240,34 @@ export default function InternTasks() {
                             {projectSub ? (
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-4)' }}>
                                 {projectSub.status === 'Changes Requested' && (
-                                  <button className="intern-btn intern-btn--assign" style={{ background: 'var(--color-card-purple)', padding: '6px 16px', fontSize: '14px' }} onClick={(e) => handleOpenSubmit(e, project)}>
-                                    Resubmit Project
-                                  </button>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                                    {!allTasksDone && <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Complete all tasks to resubmit</span>}
+                                    <button 
+                                      className="intern-btn intern-btn--assign" 
+                                      style={{ background: 'var(--color-card-purple)', padding: '6px 16px', fontSize: '14px', ...(!allTasksDone ? { opacity: 0.5, cursor: 'not-allowed' } : {}) }} 
+                                      onClick={(e) => handleOpenSubmit(e, project)}
+                                      disabled={!allTasksDone}
+                                    >
+                                      Resubmit Project
+                                    </button>
+                                  </div>
                                 )}
                                 <span className={`task-badge`} style={{ background: projectSub.status === 'Approved' ? 'var(--color-card-mint)' : (projectSub.status === 'Changes Requested' ? 'var(--color-card-pink)' : 'var(--color-ink)'), color: 'var(--color-bg)' }}>
                                   Status: {projectSub.status}
                                 </span>
                               </div>
                             ) : (
-                              <button className="intern-btn intern-btn--assign" style={{ background: 'var(--color-card-purple)' }} onClick={(e) => handleOpenSubmit(e, project)}>
-                                Submit Project
-                              </button>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)' }}>
+                                {!allTasksDone && <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>Complete all tasks to submit</span>}
+                                <button 
+                                  className="intern-btn intern-btn--assign" 
+                                  style={{ background: 'var(--color-card-purple)', ...(!allTasksDone ? { opacity: 0.5, cursor: 'not-allowed' } : {}) }} 
+                                  onClick={(e) => handleOpenSubmit(e, project)}
+                                  disabled={!allTasksDone}
+                                >
+                                  Submit Project
+                                </button>
+                              </div>
                             )}
                           </td>
                         </tr>
