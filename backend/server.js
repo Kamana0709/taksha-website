@@ -191,6 +191,104 @@ app.delete('/api/tasks/:id', authenticateToken, async (req, res) => {
   }
 });
 
+// --- SUBMISSIONS API ---
+app.post('/api/submissions', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'INTERN') return res.status(403).json({ error: 'Only interns can submit work' });
+    
+    const { taskId, githubUrl, liveUrl, description } = req.body;
+    
+    // Create the submission
+    const submission = await prisma.submission.create({
+      data: {
+        taskId,
+        internId: req.user.id,
+        githubUrl,
+        liveUrl,
+        description,
+        status: 'Submitted'
+      },
+      include: {
+        task: true,
+        intern: true
+      }
+    });
+
+    // Update the task status to REVIEW
+    await prisma.task.update({
+      where: { id: taskId },
+      data: { 
+        status: 'REVIEW',
+        submissionLink: githubUrl // keeping this for backwards compatibility
+      }
+    });
+
+    res.json(submission);
+  } catch (err) {
+    console.error('Failed to create submission:', err);
+    res.status(500).json({ error: 'Failed to create submission' });
+  }
+});
+
+app.get('/api/submissions', authenticateToken, async (req, res) => {
+  try {
+    let submissions;
+    if (req.user.role === 'INTERN') {
+      submissions = await prisma.submission.findMany({
+        where: { internId: req.user.id },
+        include: { task: true, intern: true, reviewedBy: true },
+        orderBy: { createdAt: 'desc' }
+      });
+    } else {
+      submissions = await prisma.submission.findMany({
+        include: { task: true, intern: true, reviewedBy: true },
+        orderBy: { createdAt: 'desc' }
+      });
+    }
+    res.json(submissions);
+  } catch (err) {
+    console.error('Failed to fetch submissions:', err);
+    res.status(500).json({ error: 'Failed to fetch submissions' });
+  }
+});
+
+app.put('/api/submissions/:id/review', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can review submissions' });
+    
+    const { id } = req.params;
+    const { status, mentorFeedback } = req.body; // status is 'Approved' or 'Changes Requested'
+    
+    const submission = await prisma.submission.update({
+      where: { id },
+      data: {
+        status,
+        mentorFeedback,
+        reviewedAt: new Date(),
+        reviewedById: req.user.id
+      },
+      include: {
+        task: true
+      }
+    });
+
+    // Update the associated task status
+    const taskStatus = status === 'Approved' ? 'DONE' : 'CHANGES_REQUESTED';
+    await prisma.task.update({
+      where: { id: submission.taskId },
+      data: {
+        status: taskStatus,
+        feedback: mentorFeedback
+      }
+    });
+
+    res.json(submission);
+  } catch (err) {
+    console.error('Failed to review submission:', err);
+    res.status(500).json({ error: 'Failed to update submission' });
+  }
+});
+
 // --- ANNOUNCEMENTS API ---
 app.get('/api/announcements', authenticateToken, async (req, res) => {
   try {

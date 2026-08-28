@@ -10,7 +10,7 @@ export const useWorkspace = () => useContext(WorkspaceContext);
 // Default data removed, fetching from backend instead
 
 export const WorkspaceProvider = ({ children }) => {
-  const [data, setData] = useState({ tasks: [], interns: [], announcements: [] });
+  const [data, setData] = useState({ tasks: [], interns: [], announcements: [], submissions: [] });
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
 
@@ -19,16 +19,18 @@ export const WorkspaceProvider = ({ children }) => {
 
     const fetchData = async () => {
       try {
-        const [tasksRes, internsRes, announcementsRes] = await Promise.all([
+        const [tasksRes, internsRes, announcementsRes, submissionsRes] = await Promise.all([
           axios.get(`${API_URL}/tasks`),
           user.role === 'MENTOR' ? axios.get(`${API_URL}/users/interns`) : Promise.resolve({ data: [] }),
-          axios.get(`${API_URL}/announcements`)
+          axios.get(`${API_URL}/announcements`),
+          axios.get(`${API_URL}/submissions`)
         ]);
 
         setData({
           tasks: tasksRes.data,
           interns: internsRes.data,
-          announcements: announcementsRes.data
+          announcements: announcementsRes.data,
+          submissions: submissionsRes.data
         });
       } catch (err) {
         console.error("Failed to fetch workspace data", err);
@@ -109,6 +111,39 @@ export const WorkspaceProvider = ({ children }) => {
     }
   };
 
+  const submitTaskWork = async (submissionData) => {
+    try {
+      const res = await axios.post(`${API_URL}/submissions`, submissionData);
+      setData(prev => ({
+        ...prev,
+        submissions: [res.data, ...prev.submissions],
+        tasks: prev.tasks.map(t => t.id === submissionData.taskId ? { ...t, status: 'REVIEW', submissionLink: submissionData.githubUrl } : t)
+      }));
+      return { success: true };
+    } catch (err) {
+      console.error(err);
+      return { success: false, error: err.response?.data?.error || 'Failed to submit work' };
+    }
+  };
+
+  const reviewSubmission = async (submissionId, reviewData) => {
+    try {
+      const res = await axios.put(`${API_URL}/submissions/${submissionId}/review`, reviewData);
+      const updatedSubmission = res.data;
+      const taskStatus = reviewData.status === 'Approved' ? 'DONE' : 'CHANGES_REQUESTED';
+      
+      setData(prev => ({
+        ...prev,
+        submissions: prev.submissions.map(s => s.id === submissionId ? updatedSubmission : s),
+        tasks: prev.tasks.map(t => t.id === updatedSubmission.taskId ? { ...t, status: taskStatus, feedback: reviewData.mentorFeedback } : t)
+      }));
+      return { success: true };
+    } catch (err) {
+      console.error(err);
+      return { success: false, error: err.response?.data?.error || 'Failed to review submission' };
+    }
+  };
+
   if (loading && user) return null; // Loading
 
   return (
@@ -116,12 +151,15 @@ export const WorkspaceProvider = ({ children }) => {
       tasks: data.tasks, 
       interns: data.interns, 
       announcements: data.announcements || [],
+      submissions: data.submissions || [],
       createTask, 
       updateTaskStatus,
       updateTaskDetails,
       deleteTask,
       createAnnouncement,
-      createIntern
+      createIntern,
+      submitTaskWork,
+      reviewSubmission
     }}>
       {children}
     </WorkspaceContext.Provider>

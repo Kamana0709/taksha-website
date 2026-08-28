@@ -7,33 +7,24 @@ import './InternSubmissions.css';
 
 export default function InternSubmissions() {
   const { user } = useAuth();
-  const { tasks } = useWorkspace();
+  const { submissions, tasks } = useWorkspace();
 
-  const myTasks = tasks.filter(t => t.assignee === user?.id);
-  const submissions = myTasks.filter(t => t.status === 'REVIEW' || t.status === 'DONE' || t.status === 'CHANGES_REQUESTED');
-
-  // If no submissions exist, we'll inject some dummies for the prototype visualization
-  if (submissions.length === 0) {
-    submissions.push(
-      { id: 'd1', title: 'Responsive Navbar', project: 'Finora Project', status: 'DONE', date: '06 May', submissionLink: 'https://github.com/taksha/navbar', feedback: 'Great job! The mobile drawer works perfectly on iOS devices.' },
-      { id: 'd2', title: 'Login Page UI', project: 'NovaCare App', status: 'CHANGES_REQUESTED', date: '08 May', submissionLink: 'https://github.com/taksha/login', feedback: 'The contrast on the input borders needs to be thicker to match the Neo-Brutalist spec. Please update and resubmit.' }
-    );
-  }
+  const mySubmissions = submissions.filter(s => s.internId === user?.id);
 
   const getStatusColor = (status) => {
     switch(status) {
-      case 'DONE': return 'var(--color-card-mint)';
-      case 'CHANGES_REQUESTED': return 'var(--color-card-pink)';
-      case 'REVIEW': return 'var(--color-card-lilac)';
+      case 'Approved': return 'var(--color-card-mint)';
+      case 'Changes Requested': return 'var(--color-card-pink)';
+      case 'Submitted': return 'var(--color-card-lilac)';
       default: return 'var(--color-ink)';
     }
   };
 
   const getStatusIcon = (status) => {
     switch(status) {
-      case 'DONE': return <CheckCircle size={14} />;
-      case 'CHANGES_REQUESTED': return <AlertTriangle size={14} />;
-      case 'REVIEW': return <Clock size={14} />;
+      case 'Approved': return <CheckCircle size={14} />;
+      case 'Changes Requested': return <AlertTriangle size={14} />;
+      case 'Submitted': return <Clock size={14} />;
       default: return null;
     }
   };
@@ -50,30 +41,48 @@ export default function InternSubmissions() {
         </header>
 
         <div className="timeline">
-          {submissions.map((sub, idx) => (
-            <div key={sub.id || idx} className="timeline-item">
+          {mySubmissions.length === 0 && (
+            <div style={{ textAlign: 'center', padding: 'var(--space-8)' }}>
+              No submissions found. Submit work from the Tasks page.
+            </div>
+          )}
+          {mySubmissions.map((sub) => (
+            <div key={sub.id} className="timeline-item">
               <div className="timeline-item__dot" style={{ borderColor: getStatusColor(sub.status) }}></div>
               <div className="timeline-item__content">
                 <div className="timeline-header">
-                  <h3 className="timeline-title">{sub.title}</h3>
-                  <span className="timeline-date">{sub.date}</span>
+                  <h3 className="timeline-title">{sub.task?.title || 'Unknown Task'}</h3>
+                  <span className="timeline-date">{new Date(sub.createdAt).toLocaleDateString()}</span>
                 </div>
                 
-                <span className="timeline-project">{sub.project}</span>
+                <span className="timeline-project">{sub.task?.project || 'Unknown Project'}</span>
                 
-                {sub.submissionLink && (
-                  <a href={sub.submissionLink} target="_blank" rel="noreferrer" className="timeline-link">
-                    <ExternalLink size={16} /> View Submitted Artifact
-                  </a>
+                {sub.description && (
+                  <p style={{ margin: 'var(--space-2) 0', fontStyle: 'italic', color: 'var(--color-text-secondary)' }}>
+                    "{sub.description}"
+                  </p>
                 )}
+
+                <div style={{ display: 'flex', gap: 'var(--space-4)', margin: 'var(--space-2) 0' }}>
+                  {sub.githubUrl && (
+                    <a href={sub.githubUrl} target="_blank" rel="noreferrer" className="timeline-link">
+                      <ExternalLink size={16} /> View GitHub Repo
+                    </a>
+                  )}
+                  {sub.liveUrl && (
+                    <a href={sub.liveUrl} target="_blank" rel="noreferrer" className="timeline-link">
+                      <ExternalLink size={16} /> View Live App
+                    </a>
+                  )}
+                </div>
 
                 <div className="timeline-feedback" style={{ borderLeftColor: getStatusColor(sub.status) }}>
                   <h4 style={{ color: getStatusColor(sub.status) }}>
                     {getStatusIcon(sub.status)} 
-                    {sub.status === 'DONE' ? 'Verified / Completed' : sub.status === 'CHANGES_REQUESTED' ? 'Changes Requested' : 'Pending Mentor Review'}
+                    {sub.status === 'Approved' ? 'Verified / Completed' : sub.status === 'Changes Requested' ? 'Changes Requested' : 'Pending Mentor Review'}
                   </h4>
-                  {sub.feedback ? (
-                    <p>{sub.feedback}</p>
+                  {sub.mentorFeedback ? (
+                    <p>{sub.mentorFeedback}</p>
                   ) : (
                     <p style={{ fontStyle: 'italic' }}>Mentor has not left any remarks yet.</p>
                   )}

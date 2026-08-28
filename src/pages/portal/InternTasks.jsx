@@ -2,13 +2,19 @@ import React, { useState } from 'react';
 import SEO from '../../components/SEO/SEO';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { useAuth } from '../../context/AuthContext';
-import { Filter, Search, CheckSquare } from 'lucide-react';
+import { Filter, Search, CheckSquare, X } from 'lucide-react';
 import './InternTasks.css';
 
 export default function InternTasks() {
   const { user } = useAuth();
-  const { tasks, updateTaskStatus } = useWorkspace();
+  const { tasks, updateTaskStatus, submitTaskWork } = useWorkspace();
   const [filter, setFilter] = useState('ALL');
+  
+  const [submitModalOpen, setSubmitModalOpen] = useState(false);
+  const [activeTask, setActiveTask] = useState(null);
+  const [submissionData, setSubmissionData] = useState({ githubUrl: '', liveUrl: '', description: '' });
+  const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const myTasks = tasks.filter(t => t.assignee === user?.id);
   
@@ -30,6 +36,37 @@ export default function InternTasks() {
     }
   };
 
+  const handleOpenSubmit = (task) => {
+    setActiveTask(task);
+    setSubmissionData({ githubUrl: '', liveUrl: '', description: '' });
+    setSubmitError('');
+    setSubmitModalOpen(true);
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    if (!submissionData.githubUrl.includes('github.com')) {
+      setSubmitError('Please provide a valid GitHub repository URL.');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    setSubmitError('');
+    const res = await submitTaskWork({
+      taskId: activeTask.id,
+      ...submissionData
+    });
+    
+    setIsSubmitting(false);
+    
+    if (res.success) {
+      setSubmitModalOpen(false);
+      setActiveTask(null);
+    } else {
+      setSubmitError(res.error || 'Failed to submit work. Please try again.');
+    }
+  };
+
   return (
     <>
       <SEO title="My Tasks | Taksha Workspace" />
@@ -47,6 +84,67 @@ export default function InternTasks() {
             </select>
           </div>
         </header>
+
+        {submitModalOpen && activeTask && (
+          <div className="modal-overlay">
+            <div className="modal-content" style={{ maxWidth: '600px' }}>
+              <button className="modal-close" onClick={() => setSubmitModalOpen(false)}><X /></button>
+              <h2>Submit Work: {activeTask.title}</h2>
+              <p style={{ marginBottom: 'var(--space-4)' }}>Submit your GitHub repository link to mark this project as completed.</p>
+              
+              {submitError && (
+                <div style={{ padding: 'var(--space-2)', background: 'var(--color-card-pink)', color: 'var(--color-bg)', fontWeight: 800, marginBottom: 'var(--space-4)' }}>
+                  {submitError}
+                </div>
+              )}
+              
+              <form onSubmit={handleFormSubmit}>
+                <div style={{ marginBottom: 'var(--space-4)' }}>
+                  <label style={{ display: 'block', fontWeight: 800, marginBottom: 'var(--space-2)' }}>GitHub Repository URL *</label>
+                  <input 
+                    required 
+                    type="url" 
+                    placeholder="https://github.com/username/repo" 
+                    value={submissionData.githubUrl} 
+                    onChange={e => setSubmissionData({...submissionData, githubUrl: e.target.value})} 
+                    style={{ width: '100%', padding: '12px', border: '2px solid var(--color-ink)' }} 
+                  />
+                </div>
+                
+                <div style={{ marginBottom: 'var(--space-4)' }}>
+                  <label style={{ display: 'block', fontWeight: 800, marginBottom: 'var(--space-2)' }}>Live/Deployed Project URL (Optional)</label>
+                  <input 
+                    type="url" 
+                    placeholder="https://myproject.vercel.app" 
+                    value={submissionData.liveUrl} 
+                    onChange={e => setSubmissionData({...submissionData, liveUrl: e.target.value})} 
+                    style={{ width: '100%', padding: '12px', border: '2px solid var(--color-ink)' }} 
+                  />
+                </div>
+                
+                <div style={{ marginBottom: 'var(--space-6)' }}>
+                  <label style={{ display: 'block', fontWeight: 800, marginBottom: 'var(--space-2)' }}>Description/Updates (Optional)</label>
+                  <textarea 
+                    rows="4"
+                    placeholder="Briefly describe what you completed or any challenges faced..." 
+                    value={submissionData.description} 
+                    onChange={e => setSubmissionData({...submissionData, description: e.target.value})} 
+                    style={{ width: '100%', padding: '12px', border: '2px solid var(--color-ink)' }} 
+                  />
+                </div>
+                
+                <button 
+                  type="submit" 
+                  className="intern-btn intern-btn--assign" 
+                  style={{ width: '100%' }}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Submitting...' : 'Submit Work'}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
 
         <div className="task-table-container">
           <table className="task-table">
@@ -91,8 +189,8 @@ export default function InternTasks() {
                         </button>
                       )}
                       {(task.status === 'IN_PROGRESS' || task.status === 'CHANGES_REQUESTED') && (
-                        <button className="task-table__action" style={{ background: 'var(--color-card-purple)' }} onClick={() => updateTaskStatus(task.id, 'REVIEW')}>
-                          SUBMIT
+                        <button className="task-table__action" style={{ background: 'var(--color-card-purple)' }} onClick={() => handleOpenSubmit(task)}>
+                          SUBMIT WORK
                         </button>
                       )}
                       {task.status === 'REVIEW' && (

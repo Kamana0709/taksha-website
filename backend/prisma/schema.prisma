@@ -25,6 +25,8 @@ model User {
   assignedTasks Task[]   @relation("TaskAssignee")
   createdTasks  Task[]   @relation("TaskAssigner")
   announcements Announcement[]
+  submissions   Submission[] @relation("InternSubmissions")
+  reviews       Submission[] @relation("MentorReviews")
 }
 
 model Task {
@@ -42,6 +44,8 @@ model Task {
   
   assignerId     String
   assigner       User     @relation("TaskAssigner", fields: [assignerId], references: [id])
+  
+  submissions    Submission[]
 }
 
 model Announcement {
@@ -65,4 +69,25 @@ model Application {
   status    String   @default("Pending")
   date      String
   createdAt DateTime @default(now())
+}
+
+model Submission {
+  id             String   @id @default(uuid())
+  githubUrl      String
+  liveUrl        String?
+  description    String?
+  status         String   @default("Submitted") // Submitted, Under Review, Approved, Changes Requested
+  mentorFeedback String?
+  reviewedAt     DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  taskId         String
+  task           Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  internId       String
+  intern         User     @relation("InternSubmissions", fields: [internId], references: [id])
+  
+  reviewedById   String?
+  reviewedBy     User?    @relation("MentorReviews", fields: [reviewedById], references: [id])
 }
