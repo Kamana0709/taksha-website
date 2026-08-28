@@ -1064,8 +1064,10 @@ app.post('/api/project-templates/assign', authenticateToken, async (req, res) =>
         
         const mappedTask = {
           ...newTask,
-          assignee: newTask.assigneeUser.name,
-          assigner: newTask.assignerUser.name
+          assignee: newTask.assigneeId,
+          assigner: newTask.assignerId,
+          assigneeName: newTask.assigneeUser.name,
+          assignerName: newTask.assignerUser.name
         };
         
         createdTasks.push(mappedTask);
