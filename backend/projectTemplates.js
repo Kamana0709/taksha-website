@@ -1,3 +1,11 @@
+const COMMON_TASKS = [
+  "Clean GitHub repository with README",
+  "Desktop + mobile screenshots",
+  "Case study write-up (Problem → Research → Solution → Technology → Challenges → Result)",
+  "LinkedIn post explaining what was built",
+  "30–60 second demo video"
+];
+
 const PROJECT_TEMPLATES = [
   {
     key: "business-landing-page",
@@ -15,11 +23,7 @@ const PROJECT_TEMPLATES = [
       "Responsive navbar",
       "Footer",
       "Fully mobile-responsive layout",
-      "Clean GitHub repository with README",
-      "Desktop + mobile screenshots",
-      "Case study write-up (Problem → Research → Solution → Technology → Challenges → Result)",
-      "LinkedIn post explaining what was built",
-      "30–60 second demo video"
+      ...COMMON_TASKS
     ]
   },
   {
@@ -38,11 +42,7 @@ const PROJECT_TEMPLATES = [
       "Loading state",
       "Error state",
       "Empty state",
-      "Clean GitHub repository with README",
-      "Desktop + mobile screenshots",
-      "Case study write-up (Problem → Research → Solution → Technology → Challenges → Result)",
-      "LinkedIn post explaining what was built",
-      "30–60 second demo video"
+      ...COMMON_TASKS
     ]
   },
   {
@@ -65,11 +65,7 @@ const PROJECT_TEMPLATES = [
       "Sorting",
       "Responsive sidebar and dashboard navigation",
       "Loading, empty, and error states",
-      "Clean GitHub repository with README",
-      "Desktop + mobile screenshots",
-      "Case study write-up (Problem → Research → Solution → Technology → Challenges → Result)",
-      "LinkedIn post explaining what was built",
-      "30–60 second demo video"
+      ...COMMON_TASKS
     ]
   }
 ];
