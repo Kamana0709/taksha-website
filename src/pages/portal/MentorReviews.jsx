@@ -33,7 +33,7 @@ export default function MentorReviews() {
 
   return (
     <>
-      <SEO title="Reviews | Taksha Workspace" />
+      <SEO title="Reviews | Taksha Nexus Workspace" />
       <div className="mentor-reviews">
         <header className="intern-tasks__header" style={{ marginBottom: 'var(--space-6)' }}>
           <div>

@@ -23,7 +23,7 @@ async function main() {
 
   console.log('Seeding users...');
   const defaultPassword = await bcrypt.hash('password123', 10);
-  const charuPassword = await bcrypt.hash('Taksha@2606', 10);
+  const charuPassword = await bcrypt.hash('Taksha Nexus@2606', 10);
 
   const mentor = await prisma.user.create({
     data: {
@@ -87,8 +87,8 @@ async function main() {
 
   console.log('Seeding complete! You can log in with:');
   console.log('Mentor: mentor@taksha.in / password123');
-  console.log('Intern 1: charumandilwar@gmail.com / Taksha@2606');
-  console.log('Intern 2: rishikat1321@gmail.com / Taksha@2601');
+  console.log('Intern 1: charumandilwar@gmail.com / Taksha Nexus@2606');
+  console.log('Intern 2: rishikat1321@gmail.com / Taksha Nexus@2601');
 }
 
 main()

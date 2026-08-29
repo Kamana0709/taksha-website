@@ -82,8 +82,8 @@ export default function Footer() {
             whileInView="visible"
             viewport={{ once: true, margin: '-40px' }}
           >
-            <Link to="/" className="footer__brand-logo" aria-label="Taksha — Home">
-              <img src="/taksha-logo.svg" alt="Taksha" className="footer__logo-image" />
+            <Link to="/" className="footer__brand-logo" aria-label="Taksha Nexus — Home">
+              <img src="/taksha-nexus-logo.png" alt="Taksha Nexus" className="footer__logo-image" style={{ background: '#fff', borderRadius: '4px', padding: '2px' }} />
             </Link>
             <p className="footer__tagline">Crafting Digital Excellence.</p>
             <p className="footer__mission">
@@ -173,7 +173,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="footer__bottom">
           <p className="footer__copyright">
-            © {currentYear} Taksha. All rights reserved.
+            © {currentYear} Taksha Nexus. All rights reserved.
           </p>
           <div className="footer__legal">
             <Link to="/privacy-policy" className="footer__legal-link">Privacy Policy</Link>

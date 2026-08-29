@@ -12,8 +12,8 @@ export default function About() {
   return (
     <>
       <SEO
-        title="About — Taksha"
-        description="Taksha is a new, premium Digital Craft Studio building digital experiences for ambitious businesses."
+        title="About — Taksha Nexus"
+        description="Taksha Nexus is a new, premium Digital Craft Studio building digital experiences for ambitious businesses."
         canonical="/about"
       />
 
@@ -37,9 +37,9 @@ export default function About() {
               viewport={{ once: true, margin: '-60px' }}
               variants={fadeUp}
             >
-              <h2 className="h3">Why Taksha Exists</h2>
+              <h2 className="h3">Why Taksha Nexus Exists</h2>
               <p>
-                Taksha began with a simple frustration: too much of the web feels the same — templated, rushed, indistinct. We started Taksha to slow down and build things with the same care a craftsman brings to their materials. The name comes from the Sanskrit "Takṣ" — to carve, to shape, to build with precision — because that's exactly the standard we hold ourselves to.
+                Taksha Nexus began with a simple frustration: too much of the web feels the same — templated, rushed, indistinct. We started Taksha Nexus to slow down and build things with the same care a craftsman brings to their materials. The name comes from the Sanskrit "Takṣ" — to carve, to shape, to build with precision — because that's exactly the standard we hold ourselves to.
               </p>
             </motion.div>
 
@@ -65,7 +65,7 @@ export default function About() {
             >
               <h2 className="h3">Where We're Headed</h2>
               <p>
-                Taksha today is concept work and craftsmanship-first thinking. Taksha tomorrow is real client partnerships built on that same standard — plus a growing studio journal, open-source component work, and tools that make great design more accessible to ambitious businesses.
+                Taksha Nexus today is concept work and craftsmanship-first thinking. Taksha Nexus tomorrow is real client partnerships built on that same standard — plus a growing studio journal, open-source component work, and tools that make great design more accessible to ambitious businesses.
               </p>
             </motion.div>
           </div>
@@ -86,7 +86,7 @@ export default function About() {
                 <h3 className="h5">Honest Studio Note</h3>
               </div>
               <p>
-                Taksha is a newly founded studio. The work shown across this site is original concept work created to demonstrate our craft — not client case studies. We're transparent about this because honesty is one of our core values.
+                Taksha Nexus is a newly founded studio. The work shown across this site is original concept work created to demonstrate our craft — not client case studies. We're transparent about this because honesty is one of our core values.
               </p>
             </motion.div>
           </div>

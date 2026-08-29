@@ -57,7 +57,7 @@ export default function InternCalendar() {
 
   return (
     <>
-      <SEO title="Calendar | Taksha Workspace" />
+      <SEO title="Calendar | Taksha Nexus Workspace" />
       <div className="intern-calendar">
         <header className="calendar-header">
           <div>

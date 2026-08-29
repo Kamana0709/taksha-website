@@ -8,7 +8,7 @@ export default function MentorProfile() {
 
   return (
     <>
-      <SEO title="Mentor Profile | Taksha Workspace" />
+      <SEO title="Mentor Profile | Taksha Nexus Workspace" />
       <div style={{ padding: 'var(--space-6)', maxWidth: '800px', margin: '0 auto' }}>
         <header style={{ marginBottom: 'var(--space-8)' }}>
           <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: 'var(--space-2)' }}>My Profile</h1>

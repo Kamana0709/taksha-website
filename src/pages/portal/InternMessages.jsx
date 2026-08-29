@@ -64,7 +64,7 @@ export default function InternMessages() {
 
   return (
     <>
-      <SEO title="Messages | Taksha Workspace" />
+      <SEO title="Messages | Taksha Nexus Workspace" />
       <div>
         <header className="intern-tasks__header" style={{ marginBottom: 'var(--space-6)' }}>
           <div>

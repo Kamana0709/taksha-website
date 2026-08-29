@@ -40,7 +40,7 @@ export default function MentorInternDetail() {
   if (!intern) {
     return (
       <>
-        <SEO title="Intern Not Found | Taksha Workspace" />
+        <SEO title="Intern Not Found | Taksha Nexus Workspace" />
         <div className="mentor-intern-detail not-found">
           <div className="details-card" style={{ padding: 'var(--space-8)', textAlign: 'center' }}>
             <h2 className="profile-title" style={{ marginBottom: 'var(--space-4)' }}>Intern Not Found</h2>
@@ -65,7 +65,7 @@ export default function MentorInternDetail() {
 
   return (
     <>
-      <SEO title={`${intern.name}'s Profile | Taksha Workspace`} />
+      <SEO title={`${intern.name}'s Profile | Taksha Nexus Workspace`} />
       <div className="mentor-intern-detail">
         <header className="intern-tasks__header" style={{ marginBottom: 'var(--space-6)' }}>
           <div>

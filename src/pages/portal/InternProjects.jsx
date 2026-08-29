@@ -43,7 +43,7 @@ export default function InternProjects() {
 
   return (
     <>
-      <SEO title="My Projects | Taksha Workspace" />
+      <SEO title="My Projects | Taksha Nexus Workspace" />
       <div className="intern-projects">
         <header className="intern-tasks__header">
           <div>

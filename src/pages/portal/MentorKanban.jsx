@@ -16,7 +16,7 @@ export default function MentorKanban() {
 
   return (
     <>
-      <SEO title="Kanban Board | Taksha Workspace" />
+      <SEO title="Kanban Board | Taksha Nexus Workspace" />
       <div style={{ padding: 'var(--space-6)', maxWidth: '1400px', margin: '0 auto' }}>
         <header className="intern-tasks__header" style={{ marginBottom: 'var(--space-6)' }}>
           <div>

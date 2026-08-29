@@ -5,7 +5,7 @@
  */
 import { Helmet } from 'react-helmet-async';
 
-const SITE_NAME = 'Taksha';
+const SITE_NAME = 'Taksha Nexus';
 const SITE_URL = 'https://www.taksha.studio';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og/default.png`;
 

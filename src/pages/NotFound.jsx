@@ -9,7 +9,7 @@ export default function NotFound() {
   return (
     <>
       <SEO 
-        title="Page Not Found — Taksha"
+        title="Page Not Found — Taksha Nexus"
         description="This page doesn't exist. You might have followed a broken link, or the page was moved."
         canonical="/404"
       />

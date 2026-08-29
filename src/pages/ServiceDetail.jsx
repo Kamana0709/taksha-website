@@ -30,7 +30,7 @@ export default function ServiceDetail() {
   return (
     <>
       <SEO
-        title={`${service.title} — Taksha Services`}
+        title={`${service.title} — Taksha Nexus Services`}
         description={service.tagline}
         canonical={`/services/${service.slug}`}
       />

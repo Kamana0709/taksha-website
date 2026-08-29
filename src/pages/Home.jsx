@@ -1,7 +1,7 @@
 /**
  * Home Page — Primary landing page
  * PRD §9 — 8 sections: Hero, Craft Philosophy, Featured Projects,
- * Services Overview, Process Preview, Why Taksha, Brand Manifesto, Final CTA
+ * Services Overview, Process Preview, Why Taksha Nexus, Brand Manifesto, Final CTA
  */
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -89,7 +89,7 @@ const MANIFESTO_LINES = [
   'We believe design is a form of respect for the people who use it.',
   'We believe simplicity takes more discipline than complexity.',
   'We believe craft is not a phase of a project — it\'s the standard for all of it.',
-  'We are Taksha. We carve, shape, and build — with precision.',
+  'We are Taksha Nexus. We carve, shape, and build — with precision.',
 ];
 
 /* -----------------------------------------------------------------------
@@ -119,7 +119,7 @@ export default function Home() {
     <>
       <SEO
         title={null}
-        description="Taksha is a digital craft studio blending branding, design, engineering, and AI to build digital experiences ambitious businesses are proud to own."
+        description="Taksha Nexus is a digital craft studio blending branding, design, engineering, and AI to build digital experiences ambitious businesses are proud to own."
         canonical="/"
       />
       <StructuredData schema={localBusinessSchema()} />
@@ -139,7 +139,7 @@ export default function Home() {
       {/* 9.1.5 Process Preview */}
       <ProcessPreview />
 
-      {/* 9.1.6 Why Taksha */}
+      {/* 9.1.6 Why Taksha Nexus */}
       <WhyTaksha />
 
       {/* 9.1.7 Brand Manifesto */}
@@ -177,7 +177,7 @@ function HeroSection({ prefersReducedMotion }) {
               Crafting Digital Excellence.
             </motion.h1>
             <motion.p className="hero__subhead" variants={fadeUp} custom={2}>
-              Taksha blends branding, design, engineering, and AI to build digital
+              Taksha Nexus blends branding, design, engineering, and AI to build digital
               experiences ambitious businesses are proud to own.
             </motion.p>
             <motion.div className="hero__ctas" variants={fadeUp} custom={3}>
@@ -271,11 +271,11 @@ function CraftPhilosophy() {
     <section className="section section--lg craft-section">
       <div className="container">
         <SectionHeading
-          eyebrow="The Meaning Behind Taksha"
+          eyebrow="The Meaning Behind Taksha Nexus"
           title="To carve. To shape. To craft — with precision."
           subtitle={
             <>
-              Taksha comes from the Sanskrit "<span lang="sa">Takṣ</span>" — the act of shaping
+              Taksha Nexus comes from the Sanskrit "<span lang="sa">Takṣ</span>" — the act of shaping
               something with intention and skill. We apply that same philosophy to digital products:
               nothing is default, nothing is templated. Every interface, every interaction, every
               line of code is considered.
@@ -314,7 +314,7 @@ function FeaturedProjects() {
         <SectionHeading
           eyebrow="Studio Originals"
           title="Concept work. Real craft."
-          subtitle="Taksha is a new studio — every project below is a self-initiated exploration, not a client engagement. It's how we prove our craft before we're hired for yours."
+          subtitle="Taksha Nexus is a new studio — every project below is a self-initiated exploration, not a client engagement. It's how we prove our craft before we're hired for yours."
         />
 
         <motion.div
@@ -481,7 +481,7 @@ function WhyTaksha() {
             variants={staggerContainer}
           >
             <motion.span className="text-eyebrow" variants={fadeUp} style={{ display: 'block', marginBottom: 'var(--space-4)' }}>
-              Why Taksha
+              Why Taksha Nexus
             </motion.span>
             <motion.h2 className="h2" variants={fadeUp} style={{ marginBottom: 'var(--space-6)' }}>
               A new studio. An honest one.
@@ -492,7 +492,7 @@ function WhyTaksha() {
               self-initiated work built to the same standard we'd bring to yours.
             </motion.p>
             <motion.p variants={fadeUp}>
-              Taksha isn't a web development agency. We're a Digital Craft Studio — branding, design,
+              Taksha Nexus isn't a web development agency. We're a Digital Craft Studio — branding, design,
               engineering, and AI, combined with intention.
             </motion.p>
           </motion.div>

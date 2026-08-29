@@ -17,7 +17,7 @@ const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, tra
 export default function ServicesIndex() {
   return (
     <>
-      <SEO title="Services" description="Explore Taksha's services — brand identity, UI/UX design, website design, React development, and AI automation. Services built around your goals, not our templates." canonical="/services" />
+      <SEO title="Services" description="Explore Taksha Nexus' services — brand identity, UI/UX design, website design, React development, and AI automation. Services built around your goals, not our templates." canonical="/services" />
       <section className="section section--lg" style={{ paddingTop: 'calc(var(--space-24) + 64px)' }}>
         <div className="container">
           <SectionHeading eyebrow="What We Do" title="Services built around your goals, not our templates." as="h1" />

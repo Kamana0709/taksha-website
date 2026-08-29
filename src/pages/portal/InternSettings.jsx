@@ -8,7 +8,7 @@ export default function InternSettings() {
   
   return (
     <>
-      <SEO title="Settings | Taksha Workspace" />
+      <SEO title="Settings | Taksha Nexus Workspace" />
       <div className="intern-settings">
         <header className="intern-tasks__header">
           <div>

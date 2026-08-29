@@ -25,10 +25,10 @@ export function organizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Taksha',
+    name: 'Taksha Nexus',
     url: 'https://www.taksha.studio',
     logo: 'https://www.taksha.studio/logo.png',
-    description: 'Taksha is a digital craft studio blending branding, design, engineering, and AI.',
+    description: 'Taksha Nexus is a digital craft studio blending branding, design, engineering, and AI.',
     sameAs: [
       'https://www.linkedin.com/company/taksha',
       'https://www.instagram.com/taksha.studio',
@@ -68,7 +68,7 @@ export function localBusinessSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    name: 'Taksha',
+    name: 'Taksha Nexus',
     image: 'https://www.taksha.studio/og-image.jpg',
     url: 'https://www.taksha.studio',
     priceRange: '$$$$',
@@ -86,7 +86,7 @@ export function serviceSchema(serviceName, description, path) {
     name: serviceName,
     provider: {
       '@type': 'Organization',
-      name: 'Taksha',
+      name: 'Taksha Nexus',
     },
     description: description,
     url: `https://www.taksha.studio${path}`,
@@ -100,7 +100,7 @@ export function creativeWorkSchema(projectName, description, path) {
     name: projectName,
     creator: {
       '@type': 'Organization',
-      name: 'Taksha',
+      name: 'Taksha Nexus',
     },
     description: description,
     url: `https://www.taksha.studio${path}`,

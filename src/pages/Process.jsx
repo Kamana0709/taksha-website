@@ -29,7 +29,7 @@ export default function Process() {
   return (
     <>
       <SEO
-        title="Process — Taksha"
+        title="Process — Taksha Nexus"
         description="A process built on clarity, not guesswork. Every project moves through the same disciplined 10-stage process."
         canonical="/process"
       />

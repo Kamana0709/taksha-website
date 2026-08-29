@@ -20,7 +20,7 @@ export default function MentorInterns() {
 
   return (
     <>
-      <SEO title="My Interns | Taksha Workspace" />
+      <SEO title="My Interns | Taksha Nexus Workspace" />
       <div className="mentor-interns">
         <header className="intern-tasks__header">
           <div>

@@ -58,7 +58,7 @@ const upload = multer({
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Taksha Backend API is running' });
+  res.json({ status: 'ok', message: 'Taksha Nexus Backend API is running' });
 });
 
 // --- MIDDLEWARE ---
@@ -496,7 +496,7 @@ app.post('/api/applications', async (req, res) => {
 
     // 2. Send Email Notification
     const { data: emailData, error } = await resend.emails.send({
-      from: 'Taksha Careers <website@taksha.studio>',
+      from: 'Taksha Nexus Careers <website@taksha.studio>',
       to: 'takshadigital@gmail.com',
       subject: `New Application: ${name} for ${roleTitle}`,
       html: `
@@ -702,7 +702,7 @@ app.get('/api/certificates/:id/download', async (req, res) => {
     const filePath = path.join(__dirname, 'uploads', 'certificates', `${id}.pdf`);
     if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'File not found' });
     
-    res.download(filePath, `Taksha-Certificate-${cert.certificateNumber.replace(/\//g, '-')}.pdf`);
+    res.download(filePath, `Taksha-Nexus-Certificate-${cert.certificateNumber.replace(/\//g, '-')}.pdf`);
   } catch (err) {
     console.error('Failed to download certificate:', err);
     res.status(500).json({ error: 'Failed to download certificate' });

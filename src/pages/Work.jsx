@@ -42,7 +42,7 @@ export default function Work() {
     <>
       <SEO
         title="Work"
-        description="Explore Taksha's Studio Originals — concept projects across healthcare, SaaS, hospitality, real estate, and fintech, crafted without compromise."
+        description="Explore Taksha Nexus' Studio Originals — concept projects across healthcare, SaaS, hospitality, real estate, and fintech, crafted without compromise."
         canonical="/work"
       />
 
@@ -51,7 +51,7 @@ export default function Work() {
           <SectionHeading
             eyebrow="Studio Originals"
             title="Concept work, crafted without compromise."
-            subtitle="Taksha is a new studio. Every project here is a self-initiated exploration — designed and built to the same standard as client work, without a client's constraints."
+            subtitle="Taksha Nexus is a new studio. Every project here is a self-initiated exploration — designed and built to the same standard as client work, without a client's constraints."
             as="h1"
           />
 

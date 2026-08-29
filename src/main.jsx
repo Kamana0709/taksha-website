@@ -1,5 +1,5 @@
 /**
- * Main entry point — Taksha Digital Craft Studio
+ * Main entry point — Taksha Nexus Digital Craft Studio
  */
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';

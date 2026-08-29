@@ -221,7 +221,7 @@ export default function InternDashboard() {
                 <div className="announcement-icon-box">
                   <Megaphone size={20} />
                 </div>
-                <h2 className="dashboard-widget__title">TAKSHA ANNOUNCEMENTS</h2>
+                <h2 className="dashboard-widget__title">TAKSHA NEXUS ANNOUNCEMENTS</h2>
               </div>
               <Link to="/intern/dashboard" className="view-all-link">View All</Link>
             </div>

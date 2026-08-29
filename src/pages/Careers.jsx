@@ -130,8 +130,8 @@ export default function Careers() {
   return (
     <main className="careers-page pt-32 pb-32">
       <SEO 
-        title="Careers | Taksha Internship Platform" 
-        description="Join Taksha and be part of a mission to empower learners and build impactful products." 
+        title="Careers | Taksha Nexus Internship Platform" 
+        description="Join Taksha Nexus and be part of a mission to empower learners and build impactful products." 
       />
 
       {/* Hero Section */}
@@ -143,14 +143,14 @@ export default function Careers() {
             Together<span className="dot">.</span>
           </h1>
           <p className="careers-hero__desc">
-            Join Taksha and be part of a mission to empower learners, build impactful products, and create meaningful change.
+            Join Taksha Nexus and be part of a mission to empower learners, build impactful products, and create meaningful change.
           </p>
           <div className="careers-hero__actions">
             <a href="#roles" className="btn btn--primary">
               View Open Roles <ArrowRight size={20} />
             </a>
             <a href="#benefits" className="btn btn--secondary">
-              Life at Taksha <ArrowRight size={20} />
+              Life at Taksha Nexus <ArrowRight size={20} />
             </a>
           </div>
         </div>
@@ -378,7 +378,7 @@ export default function Careers() {
         <p style={{ fontWeight: '700', marginBottom: 'var(--space-4)' }}>Already part of the team?</p>
         <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
           <a href="/login" className="btn btn--secondary" style={{ background: 'var(--color-bg)' }}>
-            Taksha Workspace Login <ArrowRight size={18} />
+            Taksha Nexus Workspace Login <ArrowRight size={18} />
           </a>
         </div>
       </section>

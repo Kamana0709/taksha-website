@@ -30,7 +30,7 @@ export default function Article() {
   return (
     <>
       <SEO
-        title={`${article.title} — Taksha Journal`}
+        title={`${article.title} — Taksha Nexus Journal`}
         description={article.excerpt}
         canonical={`/journal/${article.slug}`}
       />

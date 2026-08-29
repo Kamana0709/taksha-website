@@ -7,7 +7,7 @@ export const allServices = [
     slug: 'brand-identity',
     title: 'Brand Identity',
     tagline: 'Logos, visual systems, and brand foundations built to scale.',
-    overview: 'Brand identity at Taksha means building the foundational visual and verbal system a business will grow into — logo, color, typography, tone of voice, and usage guidelines — designed to remain relevant for years, not seasons.',
+    overview: 'Brand identity at Taksha Nexus means building the foundational visual and verbal system a business will grow into — logo, color, typography, tone of voice, and usage guidelines — designed to remain relevant for years, not seasons.',
     idealClients: [
       'Startups pre-launch needing a credible visual foundation',
       'Businesses rebranding or modernizing their identity',
@@ -71,7 +71,7 @@ export const allServices = [
     ],
     timeline: '3–6 weeks for a marketing site; landing pages 1–2 weeks',
     faqs: [
-      { question: 'Do you also build the website, or just design it?', answer: 'Both — see our React Development service for the build phase. Many clients engage Taksha for design + development together for seamless continuity.' },
+      { question: 'Do you also build the website, or just design it?', answer: 'Both — see our React Development service for the build phase. Many clients engage Taksha Nexus for design + development together for seamless continuity.' },
       { question: 'Can you help with copywriting?', answer: 'We provide content direction and copy guidance. For full copywriting, we can recommend partners or scope it as an add-on.' },
       { question: 'Do you design for WordPress/Webflow?', answer: 'Our primary stack is custom React. If you need a CMS-based solution, we can discuss your specific needs during the discovery phase.' },
       { question: 'What makes your website design different from a template?', answer: 'Every design is custom — no templates, no themes. We design from your brand identity, audience, and goals, resulting in a site that is uniquely yours.' },

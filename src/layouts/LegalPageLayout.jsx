@@ -13,7 +13,7 @@ export default function LegalPageLayout({ title, description, lastUpdated, child
   return (
     <>
       <SEO 
-        title={`${title} — Taksha`}
+        title={`${title} — Taksha Nexus`}
         description={description}
       />
 

@@ -31,7 +31,7 @@ export default function InternSubmissions() {
 
   return (
     <>
-      <SEO title="Submissions Audit | Taksha Workspace" />
+      <SEO title="Submissions Audit | Taksha Nexus Workspace" />
       <div className="intern-submissions">
         <header className="intern-tasks__header">
           <div>

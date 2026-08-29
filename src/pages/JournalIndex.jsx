@@ -21,7 +21,7 @@ export default function JournalIndex() {
   return (
     <>
       <SEO
-        title="Journal — Taksha Studio"
+        title="Journal — Taksha Nexus"
         description="Insights, tutorials, and thoughts on design, engineering, and digital craft."
         canonical="/journal"
       />
@@ -31,7 +31,7 @@ export default function JournalIndex() {
           <motion.div initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.1 } } }}>
             <motion.h1 className="h1" variants={fadeUp}>Journal.</motion.h1>
             <motion.p className="journal-hero__subtitle" variants={fadeUp}>
-              Thoughts, experiments, and technical deep-dives from the Taksha team. 
+              Thoughts, experiments, and technical deep-dives from the Taksha Nexus team. 
               We write about design craft, React architecture, and the future of digital.
             </motion.p>
           </motion.div>

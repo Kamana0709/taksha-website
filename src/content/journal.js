@@ -23,7 +23,7 @@ export const allArticles = [
     title: 'The Death of the Template: Why Bespoke Design Wins in 2026',
     category: 'Blog',
     date: 'Oct 15, 2025',
-    author: 'Taksha Studio',
+    author: 'Taksha Nexus',
     readTime: '4 min read',
     excerpt: 'In a world where AI can generate a generic landing page in 3 seconds, human-crafted bespoke design is the only way to signal premium value.',
     content: `
@@ -37,8 +37,8 @@ export const allArticles = [
         "If you look like a template, customers will assume your product is a template."
       </blockquote>
       
-      <h2>Our Approach at Taksha</h2>
-      <p>At Taksha, we abandoned templates entirely. We build custom React architectures for every client, ensuring their digital presence is as unique as their fingerprint. We focus on typography-led hierarchy, fluid motion, and rigorous accessibility.</p>
+      <h2>Our Approach at Taksha Nexus</h2>
+      <p>At Taksha Nexus, we abandoned templates entirely. We build custom React architectures for every client, ensuring their digital presence is as unique as their fingerprint. We focus on typography-led hierarchy, fluid motion, and rigorous accessibility.</p>
     `
   },
   {
@@ -73,7 +73,7 @@ export const allArticles = [
     title: 'Generating Accessible Palettes with AI Agents',
     category: 'AI Experiments',
     date: 'Oct 05, 2025',
-    author: 'Taksha Labs',
+    author: 'Taksha Nexus Labs',
     readTime: '5 min read',
     excerpt: 'An experiment in using LLMs to mathematically generate color scales that guarantee WCAG 2.2 AAA compliance.',
     content: `
@@ -102,20 +102,20 @@ export const allArticles = [
       <h2>The Opportunity</h2>
       <p>An empty state is an incredible opportunity for brand personality and user onboarding. Instead of 'No projects found', we use bespoke illustrations, witty copy, and a massive, pulsing primary CTA that tells the user exactly what to do next.</p>
       
-      <p>At Taksha, we have a rule: An empty state must be more beautiful than a full state.</p>
+      <p>At Taksha Nexus, we have a rule: An empty state must be more beautiful than a full state.</p>
     `
   },
   {
     slug: 'rebuilding-taksha',
-    title: 'Rebuilding Taksha: Case Study Deep Dive',
+    title: 'Rebuilding Taksha Nexus: Case Study Deep Dive',
     category: 'Case Studies',
     date: 'Sep 20, 2025',
-    author: 'Taksha Studio',
+    author: 'Taksha Nexus',
     readTime: '8 min read',
     excerpt: 'A behind-the-scenes look at how we built our own studio website in record time.',
     content: `
       <h2>Eating Our Own Dog Food</h2>
-      <p>When it came time to launch Taksha, we knew our website had to be our strongest case study. We couldn't just tell clients we build premium, high-performance web apps—we had to show them.</p>
+      <p>When it came time to launch Taksha Nexus, we knew our website had to be our strongest case study. We couldn't just tell clients we build premium, high-performance web apps—we had to show them.</p>
       
       <h2>The Architecture</h2>
       <p>We opted for React 19 and Vite for blazingly fast HMR during development. For styling, we took a radical approach: No Tailwind. We wrote plain, semantic CSS utilizing BEM methodology and extensive CSS variables. This resulted in an incredibly lightweight bundle.</p>
@@ -147,13 +147,13 @@ export const allArticles = [
     date: 'Sep 01, 2025',
     author: 'Founder',
     readTime: '5 min read',
-    excerpt: 'How we structured Taksha to avoid the typical agency burnout cycle.',
+    excerpt: 'How we structured Taksha Nexus to avoid the typical agency burnout cycle.',
     content: `
       <h2>The Churn and Burn</h2>
       <p>The agency world is notorious for burnout. High turnover, brutal deadlines, and pitch-work that never sees the light of day. We wanted to build something different.</p>
       
       <h2>Quality over Quantity</h2>
-      <p>At Taksha, we cap our active projects. By strictly limiting our WIP (Work in Progress), we ensure that every client gets our absolute best, and our team gets to go home at 5 PM. A well-rested designer produces infinitely better work than an exhausted one.</p>
+      <p>At Taksha Nexus, we cap our active projects. By strictly limiting our WIP (Work in Progress), we ensure that every client gets our absolute best, and our team gets to go home at 5 PM. A well-rested designer produces infinitely better work than an exhausted one.</p>
     `
   },
   {
@@ -192,15 +192,15 @@ export const allArticles = [
   },
   {
     slug: 'taksha-ui-kit-release',
-    title: 'Release: The Taksha Open-Source UI Kit',
+    title: 'Release: The Taksha Nexus Open-Source UI Kit',
     category: 'Open-source Showcases',
     date: 'Aug 01, 2025',
-    author: 'Taksha Studio',
+    author: 'Taksha Nexus',
     readTime: '3 min read',
     excerpt: 'We are open-sourcing our core React component library for the community.',
     content: `
       <h2>Giving Back</h2>
-      <p>We stand on the shoulders of open-source giants. React, Vite, Framer Motion—none of our work would be possible without the community. Today, we are releasing the Taksha UI Kit.</p>
+      <p>We stand on the shoulders of open-source giants. React, Vite, Framer Motion—none of our work would be possible without the community. Today, we are releasing the Taksha Nexus UI Kit.</p>
       
       <h2>What is it?</h2>
       <p>It's a collection of 50+ headless React components, styled with plain CSS variables. No Tailwind, no bloated dependencies. Just clean, accessible, semantic markup that you can copy and paste directly into your projects.</p>

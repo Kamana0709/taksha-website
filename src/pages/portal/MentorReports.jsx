@@ -82,7 +82,7 @@ export default function MentorReports() {
 
   return (
     <>
-      <SEO title="Reports & Analytics | Taksha Workspace" />
+      <SEO title="Reports & Analytics | Taksha Nexus Workspace" />
       <div className="mentor-reports">
         <header className="intern-tasks__header">
           <div>

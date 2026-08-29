@@ -125,7 +125,7 @@ export default function MentorTasks() {
 
   return (
     <>
-      <SEO title="Task Masterlist | Taksha Workspace" />
+      <SEO title="Task Masterlist | Taksha Nexus Workspace" />
       <div className="mentor-tasks">
         <header className="intern-tasks__header" style={{ marginBottom: 'var(--space-6)' }}>
           <div>
@@ -196,7 +196,7 @@ export default function MentorTasks() {
               <button className="modal-close" onClick={() => setAssignTemplateOpen(false)}><X /></button>
               <h2>Assign Official Project</h2>
               <p style={{ color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
-                Select an official Taksha template to automatically generate the project and its complete checklist of tasks.
+                Select an official Taksha Nexus template to automatically generate the project and its complete checklist of tasks.
               </p>
               
               {error && <div style={{ color: 'var(--color-card-pink)', marginBottom: 'var(--space-4)', fontWeight: 800 }}>{error}</div>}

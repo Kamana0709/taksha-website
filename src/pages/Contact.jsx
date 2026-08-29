@@ -159,8 +159,8 @@ export default function Contact() {
   return (
     <>
       <SEO 
-        title="Start a Project — Taksha"
-        description="Tell us what you're building. Start a project with Taksha Digital Craft Studio."
+        title="Start a Project — Taksha Nexus"
+        description="Tell us what you're building. Start a project with Taksha Nexus Digital Craft Studio."
         canonical="/contact"
       />
       <StructuredData schema={localBusinessSchema()} />

@@ -75,12 +75,12 @@ export default function InternProfile() {
 
   return (
     <>
-      <SEO title="My Profile | Taksha Workspace" />
+      <SEO title="My Profile | Taksha Nexus Workspace" />
       <div className="intern-profile">
         <header className="intern-tasks__header">
           <div>
             <h1 className="intern-tasks__title">My Profile</h1>
-            <p className="intern-tasks__subtitle">Your official Taksha intern record.</p>
+            <p className="intern-tasks__subtitle">Your official Taksha Nexus intern record.</p>
           </div>
           <div>
              {!isEditing ? (

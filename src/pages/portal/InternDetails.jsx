@@ -5,7 +5,7 @@ import './InternDetails.css';
 export default function InternDetails() {
   return (
     <>
-      <SEO title="Internship Details | Taksha Workspace" />
+      <SEO title="Internship Details | Taksha Nexus Workspace" />
       <div className="intern-details">
         <header className="intern-tasks__header">
           <div>
@@ -18,7 +18,7 @@ export default function InternDetails() {
           <div className="details-section">
             <h2>Program Overview</h2>
             <p>
-              Welcome to the Taksha Frontend Internship Track! This program is designed to bridge the gap between academic learning and production-grade software development. 
+              Welcome to the Taksha Nexus Frontend Internship Track! This program is designed to bridge the gap between academic learning and production-grade software development. 
               Over the course of this internship, you will be assigned to real-world projects and expected to deliver high-quality, responsive, and accessible code.
             </p>
           </div>

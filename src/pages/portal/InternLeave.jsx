@@ -10,7 +10,7 @@ export default function InternLeave() {
 
   return (
     <>
-      <SEO title="Leave Management | Taksha Workspace" />
+      <SEO title="Leave Management | Taksha Nexus Workspace" />
       <div className="intern-leave">
         <header className="intern-tasks__header">
           <div>

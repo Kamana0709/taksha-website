@@ -411,7 +411,7 @@ module.exports = function generateCertificateHtml(data) {
       <div class="logo-area">
         <div class="logo-icon">T</div>
         <div>
-          <div class="logo-text">Taksha</div>
+          <div class="logo-text">Taksha Nexus</div>
           <div class="tagline-lines">
             <div class="tagline">CRAFTING DIGITAL<br>EXCELLENCE.</div>
           </div>
@@ -432,7 +432,7 @@ module.exports = function generateCertificateHtml(data) {
       
       <div class="body-text">
         has successfully completed the internship program as a <span class="highlight">${role} Intern</span> 
-        at <span class="highlight">Taksha</span> from <span class="highlight">${startDate}</span> to <span class="highlight">${endDate}</span>.<br><br>
+        at <span class="highlight">Taksha Nexus</span> from <span class="highlight">${startDate}</span> to <span class="highlight">${endDate}</span>.<br><br>
         During the internship, they demonstrated dedication, enthusiasm, and a strong willingness to learn. 
         We truly appreciate their efforts and contributions to the projects and tasks assigned.<br><br>
         We wish them all the best for their future endeavors.
@@ -443,7 +443,7 @@ module.exports = function generateCertificateHtml(data) {
       <div class="signature-area">
         <div class="signature-image">RA.</div>
         <div class="signature-title">FOUNDER</div>
-        <div class="signature-company">Taksha</div>
+        <div class="signature-company">Taksha Nexus</div>
       </div>
     </div>
     

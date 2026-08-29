@@ -74,8 +74,8 @@ export default function Navbar() {
       >
         <div className="navbar__inner">
           {/* Logo */}
-          <Link to="/" className="navbar__logo" aria-label="Taksha — Home">
-            <img src="/taksha-logo.svg" alt="Taksha" className="navbar__logo-image" />
+          <Link to="/" className="navbar__logo" aria-label="Taksha Nexus — Home">
+            <img src="/taksha-nexus-logo.png" alt="Taksha Nexus" className="navbar__logo-image" style={{ background: '#fff', borderRadius: '4px', padding: '2px' }} />
           </Link>
 
           {/* Desktop nav links */}

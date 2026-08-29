@@ -4,12 +4,12 @@ export default function PrivacyPolicy() {
   return (
     <LegalPageLayout 
       title="Privacy Policy" 
-      description="Taksha's privacy policy and data handling practices."
+      description="Taksha Nexus' privacy policy and data handling practices."
       lastUpdated="August 9, 2026"
     >
       <h2>1. Introduction</h2>
       <p>
-        At Taksha, we respect your privacy and are committed to protecting your personal data. 
+        At Taksha Nexus, we respect your privacy and are committed to protecting your personal data. 
         This privacy policy will inform you as to how we look after your personal data when you visit our website 
         and tell you about your privacy rights.
       </p>

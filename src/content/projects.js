@@ -49,7 +49,7 @@ const emptyCaseStudy = {
 export const allProjects = [
   {
     slug: 'taksha',
-    name: 'Taksha',
+    name: 'Taksha Nexus',
     tagline: "A studio's own site as its strongest case study",
     industry: 'Digital Studio',
     categories: ['Brand Identity', 'UI/UX', 'Website'],
@@ -72,7 +72,7 @@ export const allProjects = [
 
     // Phase 13 Case Study Data
     caseStudy: {
-      brief: "Taksha is a newly formed digital craft studio. With no past client work to showcase, the studio's own website must serve as the ultimate proof of capability across branding, UI/UX, and complex frontend engineering.",
+      brief: "Taksha Nexus is a newly formed digital craft studio. With no past client work to showcase, the studio's own website must serve as the ultimate proof of capability across branding, UI/UX, and complex frontend engineering.",
       challenge: "Most agency websites are over-engineered, relying on heavy WebGL that tanks performance, or they are just basic templates. The challenge was to build a site that feels premium, highly interactive, and bespoke, but still scores a 100 on Lighthouse performance and passes strict WCAG accessibility guidelines.",
       research: {
         summary: "We audited 50 top-tier agency websites (Awwwards winners). We found a massive correlation between 'award-winning design' and 'terrible performance'. 80% of the sites failed basic mobile accessibility tests.",

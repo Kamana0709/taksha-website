@@ -31,7 +31,7 @@ export default function Login() {
 
   return (
     <>
-      <SEO title="Taksha Workspace | Login" />
+      <SEO title="Taksha Nexus Workspace | Login" />
       <div className="auth-card" style={{ padding: 0 }}>
         <div className="auth-banner">
           AUTHORIZED PERSONNEL ONLY
