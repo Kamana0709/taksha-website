@@ -10,7 +10,7 @@ import './MentorDashboard.css';
 
 export default function MentorDashboard() {
   const { user } = useAuth();
-  const { projects, tasks, interns, createTask, updateTaskStatus, createAnnouncement } = useWorkspace();
+  const { projects, tasks, interns, submissions, createTask, updateTaskStatus, createAnnouncement, reviewSubmission } = useWorkspace();
   const navigate = useNavigate();
   const [isTaskModalOpen, setIsTaskModalOpen] = React.useState(false);
   const [isAnnouncementModalOpen, setIsAnnouncementModalOpen] = React.useState(false);
@@ -25,7 +25,7 @@ export default function MentorDashboard() {
     day: 'numeric' 
   });
 
-  const pendingReviews = tasks.filter(t => t.status === 'REVIEW');
+  const pendingReviews = (submissions || []).filter(s => s.status === 'Submitted');
   const completedTasks = tasks.filter(t => t.status === 'DONE');
   const changesRequested = tasks.filter(t => t.status === 'CHANGES_REQUESTED');
 
@@ -210,22 +210,22 @@ export default function MentorDashboard() {
                 {pendingReviews.map(sub => (
                   <li key={sub.id} className="review-item">
                     <div className="review-item__header">
-                      <span className="review-task">{sub.title}</span>
-                      <span className="review-time">{sub.date}</span>
+                      <span className="review-task">Project Submission</span>
+                      <span className="review-time">{new Date(sub.createdAt).toLocaleDateString()}</span>
                     </div>
                     <div className="review-item__meta">
-                      <span className="review-intern">{interns.find(i => i.id === sub.assignee)?.name || sub.assignee}</span>
+                      <span className="review-intern">{sub.intern?.name || 'Unknown Intern'}</span>
                       <span className="dot">•</span>
                       <span className="review-project">{sub.project?.name || 'Unknown Project'}</span>
                     </div>
                     <div style={{ marginTop: 'var(--space-2)' }}>
-                      <a href={sub.submissionLink} target="_blank" rel="noreferrer" style={{ fontSize: '10px', color: 'var(--color-accent-hover)', textDecoration: 'underline' }}>View Submission</a>
+                      <a href={sub.githubUrl || sub.fileUrl || sub.liveUrl || '#'} target="_blank" rel="noreferrer" style={{ fontSize: '10px', color: 'var(--color-accent-hover)', textDecoration: 'underline' }}>View Submission</a>
                     </div>
                     <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-                      <button className="btn btn--outline btn--small review-item__btn" onClick={() => updateTaskStatus(sub.id, 'DONE')} style={{ flex: 1, borderColor: 'var(--color-card-mint)', color: 'var(--color-ink)' }}>
+                      <button className="btn btn--outline btn--small review-item__btn" onClick={() => reviewSubmission(sub.id, { status: 'Approved', mentorFeedback: 'Great work!' })} style={{ flex: 1, borderColor: 'var(--color-card-mint)', color: 'var(--color-ink)' }}>
                         Approve
                       </button>
-                      <button className="btn btn--outline btn--small review-item__btn" onClick={() => updateTaskStatus(sub.id, 'CHANGES_REQUESTED')} style={{ flex: 1, borderColor: 'var(--color-card-pink)', color: 'var(--color-ink)' }}>
+                      <button className="btn btn--outline btn--small review-item__btn" onClick={() => reviewSubmission(sub.id, { status: 'Changes Requested', mentorFeedback: 'Please make updates and resubmit.' })} style={{ flex: 1, borderColor: 'var(--color-card-pink)', color: 'var(--color-ink)' }}>
                         Reject
                       </button>
                     </div>

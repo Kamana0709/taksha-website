@@ -133,6 +133,11 @@ app.post('/api/users/interns', authenticateToken, async (req, res) => {
       }
     });
     
+    const template1 = PROJECT_TEMPLATES.find(t => t.order === 1);
+    if (template1) {
+      await assignProjectTemplateToIntern(intern.id, template1.key, req.user.id);
+    }
+    
     const { passwordHash: _, ...internData } = intern;
     res.json(internData);
   } catch (err) {
@@ -150,6 +155,9 @@ app.delete('/api/users/interns/:id', authenticateToken, async (req, res) => {
     await prisma.$transaction([
       prisma.task.deleteMany({ where: { assigneeId: id } }),
       prisma.submission.deleteMany({ where: { internId: id } }),
+      prisma.certificate.deleteMany({ where: { internId: id } }),
+      prisma.message.deleteMany({ where: { senderId: id } }),
+      prisma.message.deleteMany({ where: { receiverId: id } }),
       prisma.user.delete({ where: { id } })
     ]);
     
@@ -425,24 +433,12 @@ app.put('/api/submissions/:id/review', authenticateToken, async (req, res) => {
         reviewedById: req.user.id
       },
       include: {
-        task: { include: { project: true } }
+        project: true
       }
     });
 
-    // Note: If submission has a taskId (e.g. from a custom frontend flow), update it
-    if (submission.taskId) {
-      const taskStatus = status === 'Approved' ? 'DONE' : 'CHANGES_REQUESTED';
-      await prisma.task.update({
-        where: { id: submission.taskId },
-        data: {
-          status: taskStatus,
-          feedback: mentorFeedback
-        }
-      });
-    }
-
     if (status === 'Approved') {
-      const proj = await prisma.project.findUnique({ where: { id: submission.projectId } });
+      const proj = submission.project;
       if (proj) {
         const officialTemplate = PROJECT_TEMPLATES.find(t => t.name === proj.name);
         if (officialTemplate) {
@@ -575,6 +571,16 @@ app.put('/api/applications/:id/status', authenticateToken, async (req, res) => {
       return app;
     });
     
+    if (status === 'Accepted') {
+      const intern = await prisma.user.findUnique({ where: { email: application.email } });
+      if (intern) {
+        const template1 = PROJECT_TEMPLATES.find(t => t.order === 1);
+        if (template1) {
+          await assignProjectTemplateToIntern(intern.id, template1.key, req.user.id);
+        }
+      }
+    }
+    
     res.json(application);
   } catch (err) {
     console.error('Failed to update application status:', err);
@@ -596,7 +602,7 @@ app.get('/api/certificates/:internId/eligible', authenticateToken, async (req, r
     }
     
     const allTasksDone = tasks.every(t => t.status === 'DONE');
-    const allSubmissionsApproved = submissions.every(s => s.status === 'Approved');
+    const allSubmissionsApproved = submissions.every(s => s.status === 'Approved' || s.status === 'Auto-Submitted');
     
     const existingCert = await prisma.certificate.findFirst({ where: { internId } });
     
@@ -880,6 +886,77 @@ app.get('/api/project-templates', authenticateToken, (req, res) => {
   res.json(PROJECT_TEMPLATES);
 });
 
+const assignProjectTemplateToIntern = async (internId, templateKey, assignerId) => {
+  const template = PROJECT_TEMPLATES.find(t => t.key === templateKey);
+  if (!template) return null;
+
+  const intern = await prisma.user.findUnique({ where: { id: internId } });
+  if (!intern) return null;
+  
+  const mentorId = assignerId || intern.mentorId;
+  if (!mentorId) return null;
+
+  let project = await prisma.project.findFirst({
+    where: { name: template.name }
+  });
+
+  if (!project) {
+    project = await prisma.project.create({
+      data: {
+        name: template.name,
+        description: template.description
+      }
+    });
+  }
+
+  const today = new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
+  const createdTasks = [];
+  
+  const now = new Date();
+  await prisma.projectAssignment.upsert({
+    where: { projectId_internId: { projectId: project.id, internId: intern.id } },
+    update: {},
+    create: {
+      projectId: project.id,
+      internId: intern.id,
+      assignedAt: now,
+      deadlineDays: project.deadlineDays || 7,
+      deadlineAt: addDays(now, project.deadlineDays || 7)
+    }
+  });
+
+  for (const title of template.checklist) {
+    const existingTask = await prisma.task.findFirst({
+      where: {
+        title,
+        projectId: project.id,
+        assigneeId: intern.id
+      }
+    });
+
+    if (!existingTask) {
+      const newTask = await prisma.task.create({
+        data: {
+          title,
+          projectId: project.id,
+          assigneeId: intern.id,
+          assignerId: mentorId,
+          priority: 'Medium',
+          status: 'TODO',
+          date: today
+        },
+        include: {
+          assignee: { select: { id: true, name: true, email: true } },
+          assigner: { select: { id: true, name: true, email: true } },
+          project: { select: { id: true, name: true } }
+        }
+      });
+      createdTasks.push(newTask);
+    }
+  }
+  return { project, tasks: createdTasks };
+};
+
 const unlockNextProject = async (internId, completedProjectKey) => {
   try {
     const completedTemplate = PROJECT_TEMPLATES.find(t => t.key === completedProjectKey);
@@ -888,60 +965,7 @@ const unlockNextProject = async (internId, completedProjectKey) => {
     const nextTemplate = PROJECT_TEMPLATES.find(t => t.order === completedTemplate.order + 1);
     if (!nextTemplate) return; 
     
-    const intern = await prisma.user.findUnique({ where: { id: internId } });
-    if (!intern || !intern.mentorId) return;
-
-    let project = await prisma.project.findFirst({
-      where: { name: nextTemplate.name }
-    });
-
-    if (!project) {
-      project = await prisma.project.create({
-        data: {
-          name: nextTemplate.name,
-          description: nextTemplate.description
-        }
-      });
-    }
-
-    const existingAssignment = await prisma.projectAssignment.findUnique({
-      where: { projectId_internId: { projectId: project.id, internId: intern.id } }
-    });
-
-    if (existingAssignment) return; // Already assigned
-
-    const now = new Date();
-    await prisma.projectAssignment.create({
-      data: {
-        projectId: project.id,
-        internId: intern.id,
-        assignedAt: now,
-        deadlineDays: 7,
-        deadlineAt: addDays(now, 7)
-      }
-    });
-
-    const today = new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
-
-    for (const title of nextTemplate.checklist) {
-      const existingTask = await prisma.task.findFirst({
-        where: { title, projectId: project.id, assigneeId: intern.id }
-      });
-
-      if (!existingTask) {
-        await prisma.task.create({
-          data: {
-            title,
-            projectId: project.id,
-            assigneeId: intern.id,
-            assignerId: intern.mentorId, 
-            priority: 'Medium',
-            status: 'TODO',
-            date: today
-          }
-        });
-      }
-    }
+    await assignProjectTemplateToIntern(internId, nextTemplate.key);
   } catch (err) {
     console.error('Failed to unlock next project:', err);
   }
@@ -1006,75 +1030,21 @@ app.post('/api/project-templates/assign', authenticateToken, async (req, res) =>
       }
     }
 
-    let project = await prisma.project.findFirst({
-      where: { name: template.name }
-    });
-
-    if (!project) {
-      project = await prisma.project.create({
-        data: {
-          name: template.name,
-          description: template.description
-        }
-      });
-    }
-
-    const today = new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
-    const createdTasks = [];
+    const result = await assignProjectTemplateToIntern(intern.id, template.key, req.user.id);
     
-    const now = new Date();
-    await prisma.projectAssignment.upsert({
-      where: { projectId_internId: { projectId: project.id, internId: intern.id } },
-      update: {},
-      create: {
-        projectId: project.id,
-        internId: intern.id,
-        assignedAt: now,
-        deadlineDays: project.deadlineDays || 7,
-        deadlineAt: addDays(now, project.deadlineDays || 7)
-      }
-    });
-
-    for (const title of template.checklist) {
-      const existingTask = await prisma.task.findFirst({
-        where: {
-          title,
-          projectId: project.id,
-          assigneeId: intern.id
-        }
-      });
-
-      if (!existingTask) {
-        const newTask = await prisma.task.create({
-          data: {
-            title,
-            projectId: project.id,
-            assigneeId: intern.id,
-            assignerId: req.user.id,
-            priority: 'Medium',
-            status: 'TODO',
-            date: today
-          },
-          include: {
-            assigneeUser: { select: { id: true, name: true, email: true } },
-            assignerUser: { select: { id: true, name: true, email: true } },
-            project: { select: { id: true, name: true } }
-          }
-        });
-        
-        const mappedTask = {
-          ...newTask,
-          assignee: newTask.assigneeId,
-          assigner: newTask.assignerId,
-          assigneeName: newTask.assigneeUser.name,
-          assignerName: newTask.assignerUser.name
-        };
-        
-        createdTasks.push(mappedTask);
-      }
+    if (!result) {
+      return res.status(500).json({ error: 'Failed to assign project template' });
     }
 
-    res.status(201).json({ project, tasks: createdTasks });
+    const mappedTasks = result.tasks.map(newTask => ({
+      ...newTask,
+      assignee: newTask.assigneeId,
+      assigner: newTask.assignerId,
+      assigneeName: newTask.assignee?.name,
+      assignerName: newTask.assigner?.name
+    }));
+
+    res.status(201).json({ project: result.project, tasks: mappedTasks });
   } catch (err) {
     console.error('Failed to assign project template:', err);
     res.status(500).json({ error: 'Failed to assign project template' });
