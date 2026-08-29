@@ -122,6 +122,28 @@ module.exports = function generateCertificateHtml(data) {
         margin-top: 5px;
       }
       
+      /* Udyam Badge */
+      .udyam-badge {
+        position: absolute;
+        bottom: 50px;
+        left: 50px;
+        border: 1px solid #d8d2c4;
+        border-radius: 4px;
+        padding: 8px 12px;
+        text-align: center;
+      }
+      .udyam-badge-label {
+        font-size: 9px;
+        font-weight: 800;
+        color: #8B93A7;
+        margin-bottom: 2px;
+      }
+      .udyam-badge-value {
+        font-size: 10px;
+        font-weight: 700;
+        color: #8B93A7;
+      }
+      
       /* Logo Area */
       .logo-area {
         display: flex;
@@ -244,6 +266,18 @@ module.exports = function generateCertificateHtml(data) {
       }
       .highlight {
         font-weight: 700;
+      }
+      
+      /* Verify Text */
+      .verify-text {
+        font-size: 13px;
+        color: #051630;
+        margin-top: 10px;
+        text-align: center;
+        background: rgba(212, 175, 55, 0.1);
+        padding: 8px 15px;
+        border-radius: 4px;
+        border: 1px dashed #d4af37;
       }
       
       /* Footer */
@@ -436,6 +470,15 @@ module.exports = function generateCertificateHtml(data) {
         During the internship, they demonstrated dedication, enthusiasm, and a strong willingness to learn. 
         We truly appreciate their efforts and contributions to the projects and tasks assigned.<br><br>
         We wish them all the best for their future endeavors.
+      </div>
+      
+      <div class="verify-text">
+        Verify authenticity at: <strong>taksha.studio/verify/${encodeURIComponent(certificateId)}</strong>
+      </div>
+      
+      <div class="udyam-badge">
+        <div class="udyam-badge-label">UDYAM REGISTERED MSME</div>
+        <div class="udyam-badge-value">UDYAM-OD-19-0177339</div>
       </div>
     </div>
     

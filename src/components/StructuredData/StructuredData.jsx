@@ -26,6 +26,7 @@ export function organizationSchema() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Taksha Nexus',
+    legalName: 'TAKSHA NEXUS',
     url: 'https://www.taksha.studio',
     logo: 'https://www.taksha.studio/logo.png',
     description: 'Taksha Nexus is a digital craft studio blending branding, design, engineering, and AI.',
@@ -33,6 +34,11 @@ export function organizationSchema() {
       'https://www.linkedin.com/company/taksha',
       'https://www.instagram.com/taksha.studio',
     ],
+    identifier: {
+      '@type': 'PropertyValue',
+      propertyID: 'Udyam Registration Number',
+      value: 'UDYAM-OD-19-0177339'
+    }
   };
 }
 

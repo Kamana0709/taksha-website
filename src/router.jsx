@@ -23,6 +23,7 @@ const JournalIndex = lazy(() => import('./pages/JournalIndex'));
 const Article = lazy(() => import('./pages/Article'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const Careers = lazy(() => import('./pages/Careers'));
+const VerifyCertificate = lazy(() => import('./pages/VerifyCertificate'));
 
 // Auth Pages
 const Login = lazy(() => import('./pages/auth/Login'));
@@ -176,6 +177,14 @@ export const router = createBrowserRouter([
       {
         path: '/careers',
         element: <SuspenseWrapper><Careers /></SuspenseWrapper>,
+      },
+      {
+        path: '/verify',
+        element: <SuspenseWrapper><VerifyCertificate /></SuspenseWrapper>,
+      },
+      {
+        path: '/verify/:certificateNumber',
+        element: <SuspenseWrapper><VerifyCertificate /></SuspenseWrapper>,
       },
       {
         path: '*',

@@ -46,6 +46,14 @@ export default function Terms() {
       <p>
         These Terms will be governed by and interpreted in accordance with the laws of the jurisdiction in which Taksha Nexus operates, and you submit to the non-exclusive jurisdiction of the state and federal courts located in that region for the resolution of any disputes.
       </p>
+
+      <h2>7. Company Registration</h2>
+      <p>
+        The Taksha Nexus brand operates under the registered legal entity <strong>TAKSHA NEXUS</strong>. 
+        We are registered as a Micro Enterprise (Services) under the Udyam Registration portal (Ministry of Micro, Small and Medium Enterprises, Government of India).
+        <br /><br />
+        <strong>Udyam Registration Number:</strong> UDYAM-OD-19-0177339
+      </p>
     </LegalPageLayout>
   );
 }

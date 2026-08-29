@@ -1,0 +1,125 @@
+% =====================================================================
+% TAKSHA — INTERNSHIP CERTIFICATE OF COMPLETION (Simple / Professional)
+% Compile with: xelatex certificate_simple.tex
+% =====================================================================
+\documentclass[tikz,border=0pt]{standalone}
+\usetikzlibrary{calc}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{fontspec}
+\setlength{\parindent}{0pt}
+% ---------- fonts ----------
+\setmainfont{Poppins}[Path = ./assets/fonts/Poppins/, Extension = .ttf, UprightFont = *-Regular, BoldFont = *-Bold, ItalicFont = *-Italic]
+\newfontfamily{\nameFont}{Liberation Serif}[Ligatures=TeX]
+% ---------- palette ----------
+\definecolor{navy}{HTML}{0E1B32}
+\definecolor{gold}{HTML}{C79A3D}
+\definecolor{cream}{HTML}{FDFCFA}
+\definecolor{ink}{HTML}{1A2740}
+\definecolor{bodycol}{HTML}{4A5468}
+\definecolor{muted}{HTML}{8B93A7}
+\definecolor{hairline}{HTML}{D8D2C4}
+% ---------- editable fields ----------
+\newcommand{\certID}{TK/IC/2026/0001}
+\newcommand{\udyamNumber}{UDYAM-OD-19-0177339}
+\newcommand{\recipientName}{Charu Mandilwar}
+\newcommand{\roleTitle}{Frontend Developer Intern}
+\newcommand{\companyName}{Taksha Nexus}
+\newcommand{\dateStart}{20th May 2025}
+\newcommand{\dateEnd}{20th June 2025}
+\newcommand{\logoFile}{logo.png}
+\newcommand{\signatureFile}{signature.png}
+\begin{document}
+\begin{tikzpicture}[x=1in,y=1in,remember picture]
+ % ---------- background ----------
+ \fill[cream] (0,0) rectangle (13,9.2);
+ % ---------- outer hairline frame ----------
+ \draw[navy,line width=1.6pt] (0.5,0.5) rectangle (12.5,8.7);
+ \draw[gold,line width=0.6pt] (0.62,0.62) rectangle (12.38,8.58);
+ % ---------- quiet corner accents (echo the logo's folded-flag motif) ----------
+ \fill[navy,opacity=0.92] (0.5,8.7) -- (1.85,8.7) -- (0.5,7.75) -- cycle;
+ \fill[gold] (0.5,8.7) -- (1.15,8.7) -- (0.5,8.25) -- cycle;
+ \fill[navy,opacity=0.92] (12.5,0.5) -- (11.15,0.5) -- (12.5,1.45) -- cycle;
+ \fill[gold] (12.5,0.5) -- (11.85,0.5) -- (12.5,0.95) -- cycle;
+ % ---------- small corner ticks (quiet, structural, not decorative clutter) ----------
+ \foreach \x/\y/\dx/\dy in {0.5/8.7/0.28/-0.28, 12.5/8.7/-0.28/-0.28, 0.5/0.5/0.28/0.28, 12.5/0.5/-0.28/0.28} {
+ \draw[gold,line width=1.2pt] (\x,\y) -- (\x+\dx,\y);
+ \draw[gold,line width=1.2pt] (\x,\y) -- (\x,\y+\dy);
+ }
+ % ---------- certificate ID, top right ----------
+ \node[anchor=north east,text=muted] at (12.1,8.25) {%
+ {\fontsize{9}{11}\selectfont\bfseries CERTIFICATE ID}\\[1pt]
+ {\fontsize{9}{11}\selectfont \certID}
+ };
+ % ---------- logo ----------
+ \node[anchor=north] at (6.5,8.5) {%
+ \includegraphics[height=1.05in]{\logoFile}
+ };
+ % ---------- eyebrow ----------
+ \node[anchor=north,text=gold] at (6.5,7.15) {%
+ {\fontsize{11}{13}\selectfont\bfseries \MakeUppercase{Internship Program}}
+ };
+ % ---------- title ----------
+ \node[anchor=north,text=ink] at (6.5,6.82) {%
+ {\fontsize{38}{42}\selectfont\bfseries Certificate of Completion}
+ };
+ % ---------- thin rule under title, flanked by diamond ornaments ----------
+ \draw[gold,line width=0.8pt] (5.75,6.1) -- (6.32,6.1);
+ \draw[gold,line width=0.8pt] (6.68,6.1) -- (7.25,6.1);
+ \fill[gold] (6.5,6.1) ++(45:0.055) -- ++(135:0.055) -- ++(-135:0.055) -- ++(-45:0.055) -- cycle;
+ % ---------- intro line, flanked by short rules ----------
+ \node[anchor=north,text=bodycol] at (6.5,5.85) {%
+ {\color{hairline}\rule{0.55in}{0.6pt}}\;\;
+ {\fontsize{12}{15}\selectfont This is to certify that}\;\;
+ {\color{hairline}\rule{0.55in}{0.6pt}}
+ };
+ % ---------- recipient name ----------
+ \node[anchor=north,text=ink] at (6.5,5.5) {%
+ {\nameFont\itshape\fontsize{42}{46}\selectfont \recipientName}
+ };
+ \draw[gold,line width=0.7pt] (5.35,4.98) -- (7.65,4.98);
+ % ---------- body paragraph ----------
+ \node[anchor=north,text=bodycol] at (6.5,4.65) {%
+ \begin{minipage}{8.6in}
+ \centering
+ \fontsize{11.5}{18}\selectfont
+ has successfully completed the internship program as a
+ \textbf{\color{ink}\roleTitle} at \textbf{\color{ink}\companyName},
+ from \textbf{\color{ink}\dateStart} to \textbf{\color{ink}\dateEnd}.
+ Throughout the internship, they demonstrated dedication, enthusiasm,
+ and a strong willingness to learn, and we appreciate their
+ contributions to the projects and tasks assigned.
+ \end{minipage}
+ };
+ % ---------- signature & seal row ----------
+ \node[anchor=north,text=ink] at (4.1,2.55) {%
+ \begin{minipage}{2.6in}
+ \centering
+ {\fontsize{30}{36}\selectfont\itshape RA.}\\[2pt]
+ {\color{hairline}\rule{2.0in}{0.8pt}}\\[6pt]
+ {\fontsize{10}{12}\selectfont\bfseries FOUNDER}\\[1pt]
+ {\fontsize{9}{11}\selectfont\color{muted} \companyName}
+ \end{minipage}
+ };
+ \node[anchor=north,text=ink] at (8.9,2.55) {%
+ \begin{minipage}{2.6in}
+ \centering
+ {\fontsize{11}{13}\selectfont \dateEnd}\\[2pt]
+ {\color{hairline}\rule{2.0in}{0.8pt}}\\[6pt]
+ {\fontsize{10}{12}\selectfont\bfseries DATE ISSUED}\\[1pt]
+ {\fontsize{9}{11}\selectfont\color{muted} Bhubaneswar, Odisha}
+ \end{minipage}
+ };
+ % ---------- seal (real Taksha stamp) ----------
+ \node at (6.5,1.75) {\includegraphics[width=1.55in]{stamp.png}};
+ % ---------- Udyam Badge, bottom left ----------
+ \node[anchor=south west,text=muted,draw=hairline,line width=0.6pt,rounded corners=2pt,inner sep=4pt,align=center] at (0.9,0.72) {%
+ {\fontsize{7}{9}\selectfont\bfseries UDYAM REGISTERED MSME}\\[1pt]
+ {\fontsize{7.5}{9}\selectfont \udyamNumber}
+ };
+ % ---------- footer ----------
+ \node[anchor=south,text=muted] at (6.5,0.72) {%
+ {\fontsize{8.5}{10}\selectfont taksha.tech \; $\cdot$ \; takshadigital@gmail.com \; $\cdot$ \; Bhubaneswar, Odisha, India}
+ };
+\end{tikzpicture}
+\end{document}

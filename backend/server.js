@@ -9,9 +9,10 @@ const path = require('path');
 const { addDays, differenceInCalendarDays } = require('date-fns');
 const multer = require('multer');
 const fs = require('fs');
-const puppeteer = require('puppeteer');
+const { generateCertificatePdf } = require('./generateCertificatePdf');
 const generateCertificateHtml = require('./certificateTemplate');
 const { PROJECT_TEMPLATES } = require('./projectTemplates');
+const { uploadFile, getPublicUrl } = require('./storage');
 
 dotenv.config();
 
@@ -30,16 +31,9 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
 }
 
-// Multer storage config
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
-});
+// Multer storage config (Migrated to memory for Supabase)
+// Keep uploads directory creation as a fallback/legacy
+const storage = multer.memoryStorage();
 
 const upload = multer({ 
   storage: storage,
@@ -120,8 +114,19 @@ app.post('/api/users/interns', authenticateToken, async (req, res) => {
     const { name, email, password, track } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
     
+    const year = new Date().getFullYear();
+    const count = await prisma.user.count({
+      where: { 
+        role: 'INTERN',
+        id: { startsWith: `TNX-INT-${year}-` }
+      }
+    });
+    const seq = String(count + 1).padStart(3, '0');
+    const customInternId = `TNX-INT-${year}-${seq}`;
+    
     const intern = await prisma.user.create({
       data: {
+        id: customInternId,
         name,
         email,
         passwordHash,
@@ -366,7 +371,16 @@ app.post('/api/submissions', authenticateToken, upload.single('file'), async (re
     let fileName = null;
     
     if (req.file) {
-      fileUrl = `/uploads/${req.file.filename}`;
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const ext = path.extname(req.file.originalname);
+      const objectPath = `${uniqueSuffix}${ext}`;
+      
+      // Upload to private bucket
+      await uploadFile('submissions', objectPath, req.file.buffer, req.file.mimetype);
+      
+      // Get a long-lived signed URL (10 years) to match previous static URL behavior
+      const { getSignedUrl } = require('./storage');
+      fileUrl = await getSignedUrl('submissions', objectPath, 315360000);
       fileName = req.file.originalname;
     }
     
@@ -630,7 +644,7 @@ app.post('/api/certificates/generate', authenticateToken, async (req, res) => {
     
     const existingCert = await prisma.certificate.findFirst({ where: { internId } });
     if (existingCert) {
-      return res.json({ success: true, certificate: existingCert, fileUrl: `/uploads/certificates/${existingCert.id}.pdf` });
+      return res.json({ success: true, certificate: existingCert, fileUrl: existingCert.fileUrl || `/uploads/certificates/${existingCert.id}.pdf` });
     }
     
     const year = new Date().getFullYear();
@@ -645,17 +659,20 @@ app.post('/api/certificates/generate', authenticateToken, async (req, res) => {
     const startDateStr = startDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
     const endDateStr = new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
     
-    const html = generateCertificateHtml({
-      name: intern.name,
-      role: intern.track || 'Frontend Developer',
-      startDate: startDateStr,
-      endDate: endDateStr,
-      certificateId: certificateNumber
+    const approvedSubmissions = await prisma.submission.findMany({
+      where: { 
+        internId,
+        status: { in: ['Approved', 'Auto-Submitted'] }
+      },
+      include: { project: true }
     });
     
-    const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
+    const projectsCompleted = approvedSubmissions.map(sub => ({
+      projectName: sub.project?.name || 'Unknown Project',
+      githubUrl: sub.githubUrl,
+      liveUrl: sub.liveUrl,
+      completedAt: sub.reviewedAt || sub.updatedAt
+    }));
     
     const certsDir = path.join(__dirname, 'uploads', 'certificates');
     if (!fs.existsSync(certsDir)) {
@@ -666,14 +683,20 @@ app.post('/api/certificates/generate', authenticateToken, async (req, res) => {
     const certId = crypto.randomUUID();
     const filePath = path.join(certsDir, `${certId}.pdf`);
     
-    await page.pdf({
-      path: filePath,
-      width: '1122px',
-      height: '793px',
-      printBackground: true,
-      pageRanges: '1'
-    });
-    await browser.close();
+    // Generate PDF using LaTeX pipeline
+    await generateCertificatePdf({
+      name: intern.name,
+      role: intern.track || 'Frontend Developer',
+      startDate: startDateStr,
+      endDate: endDateStr,
+      certificateId: certificateNumber
+    }, filePath);
+    
+    // Upload the generated PDF to Supabase Storage
+    const fileBuffer = fs.readFileSync(filePath);
+    const objectPath = `${certId}.pdf`;
+    await uploadFile('certificates', objectPath, fileBuffer, 'application/pdf');
+    const supabaseUrl = getPublicUrl('certificates', objectPath);
     
     const newCert = await prisma.certificate.create({
       data: {
@@ -682,14 +705,50 @@ app.post('/api/certificates/generate', authenticateToken, async (req, res) => {
         role: intern.track || 'Frontend Developer',
         startDate: startDateStr,
         endDate: endDateStr,
-        internId
+        projectsCompleted,
+        internId,
+        fileUrl: supabaseUrl
       }
     });
     
-    res.json({ success: true, certificate: newCert, fileUrl: `/uploads/certificates/${certId}.pdf` });
+    res.json({ success: true, certificate: newCert, fileUrl: supabaseUrl });
   } catch (err) {
     console.error('Failed to generate certificate:', err);
     res.status(500).json({ error: 'Failed to generate certificate' });
+  }
+});
+
+app.get('/api/certificates/verify/:certificateNumber', async (req, res) => {
+  try {
+    const { certificateNumber } = req.params;
+    
+    // Decode if encoded (e.g. TK%2FIC%2F2026%2F0001)
+    const decodedNumber = decodeURIComponent(certificateNumber);
+    
+    const certificate = await prisma.certificate.findUnique({
+      where: { certificateNumber: decodedNumber },
+      include: {
+        intern: {
+          select: { name: true }
+        }
+      }
+    });
+    
+    if (!certificate) {
+      return res.status(404).json({ error: 'Certificate not found' });
+    }
+    
+    res.json({
+      internName: certificate.intern.name,
+      role: certificate.role,
+      startDate: certificate.startDate,
+      endDate: certificate.endDate,
+      issuedAt: certificate.issuedAt,
+      projectsCompleted: certificate.projectsCompleted || []
+    });
+  } catch (err) {
+    console.error('Failed to verify certificate:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -699,6 +758,12 @@ app.get('/api/certificates/:id/download', async (req, res) => {
     const cert = await prisma.certificate.findUnique({ where: { id } });
     if (!cert) return res.status(404).json({ error: 'Certificate not found' });
     
+    if (cert.fileUrl && cert.fileUrl.startsWith('http')) {
+      // Supabase storage
+      return res.redirect(cert.fileUrl);
+    }
+    
+    // Fallback to local disk
     const filePath = path.join(__dirname, 'uploads', 'certificates', `${id}.pdf`);
     if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'File not found' });
     
@@ -925,10 +990,13 @@ const assignProjectTemplateToIntern = async (internId, templateKey, assignerId) 
     }
   });
 
-  for (const title of template.checklist) {
+  for (const item of template.checklist) {
+    const taskTitle = typeof item === 'string' ? item : item.title;
+    const taskSkills = typeof item === 'string' ? [] : (item.skills || []);
+
     const existingTask = await prisma.task.findFirst({
       where: {
-        title,
+        title: taskTitle,
         projectId: project.id,
         assigneeId: intern.id
       }
@@ -937,13 +1005,14 @@ const assignProjectTemplateToIntern = async (internId, templateKey, assignerId) 
     if (!existingTask) {
       const newTask = await prisma.task.create({
         data: {
-          title,
+          title: taskTitle,
           projectId: project.id,
           assigneeId: intern.id,
           assignerId: mentorId,
           priority: 'Medium',
           status: 'TODO',
-          date: today
+          date: today,
+          skillTags: taskSkills
         },
         include: {
           assignee: { select: { id: true, name: true, email: true } },

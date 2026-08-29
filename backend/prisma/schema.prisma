@@ -18,6 +18,8 @@ model User {
   status        String?  @default("On Track")
   phone         String?
   location      String?
+  isAlumni      Boolean  @default(false)
+  alumniSince   DateTime?
   
   // Relations
   mentorId      String?
@@ -71,6 +73,7 @@ model Task {
   priority       String   @default("Medium")
   status         String   @default("TODO") // TODO, DONE
   date           String   // Storing as string to match current frontend format
+  skillTags      String[] @default([])
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   
@@ -114,6 +117,8 @@ model Submission {
   description    String?
   fileUrl        String?
   fileName       String?
+  videoUrl       String?
+  firstPassReview Json?
   status         String   @default("Submitted") // Submitted, Under Review, Approved, Changes Requested
   mentorFeedback String?
   reviewedAt     DateTime?
@@ -136,6 +141,8 @@ model Certificate {
   role              String
   startDate         String
   endDate           String
+  projectsCompleted Json?
+  fileUrl           String?
   issuedAt          DateTime @default(now())
   
   internId          String

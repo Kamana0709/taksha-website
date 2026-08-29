@@ -172,9 +172,14 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="footer__bottom">
-          <p className="footer__copyright">
-            © {currentYear} Taksha Nexus. All rights reserved.
-          </p>
+          <div className="footer__copyright-container">
+            <p className="footer__copyright">
+              © {currentYear} Taksha Nexus. All rights reserved.
+            </p>
+            <p className="footer__udyam" style={{ fontSize: '11px', color: 'var(--color-muted)', marginTop: '4px', margin: '4px 0 0 0' }}>
+              Udyam Registered Micro Enterprise (Services) · UDYAM-OD-19-0177339
+            </p>
+          </div>
           <div className="footer__legal">
             <Link to="/privacy-policy" className="footer__legal-link">Privacy Policy</Link>
             <Link to="/terms-and-conditions" className="footer__legal-link">Terms &amp; Conditions</Link>
