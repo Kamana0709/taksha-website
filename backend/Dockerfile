@@ -5,7 +5,7 @@ FROM node:20-bullseye-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
     texlive-xetex \
     texlive-latex-extra \
-    texlive-fonts-extra \
+    texlive-pictures \
     fonts-liberation \
     ca-certificates \
     curl \

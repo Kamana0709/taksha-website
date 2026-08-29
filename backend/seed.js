@@ -57,7 +57,7 @@ async function main() {
   for (const intern of [intern1, intern2]) {
     for (const template of PROJECT_TEMPLATES) {
       const project = projectMap[template.key];
-      
+
       const now = new Date();
       await prisma.projectAssignment.create({
         data: {
@@ -68,11 +68,12 @@ async function main() {
           deadlineAt: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
         }
       });
-      
-      for (const title of template.checklist) {
+
+      for (const checklistItem of template.checklist) {
         await prisma.task.create({
           data: {
-            title,
+            title: checklistItem.title,
+            skillTags: checklistItem.skills || [],
             projectId: project.id,
             assigneeId: intern.id,
             assignerId: mentor.id,
