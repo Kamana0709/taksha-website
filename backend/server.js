@@ -10,7 +10,6 @@ const { addDays, differenceInCalendarDays } = require('date-fns');
 const multer = require('multer');
 const fs = require('fs');
 const { generateCertificatePdf } = require('./generateCertificatePdf');
-const generateCertificateHtml = require('./certificateTemplate');
 const { PROJECT_TEMPLATES } = require('./projectTemplates');
 const { uploadFile, getPublicUrl } = require('./storage');
 
