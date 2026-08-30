@@ -24,6 +24,7 @@ async function main() {
   console.log('Seeding users...');
   const defaultPassword = await bcrypt.hash('password123', 10);
   const charuPassword = await bcrypt.hash('Taksha Nexus@2606', 10);
+  const rishikaPassword = await bcrypt.hash('Taksha Nexus@2601', 10);
 
   const mentor = await prisma.user.create({
     data: {
@@ -34,8 +35,11 @@ async function main() {
     },
   });
 
+  const year = new Date().getFullYear();
+
   const intern1 = await prisma.user.create({
     data: {
+      id: `TNX-INT-${year}-001`,
       email: 'charumandilwar@gmail.com',
       name: 'Charu Mandilwar',
       passwordHash: charuPassword,
@@ -46,9 +50,10 @@ async function main() {
 
   const intern2 = await prisma.user.create({
     data: {
-      email: 'intern@taksha.in',
-      name: 'Intern User',
-      passwordHash: defaultPassword,
+      id: `TNX-INT-${year}-002`,
+      email: 'rishikat1321@gmail.com',
+      name: 'Rishika T',
+      passwordHash: rishikaPassword,
       role: 'INTERN',
       mentorId: mentor.id,
     },

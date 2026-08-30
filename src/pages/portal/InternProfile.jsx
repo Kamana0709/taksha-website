@@ -29,7 +29,7 @@ export default function InternProfile() {
   const handleDownloadCertificate = async () => {
     setIsGeneratingCert(true);
     let certId = certData?.certificate?.id;
-    
+
     if (!certData?.alreadyIssued) {
       const res = await generateCertificate(user.id);
       if (res.success) {
@@ -41,7 +41,7 @@ export default function InternProfile() {
         return;
       }
     }
-    
+
     const backendUrl = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '');
     window.open(`${backendUrl}/api/certificates/${certId}/download`, '_blank');
     setIsGeneratingCert(false);
@@ -83,20 +83,20 @@ export default function InternProfile() {
             <p className="intern-tasks__subtitle">Your official Taksha Nexus intern record.</p>
           </div>
           <div>
-             {!isEditing ? (
-               <button className="intern-btn intern-btn--view" onClick={handleEditClick} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                 <Pencil size={16} /> Edit Profile
-               </button>
-             ) : (
-               <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                 <button className="intern-btn intern-btn--view" onClick={handleCancelClick} disabled={isSaving} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', background: 'var(--color-bg)' }}>
-                   <X size={16} /> Cancel
-                 </button>
-                 <button className="intern-btn intern-btn--assign" onClick={handleSaveClick} disabled={isSaving} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                   <Save size={16} /> {isSaving ? 'Saving...' : 'Save'}
-                 </button>
-               </div>
-             )}
+            {!isEditing ? (
+              <button className="intern-btn intern-btn--view" onClick={handleEditClick} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                <Pencil size={16} /> Edit Profile
+              </button>
+            ) : (
+              <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                <button className="intern-btn intern-btn--view" onClick={handleCancelClick} disabled={isSaving} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', background: 'var(--color-bg)' }}>
+                  <X size={16} /> Cancel
+                </button>
+                <button className="intern-btn intern-btn--assign" onClick={handleSaveClick} disabled={isSaving} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                  <Save size={16} /> {isSaving ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+            )}
           </div>
         </header>
 
@@ -110,7 +110,7 @@ export default function InternProfile() {
               <div className="profile-role">Frontend Track Intern</div>
             </div>
           </div>
-          
+
           <div className="profile-body">
             <div>
               <div className="profile-info-group">
@@ -120,11 +120,11 @@ export default function InternProfile() {
               <div className="profile-info-group">
                 <div className="profile-label">Phone Number</div>
                 {isEditing ? (
-                  <input 
-                    type="text" 
-                    className="profile-input" 
-                    value={editData.phone} 
-                    onChange={e => setEditData({...editData, phone: e.target.value})} 
+                  <input
+                    type="text"
+                    className="profile-input"
+                    value={editData.phone}
+                    onChange={e => setEditData({ ...editData, phone: e.target.value })}
                     placeholder="+91 98765 43210"
                   />
                 ) : (
@@ -134,11 +134,11 @@ export default function InternProfile() {
               <div className="profile-info-group">
                 <div className="profile-label">Location</div>
                 {isEditing ? (
-                  <input 
-                    type="text" 
-                    className="profile-input" 
-                    value={editData.location} 
-                    onChange={e => setEditData({...editData, location: e.target.value})} 
+                  <input
+                    type="text"
+                    className="profile-input"
+                    value={editData.location}
+                    onChange={e => setEditData({ ...editData, location: e.target.value })}
                     placeholder="Remote (India)"
                   />
                 ) : (
@@ -146,11 +146,11 @@ export default function InternProfile() {
                 )}
               </div>
             </div>
-            
+
             <div>
               <div className="profile-info-group">
                 <div className="profile-label">Intern ID</div>
-                <div className="profile-value">TAK-2026-042</div>
+                <div className="profile-value">{user?.id || '\u2014'}</div>
               </div>
               <div className="profile-info-group">
                 <div className="profile-label">Lead Mentor</div>
@@ -158,10 +158,12 @@ export default function InternProfile() {
               </div>
               <div className="profile-info-group">
                 <div className="profile-label">Start Date</div>
-                <div className="profile-value">01 May 2026</div>
+                <div className="profile-value">
+                  {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }) : '\u2014'}
+                </div>
               </div>
             </div>
-            
+
             <div style={{ marginTop: 'var(--space-8)' }}>
               <div className="profile-info-group">
                 <div className="profile-label">Internship Certificate</div>
@@ -169,8 +171,8 @@ export default function InternProfile() {
                   {!certData ? (
                     <span style={{ color: 'var(--color-text-secondary)' }}>Checking eligibility...</span>
                   ) : certData.isEligible || certData.alreadyIssued ? (
-                    <button 
-                      className="intern-btn intern-btn--assign" 
+                    <button
+                      className="intern-btn intern-btn--assign"
                       onClick={handleDownloadCertificate}
                       disabled={isGeneratingCert}
                       style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}

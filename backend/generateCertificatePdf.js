@@ -7,14 +7,14 @@ function escapeLatex(str) {
   if (typeof str !== 'string') return '';
   // 1. Backslash must be escaped first
   let escaped = str.replace(/\\/g, '\\textbackslash{}');
-  
+
   // 2. Escape other special characters
   escaped = escaped.replace(/([&%$#_{}])/g, '\\$1');
-  
+
   // 3. Escape tilde and caret
   escaped = escaped.replace(/~/g, '\\textasciitilde{}');
   escaped = escaped.replace(/\^/g, '\\textasciicircum{}');
-  
+
   return escaped;
 }
 
@@ -66,6 +66,13 @@ function generateCertificatePdf(data, destPath) {
       fs.copyFileSync(logoSrc, path.join(tmpDir, 'logo.png'));
       fs.copyFileSync(stampSrc, path.join(tmpDir, 'stamp.png'));
 
+      // Copy fonts folder too, since the .tex template loads Poppins via a
+      // path relative to the xelatex working directory (this tmpDir)
+      const fontsSrc = path.join(__dirname, 'assets', 'fonts', 'Poppins');
+      const fontsDest = path.join(tmpDir, 'assets', 'fonts', 'Poppins');
+      fs.mkdirSync(fontsDest, { recursive: true });
+      fs.cpSync(fontsSrc, fontsDest, { recursive: true });
+
       // Spawn xelatex
       // Execute twice to ensure coordinates and references resolve properly (standard for tikz)
       const args = [
@@ -101,7 +108,7 @@ function generateCertificatePdf(data, destPath) {
           if (!fs.existsSync(pdfPath)) {
             throw new Error('PDF was not generated despite success exit code.');
           }
-          
+
           // Ensure destination directory exists
           const destDir = path.dirname(destPath);
           if (!fs.existsSync(destDir)) {
@@ -115,13 +122,13 @@ function generateCertificatePdf(data, destPath) {
         .catch(reject)
         .finally(() => {
           if (tmpDir) {
-            fs.rm(tmpDir, { recursive: true, force: true }, () => {});
+            fs.rm(tmpDir, { recursive: true, force: true }, () => { });
           }
         });
 
     } catch (err) {
       if (tmpDir) {
-        fs.rm(tmpDir, { recursive: true, force: true }, () => {});
+        fs.rm(tmpDir, { recursive: true, force: true }, () => { });
       }
       reject(err);
     }
