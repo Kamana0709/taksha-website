@@ -264,7 +264,69 @@ app.put('/api/users/profile', authenticateToken, async (req, res) => {
     });
   } catch (err) {
     console.error('Failed to update profile:', err);
-    res.status(500).json({ error: 'Failed to update profile' });
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
+// --- BULK IMPORT API ---
+app.post('/api/interns/bulk-import', authenticateToken, async (req, res) => {
+  if (req.user.role !== 'SUPER_ADMIN') {
+    return res.status(403).json({ error: 'Only Super Admins can bulk import interns' });
+  }
+
+  try {
+    const { interns } = req.body;
+    if (!Array.isArray(interns) || interns.length === 0) {
+      return res.status(400).json({ error: 'Invalid data format. Expected an array of interns.' });
+    }
+
+    const results = { successful: 0, failed: 0, errors: [] };
+
+    for (const intern of interns) {
+      try {
+        const { name, email, track, college, roleTitle } = intern;
+        if (!name || !email) {
+          results.failed++;
+          results.errors.push(`Missing name or email for a row.`);
+          continue;
+        }
+
+        const existing = await prisma.user.findUnique({ where: { email } });
+        if (existing) {
+          results.failed++;
+          results.errors.push(`${email} already exists.`);
+          continue;
+        }
+
+        const tempPassword = 'Taksha' + Math.floor(1000 + Math.random() * 9000) + '!';
+        const passwordHash = await bcrypt.hash(tempPassword, 10);
+
+        await prisma.user.create({
+          data: {
+            name,
+            email,
+            passwordHash,
+            role: 'INTERN',
+            track: track || roleTitle || 'General',
+            college: college || null,
+            status: 'Completed',
+            isAlumni: true,
+            mustChangePassword: true,
+            progress: 100
+          }
+        });
+
+        results.successful++;
+      } catch (err) {
+        results.failed++;
+        results.errors.push(`Failed to import ${intern.email || 'unknown'}: ${err.message}`);
+      }
+    }
+
+    res.status(200).json(results);
+  } catch (err) {
+    console.error('Bulk import error:', err);
+    res.status(500).json({ error: 'Failed to process bulk import' });
   }
 });
 

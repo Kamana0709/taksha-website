@@ -41,6 +41,71 @@ export default function SuperAdminDashboard() {
     }
   };
 
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const text = event.target.result;
+      const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+      if (lines.length < 2) {
+        alert('Invalid CSV or empty file');
+        return;
+      }
+
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      const interns = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        // Simple split assuming no commas inside values for simplicity
+        const row = lines[i].split(',').map(v => v.trim());
+        const intern = {};
+        
+        headers.forEach((header, index) => {
+          intern[header] = row[index] || '';
+        });
+
+        interns.push({
+          name: intern.name || intern.fullname || '',
+          email: intern.email || '',
+          track: intern.track || intern.role || intern.roletitle || 'General',
+          college: intern.college || intern.university || '',
+          roleTitle: intern.roletitle || intern.role || 'Intern'
+        });
+      }
+
+      try {
+        const token = localStorage.getItem('taksha_token');
+        const API_URL = import.meta.env.VITE_API_URL || '/api';
+        const res = await fetch(`${API_URL}/interns/bulk-import`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ interns })
+        });
+        
+        const data = await res.json();
+        if (res.ok) {
+          alert(`Successfully imported ${data.successful} interns. Failed: ${data.failed}`);
+          if (data.errors && data.errors.length > 0) {
+            console.error('Import errors:', data.errors);
+            alert(`Some imports failed. Check console for details.`);
+          }
+        } else {
+          alert(`Import failed: ${data.error}`);
+        }
+      } catch (err) {
+        alert(`Error: ${err.message}`);
+      }
+      
+      e.target.value = null;
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <div className="mentor-dashboard">
       <header className="dashboard-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-8)' }}>
@@ -54,6 +119,12 @@ export default function SuperAdminDashboard() {
           <div style={{ background: 'var(--color-surface)', padding: 'var(--space-2) var(--space-4)', borderRadius: '40px', border: '2px solid var(--color-ink)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
             System Status <span style={{ background: 'var(--color-card-mint)', color: 'var(--color-ink)', padding: '2px 8px', borderRadius: '20px', fontSize: 'var(--text-xs)' }}>Operational</span>
           </div>
+          
+          <label className="btn btn--secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', cursor: 'pointer', margin: 0 }}>
+            <Download size={16} /> Bulk Import CSV
+            <input type="file" accept=".csv" style={{ display: 'none' }} onChange={handleFileUpload} />
+          </label>
+          
           <button className="btn btn--primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'var(--color-ink)', color: 'var(--color-surface)', border: '2px solid var(--color-ink)', fontWeight: 'bold', cursor: 'pointer' }}>
             <FileText size={16} /> Generate Report
           </button>
