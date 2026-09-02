@@ -301,7 +301,6 @@ export default function InternProfile() {
                   )}
                 </div>
               </div>
-            </div>
           </div>
         </div>
       </div>

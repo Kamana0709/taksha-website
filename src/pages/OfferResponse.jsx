@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import SEO from '../components/SEO/SEO';
-import Navigation from '../components/Navigation/Navigation';
+import Navbar from '../components/Navbar/Navbar';
 import Footer from '../components/Footer/Footer';
-import '../styles/careers.css';
+import './Careers.css';
 
 export default function OfferResponse() {
   const { id } = useParams();
@@ -15,7 +15,7 @@ export default function OfferResponse() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    fetch(\`/api/applications/\${id}/offer-details\`)
+    fetch(`/api/applications/${id}/offer-details`)
       .then(res => {
         if (!res.ok) throw new Error('Offer not found or invalid');
         return res.json();
@@ -36,7 +36,7 @@ export default function OfferResponse() {
   const handleAction = async (action) => {
     setActioning(true);
     try {
-      const res = await fetch(\`/api/applications/\${id}/offer-response\`, {
+      const res = await fetch(`/api/applications/${id}/offer-response`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action })
@@ -55,8 +55,8 @@ export default function OfferResponse() {
 
   return (
     <>
-      <SEO title="Offer Decision | Taksha Nexus" />
-      <Navigation />
+      <SEO title="Offer Response | Taksha Nexus" />
+      <Navbar />
       <main className="careers-page pt-32 pb-24" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div className="container" style={{ maxWidth: '600px', margin: '0 auto' }}>
           
