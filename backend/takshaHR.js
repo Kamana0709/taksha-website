@@ -225,7 +225,7 @@ const generateOfferPDF = async (application) => {
       doc.end();
 
       writeStream.on('finish', () => {
-        resolve(`/uploads/offers/${filename}`);
+        resolve(filePath);
       });
     } catch (err) {
       reject(err);

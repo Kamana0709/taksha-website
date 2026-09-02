@@ -1349,8 +1349,17 @@ app.post('/api/applications/:id/generate-offer', authenticateToken, async (req, 
       return res.status(404).json({ error: 'Application not found' });
     }
 
-    // Call the takshaHR PDF generator
-    const offerUrl = await takshaHR.generateOfferPDF(application);
+    // Call the takshaHR PDF generator (returns local filepath)
+    const localPdfPath = await takshaHR.generateOfferPDF(application);
+
+    // Upload to Supabase to make it permanent and previewable
+    const { uploadFile, getSignedUrl } = require('./storage');
+    const fileBuffer = fs.readFileSync(localPdfPath);
+    const objectPath = `offer_${application.id}.pdf`;
+    
+    // Using submissions bucket since it's an application document
+    await uploadFile('submissions', objectPath, fileBuffer, 'application/pdf');
+    const offerUrl = await getSignedUrl('submissions', objectPath, 315360000); // 10 years valid
 
     // Update the application record
     const updatedApp = await prisma.application.update({
@@ -1395,10 +1404,16 @@ app.post('/api/applications/:id/send-offer', authenticateToken, async (req, res)
     });
 
     // Prepare attachments
-    const pdfPath = path.join(__dirname, application.offerUrl);
     let attachments = [];
-    if (fs.existsSync(pdfPath)) {
-      attachments.push({ filename: path.basename(pdfPath), path: pdfPath });
+    if (application.offerUrl) {
+      if (application.offerUrl.startsWith('http')) {
+        attachments.push({ filename: `Taksha_Nexus_Internship_Offer.pdf`, href: application.offerUrl });
+      } else {
+        const pdfPath = path.join(__dirname, application.offerUrl);
+        if (fs.existsSync(pdfPath)) {
+          attachments.push({ filename: path.basename(pdfPath), path: pdfPath });
+        }
+      }
     }
 
     const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://taksha-website.vercel.app';
