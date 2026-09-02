@@ -5,7 +5,7 @@
  * PRD §5.3 Developer Note
  */
 import { useEffect } from 'react';
-import { Outlet, useLocation, ScrollRestoration } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from '../components/Navbar/Navbar';
 import Footer from '../components/Footer/Footer';

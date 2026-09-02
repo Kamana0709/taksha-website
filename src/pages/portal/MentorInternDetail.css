@@ -134,9 +134,16 @@
     flex-direction: column;
     text-align: center;
   }
+
+  .profile-header>div:last-child {
+    width: 100%;
+    justify-content: center;
+  }
+
   .profile-body {
     grid-template-columns: 1fr;
   }
+
   .task-breakdown {
     grid-template-columns: 1fr;
   }

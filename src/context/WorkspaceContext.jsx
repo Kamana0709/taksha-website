@@ -22,7 +22,7 @@ export const WorkspaceProvider = ({ children }) => {
         const [projectsRes, tasksRes, internsRes, announcementsRes, submissionsRes] = await Promise.all([
           axios.get(`${API_URL}/projects`),
           axios.get(`${API_URL}/tasks`),
-          user.role === 'MENTOR' ? axios.get(`${API_URL}/users/interns`) : Promise.resolve({ data: [] }),
+          ['MENTOR', 'SUPER_ADMIN'].includes(user.role) ? axios.get(`${API_URL}/users/interns`) : Promise.resolve({ data: [] }),
           axios.get(`${API_URL}/announcements`),
           axios.get(`${API_URL}/submissions`)
         ]);
@@ -40,12 +40,12 @@ export const WorkspaceProvider = ({ children }) => {
         setLoading(false);
       }
     };
-    
+
     fetchData();
-    
+
     // Poll every 5 seconds for real-time updates across portals
     const intervalId = setInterval(fetchData, 5000);
-    
+
     return () => clearInterval(intervalId);
   }, [user]);
 
@@ -65,13 +65,13 @@ export const WorkspaceProvider = ({ children }) => {
       const res = await axios.post(`${API_URL}/project-templates/assign`, { templateKey, internId });
       const newTasks = res.data.tasks;
       const project = res.data.project;
-      
+
       setData(prev => {
         let updatedProjects = [...prev.projects];
         if (!updatedProjects.find(p => p.id === project.id)) {
           updatedProjects.push(project);
         }
-        
+
         return {
           ...prev,
           projects: updatedProjects,
@@ -88,8 +88,8 @@ export const WorkspaceProvider = ({ children }) => {
   const createTask = async (task) => {
     try {
       const res = await axios.post(`${API_URL}/tasks`, task);
-      setData(prev => ({ 
-        ...prev, 
+      setData(prev => ({
+        ...prev,
         tasks: [...prev.tasks, res.data],
         projects: prev.projects.map(p => p.id === task.projectId ? { ...p, tasks: [...(p.tasks || []), res.data] } : p)
       }));
@@ -149,6 +149,20 @@ export const WorkspaceProvider = ({ children }) => {
     }
   };
 
+  const updateIntern = async (internId, updatedData) => {
+    try {
+      const res = await axios.put(`${API_URL}/users/interns/${internId}`, updatedData);
+      setData(prev => ({
+        ...prev,
+        interns: prev.interns.map(i => i.id === internId ? res.data : i)
+      }));
+      return { success: true, intern: res.data };
+    } catch (err) {
+      console.error(err);
+      return { success: false, error: err.response?.data?.error || 'Failed to update intern' };
+    }
+  };
+
   const deleteIntern = async (internId) => {
     try {
       await axios.delete(`${API_URL}/users/interns/${internId}`);
@@ -190,7 +204,7 @@ export const WorkspaceProvider = ({ children }) => {
       } else {
         res = await axios.post(`${API_URL}/submissions`, submissionData);
       }
-      
+
       setData(prev => ({
         ...prev,
         submissions: [res.data, ...prev.submissions]
@@ -206,7 +220,7 @@ export const WorkspaceProvider = ({ children }) => {
     try {
       const res = await axios.put(`${API_URL}/submissions/${submissionId}/review`, reviewData);
       const updatedSubmission = res.data;
-      
+
       setData(prev => ({
         ...prev,
         submissions: prev.submissions.map(s => s.id === submissionId ? updatedSubmission : s)
@@ -238,23 +252,22 @@ export const WorkspaceProvider = ({ children }) => {
     }
   };
 
-  if (loading && user) return null; // Loading
-
   return (
-    <WorkspaceContext.Provider value={{ 
+    <WorkspaceContext.Provider value={{
       projects: data.projects,
-      tasks: data.tasks, 
-      interns: data.interns, 
+      tasks: data.tasks,
+      interns: data.interns,
       announcements: data.announcements || [],
       submissions: data.submissions || [],
       createProject,
       assignProjectTemplate,
-      createTask, 
+      createTask,
       updateTaskStatus,
       updateTaskDetails,
       deleteTask,
       createAnnouncement,
       createIntern,
+      updateIntern,
       deleteIntern,
       submitProjectWork,
       reviewSubmission,

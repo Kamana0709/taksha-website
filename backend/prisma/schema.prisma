@@ -22,6 +22,25 @@ model User {
   isAlumni      Boolean  @default(false)
   alumniSince   DateTime?
   
+  // Taksha HR fields
+  mustChangePassword Boolean @default(false)
+  dob           String?  // format DD/MM/YYYY or similar for password gen
+  
+  // Profile fields imported from application
+  college         String?
+  degree          String?
+  specialization  String?
+  currentYear     String?
+  graduationYear  String?
+  skills          String?
+  experience      String?
+  githubUrl       String?
+  linkedinUrl     String?
+  resumeUrl       String?
+  portfolioUrl    String?
+  duration        String?
+  availability    String?
+  
   // Relations
   mentorId      String?
   mentor        User?    @relation("MentorInterns", fields: [mentorId], references: [id])
@@ -99,16 +118,82 @@ model Announcement {
 }
 
 model Application {
-  id        String   @id @default(uuid())
-  name      String
-  email     String
-  portfolio String?
-  message   String
-  roleId    String
-  roleTitle String
-  status    String   @default("Pending")
-  date      String
-  createdAt DateTime @default(now())
+  id              String   @id @default(uuid())
+  name            String
+  email           String
+  portfolio       String?  // Legacy or portfolio url
+  message         String?  // Legacy or cover letter
+  roleId          String
+  roleTitle       String
+  status          String   @default("Pending")
+  date            String
+  createdAt       DateTime @default(now())
+
+  // New Fields - Section 1: Personal
+  phone           String?
+  location        String?
+
+  // Section 2: Education
+  college         String?
+  degree          String?
+  specialization  String?
+  currentYear     String?
+  graduationYear  String?
+
+  // Section 3 & 4: Skills & Projects
+  skills          String?
+  experience      String?
+  hasProjects     Boolean? @default(false)
+  bestProject     String?
+  githubUrl       String?
+  linkedinUrl     String?
+
+  // Section 5: Resume
+  resumeUrl       String?
+
+  // Section 6: Availability
+  duration        String?
+  availability    String?
+  hoursPerWeek    String?
+  startDate       String?
+
+  // Section 7: Motivation
+  motivation      String?
+  expectations    String?
+  whySelectYou    String?
+
+  // Section 8: Source
+  source          String?
+
+  // Taksha HR AI Evaluation Fields
+  aiScore             Int?
+  aiStrengths         String? // stored as JSON string or text
+  aiWeaknesses        String? // stored as JSON string or text
+  aiMissingSkills     String? // stored as JSON string or text
+  aiRecommendation    String? // Strong Match, Potential Match, Weak Match
+  
+  // Offer Pipeline Fields
+  offerStatus         String? // Generated, Awaiting Approval, Sent, Accepted, Declined
+  offerUrl            String? // Link to generated PDF
+  offerGeneratedAt    DateTime?
+  offerRespondedAt    DateTime?
+}
+
+model SystemLog {
+  id          String   @id @default(uuid())
+  action      String
+  candidate   String?  // Candidate Name or User Name
+  result      String?
+  timestamp   DateTime @default(now())
+  performedBy String   // "Taksha HR", "Super Admin", etc.
+}
+
+model SystemSettings {
+  id                  String   @id @default("taksha-hr-settings")
+  enableAiAnalysis    Boolean  @default(true)
+  offerGenerationMode String   @default("Generate + Admin Approval")
+  accountCreationMode String   @default("After Offer Accepted")
+  updatedAt           DateTime @updatedAt
 }
 
 model Submission {

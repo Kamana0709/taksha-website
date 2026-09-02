@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   ArrowRight, MapPin, Clock, Code, Database, 
@@ -7,6 +8,7 @@ import {
 } from 'lucide-react';
 import SEO from '../components/SEO/SEO';
 import SectionHeading from '../components/SectionHeading/SectionHeading';
+import ApplicationForm from '../components/ApplicationForm';
 import './Careers.css';
 
 const ROLES = [
@@ -53,50 +55,6 @@ const ROLES = [
       'Knowledge of React on the frontend',
       'Eagerness to learn cloud deployment'
     ]
-  },
-  {
-    id: 'DES001',
-    category: 'DESIGN',
-    categoryColor: 'var(--color-card-mint)',
-    title: 'UI/UX Designer Intern',
-    desc: 'Design intuitive user interfaces and create delightful experiences for our users.',
-    location: 'Remote',
-    duration: '3 Months',
-    icon: PenTool,
-    btnColor: 'var(--color-card-mint)',
-    responsibilities: [
-      'Create wireframes, prototypes, and high-fidelity mockups',
-      'Conduct user research and usability testing',
-      'Maintain and expand the design system'
-    ],
-    requirements: [
-      'Proficiency in Figma or Adobe XD',
-      'Strong portfolio demonstrating UI/UX principles',
-      'Good understanding of typography and color theory',
-      'Empathy for the end-user'
-    ]
-  },
-  {
-    id: 'MKT001',
-    category: 'MARKETING',
-    categoryColor: 'var(--color-card-pink)',
-    title: 'Digital Marketing Intern',
-    desc: 'Plan and execute campaigns, manage social media, and drive meaningful engagement.',
-    location: 'Remote',
-    duration: '3 Months',
-    icon: Megaphone,
-    btnColor: 'var(--color-card-pink)',
-    responsibilities: [
-      'Manage social media accounts and content calendars',
-      'Assist in SEO optimization and content writing',
-      'Track and report campaign performance'
-    ],
-    requirements: [
-      'Excellent written and verbal communication',
-      'Familiarity with social media analytics tools',
-      'Creative mindset with an eye for trends',
-      'Basic knowledge of SEO principles'
-    ]
   }
 ];
 
@@ -111,9 +69,19 @@ const BENEFITS = [
 
 export default function Careers() {
   const [selectedRole, setSelectedRole] = React.useState(null);
-  const [isApplied, setIsApplied] = React.useState(false);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [errorMsg, setErrorMsg] = React.useState('');
+  
+  // Prevent body scroll when modal is open
+  React.useEffect(() => {
+    if (selectedRole) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedRole]);
+
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 1, 0.5, 1] } }
@@ -146,12 +114,12 @@ export default function Careers() {
             Join Taksha Nexus and be part of a mission to empower learners, build impactful products, and create meaningful change.
           </p>
           <div className="careers-hero__actions">
-            <a href="#roles" className="btn btn--primary">
+            <button type="button" className="btn btn--primary" onClick={() => document.getElementById('roles')?.scrollIntoView({ behavior: 'smooth' })}>
               View Open Roles <ArrowRight size={20} />
-            </a>
-            <a href="#benefits" className="btn btn--secondary">
+            </button>
+            <button type="button" className="btn btn--secondary" onClick={() => document.getElementById('benefits')?.scrollIntoView({ behavior: 'smooth' })}>
               Life at Taksha Nexus <ArrowRight size={20} />
-            </a>
+            </button>
           </div>
         </div>
 
@@ -205,7 +173,7 @@ export default function Careers() {
             <h2 className="section-title">Find Your Opportunity</h2>
             <p className="section-desc">Explore exciting opportunities and build your career with us.</p>
           </div>
-          <a href="#" className="view-all-link">View All Roles <ArrowRight size={16} /></a>
+          <button type="button" className="view-all-link" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>View All Roles <ArrowRight size={16} /></button>
         </div>
 
         <motion.div 
@@ -292,82 +260,7 @@ export default function Careers() {
             </div>
 
             <div className="role-modal__content">
-              {!isApplied ? (
-                <div className="role-modal__split">
-                  <div className="role-modal__details">
-                    <p className="role-modal__desc">{selectedRole.desc}</p>
-                    
-                    <h4 className="role-modal__section-title">Key Responsibilities</h4>
-                    <ul className="role-modal__list">
-                      {selectedRole.responsibilities.map((req, i) => (
-                        <li key={i}>{req}</li>
-                      ))}
-                    </ul>
-
-                    <h4 className="role-modal__section-title">Requirements</h4>
-                    <ul className="role-modal__list">
-                      {selectedRole.requirements.map((req, i) => (
-                        <li key={i}>{req}</li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="role-modal__apply">
-                    <h3 className="apply-title">Apply Now</h3>
-                    <form className="apply-form" onSubmit={async (e) => { 
-                      e.preventDefault(); 
-                      setIsSubmitting(true);
-                      setErrorMsg('');
-                      
-                      const formData = new FormData(e.target);
-                      const data = {
-                        name: formData.get('name'),
-                        email: formData.get('email'),
-                        portfolio: formData.get('portfolio'),
-                        message: formData.get('message'),
-                        roleId: selectedRole.id,
-                        roleTitle: selectedRole.title
-                      };
-
-                      try {
-                        const response = await fetch('/api/applications', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify(data)
-                        });
-                        
-                        if (response.ok) {
-                          setIsApplied(true);
-                        } else {
-                          setErrorMsg('Failed to submit application. Please try again later.');
-                        }
-                      } catch (err) {
-                        setErrorMsg('Network error. Please try again.');
-                      } finally {
-                        setIsSubmitting(false);
-                      }
-                    }}>
-                      <input type="text" name="name" placeholder="Full Name" className="form-input" required />
-                      <input type="email" name="email" placeholder="Email Address" className="form-input" required />
-                      <input type="url" name="portfolio" placeholder="Portfolio / LinkedIn URL" className="form-input" required />
-                      <textarea name="message" placeholder="Why are you a good fit?" className="form-textarea" rows="3" required></textarea>
-                      {errorMsg && <p style={{ color: 'red', fontSize: '14px', margin: 0 }}>{errorMsg}</p>}
-                      <button type="submit" className="btn btn--primary" style={{ background: 'var(--color-ink)', color: 'var(--color-bg)' }} disabled={isSubmitting}>
-                        {isSubmitting ? 'Submitting...' : <>Submit Application <ArrowRight size={18} /></>}
-                      </button>
-                    </form>
-                  </div>
-                </div>
-              ) : (
-                <div className="role-modal__success">
-                  <CheckCircle size={64} color="var(--color-card-mint)" />
-                  <h3>Application Submitted!</h3>
-                  <p>Thank you for applying for the <strong>{selectedRole.title}</strong> role. Our team will review your application and get back to you shortly.</p>
-                  <button className="btn btn--secondary" onClick={() => setSelectedRole(null)}>
-                    Close Window
-                  </button>
-                </div>
-              )}
+              <ApplicationForm role={selectedRole} onCancel={() => setSelectedRole(null)} />
             </div>
           </div>
         </div>
@@ -377,9 +270,9 @@ export default function Careers() {
       <section className="container section-padding" style={{ borderTop: '2px dashed var(--color-ink)', marginTop: 'var(--space-12)', textAlign: 'center' }}>
         <p style={{ fontWeight: '700', marginBottom: 'var(--space-4)' }}>Already part of the team?</p>
         <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href="/login" className="btn btn--secondary" style={{ background: 'var(--color-bg)' }}>
+          <Link to="/login" className="btn btn--secondary" style={{ background: 'var(--color-bg)', textDecoration: 'none' }}>
             Taksha Nexus Workspace Login <ArrowRight size={18} />
-          </a>
+          </Link>
         </div>
       </section>
 

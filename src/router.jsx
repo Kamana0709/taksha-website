@@ -27,6 +27,7 @@ const VerifyCertificate = lazy(() => import('./pages/VerifyCertificate'));
 
 // Auth Pages
 const Login = lazy(() => import('./pages/auth/Login'));
+const ChangePassword = lazy(() => import('./pages/auth/ChangePassword'));
 
 // Portal Pages
 const InternDashboard = lazy(() => import('./pages/portal/InternDashboard'));
@@ -43,7 +44,6 @@ const InternMessages = lazy(() => import('./pages/portal/InternMessages'));
 const MentorDashboard = lazy(() => import('./pages/portal/MentorDashboard'));
 const MentorInterns = lazy(() => import('./pages/portal/MentorInterns'));
 const MentorInternDetail = lazy(() => import('./pages/portal/MentorInternDetail'));
-const MentorApplications = lazy(() => import('./pages/portal/MentorApplications'));
 const MentorTasks = lazy(() => import('./pages/portal/MentorTasks'));
 const MentorKanban = lazy(() => import('./pages/portal/MentorKanban'));
 const MentorSubmissions = lazy(() => import('./pages/portal/MentorSubmissions'));
@@ -52,6 +52,10 @@ const MentorReports = lazy(() => import('./pages/portal/MentorReports'));
 const MentorProfile = lazy(() => import('./pages/portal/MentorProfile'));
 const MentorSettings = lazy(() => import('./pages/portal/MentorSettings'));
 const MentorMessages = lazy(() => import('./pages/portal/MentorMessages'));
+
+const SuperAdminDashboard = lazy(() => import('./pages/portal/SuperAdminDashboard'));
+const SuperAdminApplications = lazy(() => import('./pages/portal/SuperAdminApplications'));
+const OfferResponse = lazy(() => import('./pages/OfferResponse'));
 
 // Suspense wrapper with minimal loading state
 function SuspenseWrapper({ children }) {
@@ -83,6 +87,10 @@ export const router = createBrowserRouter([
         path: '/login',
         element: <SuspenseWrapper><Login /></SuspenseWrapper>,
       },
+      {
+        path: '/change-password',
+        element: <SuspenseWrapper><ChangePassword /></SuspenseWrapper>,
+      },
     ],
   },
   {
@@ -112,7 +120,6 @@ export const router = createBrowserRouter([
       },
       { path: '/mentor/interns', element: <SuspenseWrapper><MentorInterns /></SuspenseWrapper> },
       { path: '/mentor/interns/:internId', element: <SuspenseWrapper><MentorInternDetail /></SuspenseWrapper> },
-      { path: '/mentor/applications', element: <SuspenseWrapper><MentorApplications /></SuspenseWrapper> },
       { path: '/mentor/tasks', element: <SuspenseWrapper><MentorTasks /></SuspenseWrapper> },
       { path: '/mentor/kanban', element: <SuspenseWrapper><MentorKanban /></SuspenseWrapper> },
       { path: '/mentor/submissions', element: <SuspenseWrapper><MentorSubmissions /></SuspenseWrapper> },
@@ -121,6 +128,16 @@ export const router = createBrowserRouter([
       { path: '/mentor/profile', element: <SuspenseWrapper><MentorProfile /></SuspenseWrapper> },
       { path: '/mentor/settings', element: <SuspenseWrapper><MentorSettings /></SuspenseWrapper> },
       { path: '/mentor/messages', element: <SuspenseWrapper><MentorMessages /></SuspenseWrapper> },
+    ],
+  },
+  {
+    element: <PortalLayout role="superadmin" />,
+    children: [
+      {
+        path: '/superadmin/dashboard',
+        element: <SuspenseWrapper><SuperAdminDashboard /></SuspenseWrapper>,
+      },
+      { path: '/superadmin/applications', element: <SuspenseWrapper><SuperAdminApplications /></SuspenseWrapper> },
     ],
   },
   {
@@ -185,6 +202,10 @@ export const router = createBrowserRouter([
       {
         path: '/verify/:certificateNumber',
         element: <SuspenseWrapper><VerifyCertificate /></SuspenseWrapper>,
+      },
+      {
+        path: '/offer-response/:id',
+        element: <SuspenseWrapper><OfferResponse /></SuspenseWrapper>,
       },
       {
         path: '*',

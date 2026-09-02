@@ -130,8 +130,8 @@ export default function Home() {
       {/* 9.1.2 Craft Philosophy */}
       <CraftPhilosophy />
 
-      {/* 9.1.3 Featured Projects */}
-      <FeaturedProjects />
+      {/* 9.1.3 Featured Projects - Hidden until real concept projects are added */}
+      {/* <FeaturedProjects /> */}
 
       {/* 9.1.4 Services Overview */}
       <ServicesOverview />

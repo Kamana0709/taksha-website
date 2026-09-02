@@ -11,7 +11,16 @@ export default function InternProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     phone: user?.phone || '',
-    location: user?.location || ''
+    location: user?.location || '',
+    college: user?.college || '',
+    degree: user?.degree || '',
+    specialization: user?.specialization || '',
+    currentYear: user?.currentYear || '',
+    graduationYear: user?.graduationYear || '',
+    skills: user?.skills || '',
+    githubUrl: user?.githubUrl || '',
+    linkedinUrl: user?.linkedinUrl || '',
+    portfolioUrl: user?.portfolioUrl || ''
   });
   const [error, setError] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -51,7 +60,16 @@ export default function InternProfile() {
     setIsEditing(true);
     setEditData({
       phone: user?.phone || '',
-      location: user?.location || ''
+      location: user?.location || '',
+      college: user?.college || '',
+      degree: user?.degree || '',
+      specialization: user?.specialization || '',
+      currentYear: user?.currentYear || '',
+      graduationYear: user?.graduationYear || '',
+      skills: user?.skills || '',
+      githubUrl: user?.githubUrl || '',
+      linkedinUrl: user?.linkedinUrl || '',
+      portfolioUrl: user?.portfolioUrl || ''
     });
     setError('');
   };
@@ -165,6 +183,103 @@ export default function InternProfile() {
             </div>
 
             <div style={{ marginTop: 'var(--space-8)' }}>
+              <h3 className="profile-title" style={{ fontSize: '1.2rem', marginBottom: 'var(--space-4)', borderBottom: '2px solid var(--color-ink)', paddingBottom: 'var(--space-2)' }}>
+                Extended Profile Information
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 'var(--space-6)' }}>
+                <div>
+                  <div className="profile-info-group">
+                    <div className="profile-label">College / University</div>
+                    {isEditing ? (
+                      <input type="text" className="profile-input" value={editData.college} onChange={e => setEditData({ ...editData, college: e.target.value })} placeholder="Not set" />
+                    ) : (
+                      <div className="profile-value">{user?.college || '—'}</div>
+                    )}
+                  </div>
+                  <div className="profile-info-group">
+                    <div className="profile-label">Degree</div>
+                    {isEditing ? (
+                      <input type="text" className="profile-input" value={editData.degree} onChange={e => setEditData({ ...editData, degree: e.target.value })} placeholder="Not set" />
+                    ) : (
+                      <div className="profile-value">{user?.degree || '—'}</div>
+                    )}
+                  </div>
+                  <div className="profile-info-group">
+                    <div className="profile-label">Specialization</div>
+                    {isEditing ? (
+                      <input type="text" className="profile-input" value={editData.specialization} onChange={e => setEditData({ ...editData, specialization: e.target.value })} placeholder="Not set" />
+                    ) : (
+                      <div className="profile-value">{user?.specialization || '—'}</div>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
+                    <div className="profile-info-group" style={{ flex: 1 }}>
+                      <div className="profile-label">Current Year</div>
+                      {isEditing ? (
+                        <input type="text" className="profile-input" value={editData.currentYear} onChange={e => setEditData({ ...editData, currentYear: e.target.value })} placeholder="Not set" />
+                      ) : (
+                        <div className="profile-value">{user?.currentYear || '—'}</div>
+                      )}
+                    </div>
+                    <div className="profile-info-group" style={{ flex: 1 }}>
+                      <div className="profile-label">Grad Year</div>
+                      {isEditing ? (
+                        <input type="text" className="profile-input" value={editData.graduationYear} onChange={e => setEditData({ ...editData, graduationYear: e.target.value })} placeholder="Not set" />
+                      ) : (
+                        <div className="profile-value">{user?.graduationYear || '—'}</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="profile-info-group">
+                    <div className="profile-label">Skills</div>
+                    {isEditing ? (
+                      <input type="text" className="profile-input" value={editData.skills} onChange={e => setEditData({ ...editData, skills: e.target.value })} placeholder="Not set" />
+                    ) : (
+                      <div className="profile-value">{user?.skills || '—'}</div>
+                    )}
+                  </div>
+                  <div className="profile-info-group">
+                    <div className="profile-label">GitHub URL</div>
+                    {isEditing ? (
+                      <input type="text" className="profile-input" value={editData.githubUrl} onChange={e => setEditData({ ...editData, githubUrl: e.target.value })} placeholder="Not set" />
+                    ) : (
+                      <div className="profile-value">
+                        {user?.githubUrl ? <a href={user.githubUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-accent)', fontWeight: 'bold' }}>View GitHub ↗</a> : '—'}
+                      </div>
+                    )}
+                  </div>
+                  <div className="profile-info-group">
+                    <div className="profile-label">LinkedIn URL</div>
+                    {isEditing ? (
+                      <input type="text" className="profile-input" value={editData.linkedinUrl} onChange={e => setEditData({ ...editData, linkedinUrl: e.target.value })} placeholder="Not set" />
+                    ) : (
+                      <div className="profile-value">
+                        {user?.linkedinUrl ? <a href={user.linkedinUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-accent)', fontWeight: 'bold' }}>View LinkedIn ↗</a> : '—'}
+                      </div>
+                    )}
+                  </div>
+                  <div className="profile-info-group">
+                    <div className="profile-label">Portfolio URL</div>
+                    {isEditing ? (
+                      <input type="text" className="profile-input" value={editData.portfolioUrl} onChange={e => setEditData({ ...editData, portfolioUrl: e.target.value })} placeholder="Not set" />
+                    ) : (
+                      <div className="profile-value">
+                        {user?.portfolioUrl ? <a href={user.portfolioUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-accent)', fontWeight: 'bold' }}>View Portfolio ↗</a> : '—'}
+                      </div>
+                    )}
+                  </div>
+                  <div className="profile-info-group">
+                    <div className="profile-label">Resume PDF</div>
+                    <div className="profile-value">
+                      {user?.resumeUrl ? <a href={user.resumeUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--color-ink)', fontWeight: 'bold' }}>Download Resume PDF ↗</a> : '—'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
               <div className="profile-info-group">
                 <div className="profile-label">Internship Certificate</div>
                 <div style={{ marginTop: 'var(--space-2)' }}>

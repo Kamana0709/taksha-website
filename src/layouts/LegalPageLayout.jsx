@@ -52,7 +52,7 @@ export default function LegalPageLayout({ title, description, lastUpdated, child
                 </nav>
               </aside>
 
-              <main className="legal-content">
+              <div className="legal-content" role="region" aria-label="Legal content">
                 <motion.div
                   initial="hidden"
                   animate="visible"
@@ -60,7 +60,7 @@ export default function LegalPageLayout({ title, description, lastUpdated, child
                 >
                   {children}
                 </motion.div>
-              </main>
+              </div>
             </div>
           </div>
         </section>

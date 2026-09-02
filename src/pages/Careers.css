@@ -5,6 +5,10 @@
 /* --------------------------------------------------------------------------
    HERO SECTION
    -------------------------------------------------------------------------- */
+.careers-page {
+  padding-top: 140px; /* Offset for fixed header */
+}
+
 .careers-hero {
   display: flex;
   flex-direction: column;
@@ -429,8 +433,9 @@
   z-index: 1000;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: var(--space-4);
+  align-items: flex-start;
+  overflow-y: auto;
+  padding: var(--space-8) var(--space-4);
   animation: fadeIn 0.2s ease;
 }
 
@@ -445,11 +450,10 @@
   box-shadow: 12px 12px 0 0 var(--color-ink);
   width: 100%;
   max-width: 900px;
-  max-height: 90vh;
-  overflow-y: auto;
   position: relative;
   display: flex;
   flex-direction: column;
+  margin-bottom: var(--space-8); /* Add bottom margin so you can scroll past the bottom */
 }
 
 .role-modal__close {
@@ -613,3 +617,104 @@
   font-size: var(--text-lg);
   max-width: 400px;
 }
+
+/* --------------------------------------------------------------------------
+   EXTENDED APPLICATION FORM
+   -------------------------------------------------------------------------- */
+.application-form-container {
+  width: 100%;
+}
+
+.apply-form-extended {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.form-section {
+  border: 2px solid var(--color-ink);
+  padding: var(--space-6);
+  background: var(--color-surface);
+  margin-bottom: var(--space-4);
+}
+
+.form-section legend {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--text-lg);
+  background: var(--color-accent);
+  padding: 4px 12px;
+  border: 2px solid var(--color-ink);
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .form-row {
+    flex-direction: row;
+  }
+  .form-row .form-group {
+    flex: 1;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: var(--space-4);
+}
+
+.form-group label {
+  font-weight: 700;
+  font-size: var(--text-sm);
+  color: var(--color-ink);
+}
+
+.radio-group {
+  display: flex;
+  gap: var(--space-6);
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.file-upload-wrapper {
+  position: relative;
+}
+
+.file-input-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.file-upload-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-card-mint);
+  border: 2px solid var(--color-ink);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: fit-content;
+}
+
+.file-upload-btn:hover {
+  background: var(--color-ink);
+  color: var(--color-bg);
+}
+

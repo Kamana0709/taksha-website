@@ -12,6 +12,7 @@ const fs = require('fs');
 const { generateCertificatePdf } = require('./generateCertificatePdf');
 const { PROJECT_TEMPLATES } = require('./projectTemplates');
 const { uploadFile, getPublicUrl } = require('./storage');
+const takshaHR = require('./takshaHR');
 
 dotenv.config();
 
@@ -34,7 +35,7 @@ if (!fs.existsSync(uploadsDir)) {
 // Keep uploads directory creation as a fallback/legacy
 const storage = multer.memoryStorage();
 
-const upload = multer({ 
+const upload = multer({
   storage: storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (req, file, cb) => {
@@ -72,7 +73,7 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
-    
+
     if (!user) {
       return res.status(400).json({ error: 'User not found' });
     }
@@ -82,11 +83,17 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
 
+    if (user.mustChangePassword) {
+      // Return a temporary token and flag to force password change
+      const tempToken = jwt.sign({ id: user.id, requirePasswordChange: true }, process.env.JWT_SECRET, { expiresIn: '15m' });
+      return res.json({ requirePasswordChange: true, tempToken, email: user.email });
+    }
+
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '24h' });
-    
-    res.json({ 
-      token, 
-      user: { id: user.id, name: user.name, email: user.email, role: user.role, track: user.track, initials: user.name.substring(0, 2).toUpperCase() } 
+
+    res.json({
+      token,
+      user: { id: user.id, name: user.name, email: user.email, role: user.role, track: user.track, initials: user.name.substring(0, 2).toUpperCase() }
     });
   } catch (err) {
     res.status(500).json({ error: 'Login failed' });
@@ -96,9 +103,13 @@ app.post('/api/auth/login', async (req, res) => {
 // --- USERS API (Interns) ---
 app.get('/api/users/interns', authenticateToken, async (req, res) => {
   try {
-    // Mentors can see their interns
+    // Mentors can see their interns, Super Admins can see all
+    let whereClause = { role: 'INTERN' };
+    if (req.user.role === 'MENTOR') {
+      whereClause.mentorId = req.user.id;
+    }
     const interns = await prisma.user.findMany({
-      where: { role: 'INTERN', mentorId: req.user.id }
+      where: whereClause
     });
     res.json(interns);
   } catch (err) {
@@ -109,20 +120,20 @@ app.get('/api/users/interns', authenticateToken, async (req, res) => {
 app.post('/api/users/interns', authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can create interns' });
-    
+
     const { name, email, password, track } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
-    
+
     const year = new Date().getFullYear();
     const count = await prisma.user.count({
-      where: { 
+      where: {
         role: 'INTERN',
         id: { startsWith: `TNX-INT-${year}-` }
       }
     });
     const seq = String(count + 1).padStart(3, '0');
     const customInternId = `TNX-INT-${year}-${seq}`;
-    
+
     const intern = await prisma.user.create({
       data: {
         id: customInternId,
@@ -136,12 +147,12 @@ app.post('/api/users/interns', authenticateToken, async (req, res) => {
         mentorId: req.user.id
       }
     });
-    
+
     const template1 = PROJECT_TEMPLATES.find(t => t.order === 1);
     if (template1) {
       await assignProjectTemplateToIntern(intern.id, template1.key, req.user.id);
     }
-    
+
     const { passwordHash: _, ...internData } = intern;
     res.json(internData);
   } catch (err) {
@@ -149,12 +160,61 @@ app.post('/api/users/interns', authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Failed to create intern (email might exist)' });
   }
 });
+app.put('/api/users/interns/:id', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can edit interns' });
+    const { id } = req.params;
+
+    const existing = await prisma.user.findUnique({ where: { id } });
+    if (!existing || existing.mentorId !== req.user.id) {
+      return res.status(404).json({ error: 'Intern not found' });
+    }
+
+    const { 
+      name, email, track, phone, location, status,
+      college, degree, specialization, currentYear, graduationYear,
+      skills, experience, githubUrl, linkedinUrl, resumeUrl, portfolioUrl,
+      duration, availability
+    } = req.body;
+    
+    const updated = await prisma.user.update({
+      where: { id },
+      data: {
+        ...(name !== undefined && { name }),
+        ...(email !== undefined && { email }),
+        ...(track !== undefined && { track }),
+        ...(phone !== undefined && { phone }),
+        ...(location !== undefined && { location }),
+        ...(status !== undefined && { status }),
+        ...(college !== undefined && { college }),
+        ...(degree !== undefined && { degree }),
+        ...(specialization !== undefined && { specialization }),
+        ...(currentYear !== undefined && { currentYear }),
+        ...(graduationYear !== undefined && { graduationYear }),
+        ...(skills !== undefined && { skills }),
+        ...(experience !== undefined && { experience }),
+        ...(githubUrl !== undefined && { githubUrl }),
+        ...(linkedinUrl !== undefined && { linkedinUrl }),
+        ...(resumeUrl !== undefined && { resumeUrl }),
+        ...(portfolioUrl !== undefined && { portfolioUrl }),
+        ...(duration !== undefined && { duration }),
+        ...(availability !== undefined && { availability }),
+      }
+    });
+
+    const { passwordHash: _, ...internData } = updated;
+    res.json(internData);
+  } catch (err) {
+    console.error('Failed to update intern:', err);
+    res.status(500).json({ error: 'Failed to update intern (email might already be in use)' });
+  }
+});
 
 app.delete('/api/users/interns/:id', authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can delete interns' });
     const { id } = req.params;
-    
+
     // Perform cascading delete manually in a transaction
     await prisma.$transaction([
       prisma.task.deleteMany({ where: { assigneeId: id } }),
@@ -164,7 +224,7 @@ app.delete('/api/users/interns/:id', authenticateToken, async (req, res) => {
       prisma.message.deleteMany({ where: { receiverId: id } }),
       prisma.user.delete({ where: { id } })
     ]);
-    
+
     res.json({ success: true, id });
   } catch (err) {
     console.error('Failed to delete intern:', err);
@@ -174,12 +234,28 @@ app.delete('/api/users/interns/:id', authenticateToken, async (req, res) => {
 
 app.put('/api/users/profile', authenticateToken, async (req, res) => {
   try {
-    const { phone, location } = req.body;
+    const { 
+      phone, location, college, degree, specialization, 
+      currentYear, graduationYear, skills, githubUrl, 
+      linkedinUrl, portfolioUrl 
+    } = req.body;
     const user = await prisma.user.update({
       where: { id: req.user.id },
-      data: { phone, location }
+      data: { 
+        ...(phone !== undefined && { phone }),
+        ...(location !== undefined && { location }),
+        ...(college !== undefined && { college }),
+        ...(degree !== undefined && { degree }),
+        ...(specialization !== undefined && { specialization }),
+        ...(currentYear !== undefined && { currentYear }),
+        ...(graduationYear !== undefined && { graduationYear }),
+        ...(skills !== undefined && { skills }),
+        ...(githubUrl !== undefined && { githubUrl }),
+        ...(linkedinUrl !== undefined && { linkedinUrl }),
+        ...(portfolioUrl !== undefined && { portfolioUrl })
+      }
     });
-    
+
     // Return sanitized user object
     const { passwordHash: _, ...userData } = user;
     res.json({
@@ -196,7 +272,7 @@ app.put('/api/users/profile', authenticateToken, async (req, res) => {
 app.get('/api/projects', authenticateToken, async (req, res) => {
   try {
     const projects = await prisma.project.findMany({
-      include: { 
+      include: {
         tasks: true,
         assignments: req.user.role === 'INTERN' ? { where: { internId: req.user.id } } : true
       },
@@ -205,10 +281,10 @@ app.get('/api/projects', authenticateToken, async (req, res) => {
     const enhancedProjects = projects.map(p => {
       let daysRemaining = null;
       // If intern, grab their specific assignment
-      const assignment = req.user.role === 'INTERN' && p.assignments.length > 0 
-        ? p.assignments[0] 
+      const assignment = req.user.role === 'INTERN' && p.assignments.length > 0
+        ? p.assignments[0]
         : null;
-        
+
       if (assignment && assignment.deadlineAt) {
         daysRemaining = differenceInCalendarDays(new Date(assignment.deadlineAt), new Date());
       }
@@ -238,7 +314,7 @@ app.get('/api/tasks', authenticateToken, async (req, res) => {
   try {
     let tasks;
     if (req.user.role === 'INTERN') {
-      tasks = await prisma.task.findMany({ 
+      tasks = await prisma.task.findMany({
         where: { assigneeId: req.user.id },
         include: { project: { include: { assignments: { where: { internId: req.user.id } } } } }
       });
@@ -253,7 +329,7 @@ app.get('/api/tasks', authenticateToken, async (req, res) => {
       if (project) {
         // Find assignment for this specific task's assignee
         const assignment = project.assignments?.find(a => a.internId === t.assigneeId);
-        
+
         if (assignment && assignment.deadlineAt) {
           project = {
             ...project,
@@ -272,9 +348,9 @@ app.get('/api/tasks', authenticateToken, async (req, res) => {
 app.post('/api/tasks', authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can assign tasks' });
-    
+
     const { title, projectId, priority, assignee, status } = req.body;
-    
+
     const project = await prisma.project.findUnique({ where: { id: projectId } });
     if (project) {
       const now = new Date();
@@ -314,7 +390,7 @@ app.put('/api/tasks/:id/status', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-    
+
     const task = await prisma.task.update({
       where: { id },
       data: { status },
@@ -331,13 +407,13 @@ app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
     if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can edit tasks' });
     const { id } = req.params;
     const { title, projectId, priority, status, assignee } = req.body;
-    
+
     const task = await prisma.task.update({
       where: { id },
-      data: { 
-        title, 
-        ...(projectId && { projectId }), 
-        priority, 
+      data: {
+        title,
+        ...(projectId && { projectId }),
+        priority,
         status,
         ...(assignee && { assigneeId: assignee })
       },
@@ -364,25 +440,25 @@ app.delete('/api/tasks/:id', authenticateToken, async (req, res) => {
 app.post('/api/submissions', authenticateToken, upload.single('file'), async (req, res) => {
   try {
     if (req.user.role !== 'INTERN') return res.status(403).json({ error: 'Only interns can submit work' });
-    
+
     const { projectId, githubUrl, liveUrl, description } = req.body;
     let fileUrl = null;
     let fileName = null;
-    
+
     if (req.file) {
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
       const ext = path.extname(req.file.originalname);
       const objectPath = `${uniqueSuffix}${ext}`;
-      
+
       // Upload to private bucket
       await uploadFile('submissions', objectPath, req.file.buffer, req.file.mimetype);
-      
+
       // Get a long-lived signed URL (10 years) to match previous static URL behavior
       const { getSignedUrl } = require('./storage');
       fileUrl = await getSignedUrl('submissions', objectPath, 315360000);
       fileName = req.file.originalname;
     }
-    
+
     // Create the submission
     const submission = await prisma.submission.create({
       data: {
@@ -433,10 +509,10 @@ app.get('/api/submissions', authenticateToken, async (req, res) => {
 app.put('/api/submissions/:id/review', authenticateToken, async (req, res) => {
   try {
     if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can review submissions' });
-    
+
     const { id } = req.params;
     const { status, mentorFeedback } = req.body; // status is 'Approved' or 'Changes Requested'
-    
+
     const submission = await prisma.submission.update({
       where: { id },
       data: {
@@ -490,43 +566,60 @@ app.post('/api/announcements', authenticateToken, async (req, res) => {
 });
 
 // --- APPLICATIONS API ---
-app.post('/api/applications', async (req, res) => {
+app.post('/api/applications', upload.single('resume'), async (req, res) => {
   try {
-    const { name, email, portfolio, message, roleId, roleTitle } = req.body;
-    
+    const { 
+      name, email, portfolio, message, roleId, roleTitle,
+      phone, location, college, degree, specialization, currentYear, graduationYear,
+      skills, experience, hasProjects, bestProject, githubUrl, linkedinUrl,
+      duration, availability, hoursPerWeek, startDate,
+      motivation, expectations, whySelectYou, source
+    } = req.body;
+
+    let resumeUrl = null;
+    if (req.file) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const ext = path.extname(req.file.originalname);
+      const objectPath = `${uniqueSuffix}${ext}`;
+      
+      await uploadFile('submissions', objectPath, req.file.buffer, req.file.mimetype);
+      
+      const { getSignedUrl } = require('./storage');
+      resumeUrl = await getSignedUrl('submissions', objectPath, 315360000); // 10 years
+    }
+
     // 1. Save to Database
     const application = await prisma.application.create({
       data: {
-        name,
-        email,
-        portfolio,
-        message,
-        roleId,
-        roleTitle,
+        name, email, portfolio, message, roleId, roleTitle,
+        phone, location, college, degree, specialization, currentYear, graduationYear,
+        skills, experience, hasProjects: hasProjects === 'true', bestProject, githubUrl, linkedinUrl,
+        resumeUrl, duration, availability, hoursPerWeek, startDate,
+        motivation, expectations, whySelectYou, source,
         date: new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })
       }
     });
 
-    // 2. Send Email Notification
-    const { data: emailData, error } = await resend.emails.send({
-      from: 'Taksha Nexus Careers <website@taksha.studio>',
-      to: 'takshadigital@gmail.com',
-      subject: `New Application: ${name} for ${roleTitle}`,
+    // 2. Taksha HR: Log Application Receipt
+    await takshaHR.logSystemAction('Received new application', name, `Role: ${roleTitle}`, 'Taksha HR');
+
+    // 3. Taksha HR: Send Confirmation Email to Candidate
+    await takshaHR.sendEmail({
+      to: email,
+      subject: `Application Received: ${roleTitle} at Taksha Nexus`,
       html: `
-        <h2>New Job Application</h2>
-        <p><strong>Role:</strong> ${roleTitle} (${roleId})</p>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-        <p><strong>Portfolio/LinkedIn:</strong> <a href="${portfolio}">${portfolio}</a></p>
-        <h3>Message/Cover Letter:</h3>
-        <p>${message.replace(/\n/g, '<br/>')}</p>
+        <h2>Hi ${name},</h2>
+        <p>We have successfully received your application for the <strong>${roleTitle}</strong> role.</p>
+        <p>Our Taksha HR system is currently reviewing your profile. We will get back to you soon!</p>
+        <br/>
+        <p>Best Regards,</p>
+        <p>Taksha HR System<br/>Taksha Nexus</p>
       `
     });
 
-    if (error) {
-      console.error('Email failed to send, but application was saved.', error);
-      // We still return success since it's in the DB
-    }
+    // 4. Taksha HR: Async AI Evaluation
+    // We don't await this so the user gets a fast response
+    takshaHR.evaluateApplication(application.id).catch(console.error);
 
     res.status(201).json({ success: true, application });
   } catch (err) {
@@ -537,7 +630,7 @@ app.post('/api/applications', async (req, res) => {
 
 app.get('/api/applications', authenticateToken, async (req, res) => {
   try {
-    if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can view applications' });
+    if (req.user.role !== 'SUPER_ADMIN') return res.status(403).json({ error: 'Only Super Admins can view applications' });
     const applications = await prisma.application.findMany({ orderBy: { createdAt: 'desc' } });
     res.json(applications);
   } catch (err) {
@@ -545,55 +638,63 @@ app.get('/api/applications', authenticateToken, async (req, res) => {
   }
 });
 
+app.get('/api/reports/applications-summary', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'SUPER_ADMIN') return res.status(403).json({ error: 'Only Super Admins can view application stats' });
+    
+    const applications = await prisma.application.findMany();
+    
+    const summary = {
+      total: applications.length,
+      pending: applications.filter(a => a.status === 'Pending').length,
+      underReview: applications.filter(a => a.status === 'Under Review').length,
+      shortlisted: applications.filter(a => a.status === 'Shortlisted').length,
+      selected: applications.filter(a => a.status === 'Selected').length,
+      rejected: applications.filter(a => a.status === 'Rejected').length,
+      roles: {
+        frontend: applications.filter(a => a.roleId === 'DEV001').length,
+        fullstack: applications.filter(a => a.roleId === 'DEV002').length
+      }
+    };
+    
+    res.json(summary);
+  } catch (err) {
+    console.error('Failed to get applications summary:', err);
+    res.status(500).json({ error: 'Failed to fetch applications summary' });
+  }
+});
+
 app.put('/api/applications/:id/status', authenticateToken, async (req, res) => {
   try {
-    if (req.user.role !== 'MENTOR') return res.status(403).json({ error: 'Only mentors can update applications' });
+    if (req.user.role !== 'SUPER_ADMIN') return res.status(403).json({ error: 'Only Super Admins can update applications' });
     const { id } = req.params;
     const { status } = req.body;
-    
-    const application = await prisma.$transaction(async (tx) => {
-      const app = await tx.application.update({
-        where: { id },
-        data: { status }
-      });
-      
-      if (status === 'Accepted') {
-        const existingUser = await tx.user.findUnique({ where: { email: app.email } });
-        if (!existingUser) {
-          const defaultPassword = Math.random().toString(36).slice(-8); // Random password for new interns
-          const passwordHash = await bcrypt.hash(defaultPassword, 10);
-          
-          let track = 'Frontend';
-          if (app.roleTitle.toLowerCase().includes('design')) track = 'Design';
-          else if (app.roleTitle.toLowerCase().includes('backend')) track = 'Backend';
-          
-          await tx.user.create({
-            data: {
-              name: app.name,
-              email: app.email,
-              passwordHash,
-              role: 'INTERN',
-              track,
-              progress: 0,
-              status: 'On Track',
-              mentorId: req.user.id
-            }
-          });
-        }
-      }
-      return app;
+
+    const application = await prisma.application.update({
+      where: { id },
+      data: { status }
     });
-    
-    if (status === 'Accepted') {
-      const intern = await prisma.user.findUnique({ where: { email: application.email } });
-      if (intern) {
-        const template1 = PROJECT_TEMPLATES.find(t => t.order === 1);
-        if (template1) {
-          await assignProjectTemplateToIntern(intern.id, template1.key, req.user.id);
-        }
+
+    await takshaHR.logSystemAction('Application status changed', application.name, `New status: \${status}`, 'Super Admin');
+
+    // If candidate is selected, Taksha HR should automatically generate the offer letter
+    if (status === 'Selected' && !application.offerUrl) {
+      try {
+        const offerUrl = await takshaHR.generateOfferPDF(application);
+        await prisma.application.update({
+          where: { id },
+          data: { 
+            offerStatus: 'Awaiting Approval',
+            offerUrl,
+            offerGeneratedAt: new Date()
+          }
+        });
+        await takshaHR.logSystemAction('Offer Letter Generated', application.name, 'Status: Awaiting Approval', 'Taksha HR');
+      } catch (err) {
+        console.error("Failed to generate offer:", err);
       }
     }
-    
+
     res.json(application);
   } catch (err) {
     console.error('Failed to update application status:', err);
@@ -605,24 +706,24 @@ app.put('/api/applications/:id/status', authenticateToken, async (req, res) => {
 app.get('/api/certificates/:internId/eligible', authenticateToken, async (req, res) => {
   try {
     const { internId } = req.params;
-    
+
     // Eligibility: all assigned tasks across all projects are DONE, and all submissions are Approved
     const tasks = await prisma.task.findMany({ where: { assigneeId: internId } });
     const submissions = await prisma.submission.findMany({ where: { internId } });
-    
+
     if (tasks.length === 0 || submissions.length === 0) {
       return res.json({ isEligible: false });
     }
-    
+
     const allTasksDone = tasks.every(t => t.status === 'DONE');
     const allSubmissionsApproved = submissions.every(s => s.status === 'Approved' || s.status === 'Auto-Submitted');
-    
+
     const existingCert = await prisma.certificate.findFirst({ where: { internId } });
-    
-    res.json({ 
-      isEligible: allTasksDone && allSubmissionsApproved, 
+
+    res.json({
+      isEligible: allTasksDone && allSubmissionsApproved,
       alreadyIssued: !!existingCert,
-      certificate: existingCert 
+      certificate: existingCert
     });
   } catch (err) {
     console.error('Failed to check eligibility:', err);
@@ -633,55 +734,55 @@ app.get('/api/certificates/:internId/eligible', authenticateToken, async (req, r
 app.post('/api/certificates/generate', authenticateToken, async (req, res) => {
   try {
     const { internId } = req.body;
-    
+
     if (req.user.role !== 'MENTOR' && req.user.id !== internId) {
       return res.status(403).json({ error: 'Unauthorized to generate certificate' });
     }
-    
+
     const intern = await prisma.user.findUnique({ where: { id: internId } });
     if (!intern) return res.status(404).json({ error: 'Intern not found' });
-    
+
     const existingCert = await prisma.certificate.findFirst({ where: { internId } });
     if (existingCert) {
       return res.json({ success: true, certificate: existingCert, fileUrl: existingCert.fileUrl || `/uploads/certificates/${existingCert.id}.pdf` });
     }
-    
+
     const year = new Date().getFullYear();
     const count = await prisma.certificate.count({
       where: { certificateNumber: { startsWith: `TK/IC/${year}/` } }
     });
     const seq = String(count + 1).padStart(4, '0');
     const certificateNumber = `TK/IC/${year}/${seq}`;
-    
+
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - 1);
     const startDateStr = startDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
     const endDateStr = new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-    
+
     const approvedSubmissions = await prisma.submission.findMany({
-      where: { 
+      where: {
         internId,
         status: { in: ['Approved', 'Auto-Submitted'] }
       },
       include: { project: true }
     });
-    
+
     const projectsCompleted = approvedSubmissions.map(sub => ({
       projectName: sub.project?.name || 'Unknown Project',
       githubUrl: sub.githubUrl,
       liveUrl: sub.liveUrl,
       completedAt: sub.reviewedAt || sub.updatedAt
     }));
-    
+
     const certsDir = path.join(__dirname, 'uploads', 'certificates');
     if (!fs.existsSync(certsDir)) {
       fs.mkdirSync(certsDir, { recursive: true });
     }
-    
+
     const crypto = require('crypto');
     const certId = crypto.randomUUID();
     const filePath = path.join(certsDir, `${certId}.pdf`);
-    
+
     // Generate PDF using LaTeX pipeline
     await generateCertificatePdf({
       name: intern.name,
@@ -690,13 +791,13 @@ app.post('/api/certificates/generate', authenticateToken, async (req, res) => {
       endDate: endDateStr,
       certificateId: certificateNumber
     }, filePath);
-    
+
     // Upload the generated PDF to Supabase Storage
     const fileBuffer = fs.readFileSync(filePath);
     const objectPath = `${certId}.pdf`;
     await uploadFile('certificates', objectPath, fileBuffer, 'application/pdf');
     const supabaseUrl = getPublicUrl('certificates', objectPath);
-    
+
     const newCert = await prisma.certificate.create({
       data: {
         id: certId,
@@ -709,7 +810,7 @@ app.post('/api/certificates/generate', authenticateToken, async (req, res) => {
         fileUrl: supabaseUrl
       }
     });
-    
+
     res.json({ success: true, certificate: newCert, fileUrl: supabaseUrl });
   } catch (err) {
     console.error('Failed to generate certificate:', err);
@@ -720,10 +821,10 @@ app.post('/api/certificates/generate', authenticateToken, async (req, res) => {
 app.get('/api/certificates/verify/:certificateNumber', async (req, res) => {
   try {
     const { certificateNumber } = req.params;
-    
+
     // Decode if encoded (e.g. TK%2FIC%2F2026%2F0001)
     const decodedNumber = decodeURIComponent(certificateNumber);
-    
+
     const certificate = await prisma.certificate.findUnique({
       where: { certificateNumber: decodedNumber },
       include: {
@@ -732,11 +833,11 @@ app.get('/api/certificates/verify/:certificateNumber', async (req, res) => {
         }
       }
     });
-    
+
     if (!certificate) {
       return res.status(404).json({ error: 'Certificate not found' });
     }
-    
+
     res.json({
       internName: certificate.intern.name,
       role: certificate.role,
@@ -756,16 +857,16 @@ app.get('/api/certificates/:id/download', async (req, res) => {
     const { id } = req.params;
     const cert = await prisma.certificate.findUnique({ where: { id } });
     if (!cert) return res.status(404).json({ error: 'Certificate not found' });
-    
+
     if (cert.fileUrl && cert.fileUrl.startsWith('http')) {
       // Supabase storage
       return res.redirect(cert.fileUrl);
     }
-    
+
     // Fallback to local disk
     const filePath = path.join(__dirname, 'uploads', 'certificates', `${id}.pdf`);
     if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'File not found' });
-    
+
     res.download(filePath, `Taksha-Nexus-Certificate-${cert.certificateNumber.replace(/\//g, '-')}.pdf`);
   } catch (err) {
     console.error('Failed to download certificate:', err);
@@ -792,7 +893,7 @@ app.get('/api/messages/unread-count', authenticateToken, async (req, res) => {
 app.get('/api/messages/:otherUserId', authenticateToken, async (req, res) => {
   try {
     const { otherUserId } = req.params;
-    
+
     await prisma.message.updateMany({
       where: {
         senderId: otherUserId,
@@ -811,7 +912,7 @@ app.get('/api/messages/:otherUserId', authenticateToken, async (req, res) => {
       },
       orderBy: { createdAt: 'asc' }
     });
-    
+
     res.json(messages);
   } catch (err) {
     console.error('Failed to fetch messages:', err);
@@ -822,7 +923,7 @@ app.get('/api/messages/:otherUserId', authenticateToken, async (req, res) => {
 app.post('/api/messages', authenticateToken, async (req, res) => {
   try {
     const { receiverId, content } = req.body;
-    
+
     if (!receiverId || !content) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
@@ -870,7 +971,7 @@ app.get('/api/reports/summary', authenticateToken, async (req, res) => {
     const interns = await prisma.user.findMany({
       where: { mentorId: req.user.id, role: 'INTERN' }
     });
-    
+
     const internIds = interns.map(i => i.id);
     const submissions = await prisma.submission.findMany({
       where: { internId: { in: internIds } }
@@ -911,7 +1012,7 @@ app.get('/api/reports/weekly-progress', authenticateToken, async (req, res) => {
     }
 
     const { differenceInWeeks, startOfWeek } = require('date-fns');
-    
+
     const doneTasks = await prisma.task.findMany({
       where: {
         assignerId: req.user.id,
@@ -919,15 +1020,15 @@ app.get('/api/reports/weekly-progress', authenticateToken, async (req, res) => {
       },
       select: { updatedAt: true }
     });
-    
+
     const now = new Date();
     const weeks = Array(8).fill(0).map((_, i) => {
       const d = new Date(now);
       d.setDate(d.getDate() - (i * 7));
-      return { 
-        label: `W${8 - i}`, 
-        weekStart: startOfWeek(d), 
-        count: 0 
+      return {
+        label: `W${8 - i}`,
+        weekStart: startOfWeek(d),
+        count: 0
       };
     }).reverse();
 
@@ -956,7 +1057,7 @@ const assignProjectTemplateToIntern = async (internId, templateKey, assignerId) 
 
   const intern = await prisma.user.findUnique({ where: { id: internId } });
   if (!intern) return null;
-  
+
   const mentorId = assignerId || intern.mentorId;
   if (!mentorId) return null;
 
@@ -975,7 +1076,7 @@ const assignProjectTemplateToIntern = async (internId, templateKey, assignerId) 
 
   const today = new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
   const createdTasks = [];
-  
+
   const now = new Date();
   await prisma.projectAssignment.upsert({
     where: { projectId_internId: { projectId: project.id, internId: intern.id } },
@@ -1029,10 +1130,10 @@ const unlockNextProject = async (internId, completedProjectKey) => {
   try {
     const completedTemplate = PROJECT_TEMPLATES.find(t => t.key === completedProjectKey);
     if (!completedTemplate || !completedTemplate.order) return;
-    
+
     const nextTemplate = PROJECT_TEMPLATES.find(t => t.order === completedTemplate.order + 1);
-    if (!nextTemplate) return; 
-    
+    if (!nextTemplate) return;
+
     await assignProjectTemplateToIntern(internId, nextTemplate.key);
   } catch (err) {
     console.error('Failed to unlock next project:', err);
@@ -1066,12 +1167,12 @@ app.post('/api/project-templates/assign', authenticateToken, async (req, res) =>
       if (prevTemplate) {
         const prevProject = await prisma.project.findFirst({ where: { name: prevTemplate.name } });
         let prevCompleted = false;
-        
+
         if (prevProject) {
           const prevAssignment = await prisma.projectAssignment.findUnique({
             where: { projectId_internId: { projectId: prevProject.id, internId: intern.id } }
           });
-          
+
           if (prevAssignment && prevAssignment.status === 'AUTO_SUBMITTED') {
             prevCompleted = true;
           } else {
@@ -1081,15 +1182,15 @@ app.post('/api/project-templates/assign', authenticateToken, async (req, res) =>
             if (approvedSubmission) prevCompleted = true;
           }
         }
-        
+
         // Also allow if this template is ALREADY assigned to the intern
         const currentProject = await prisma.project.findFirst({ where: { name: template.name } });
         let alreadyAssigned = false;
         if (currentProject) {
-           const currentAssignment = await prisma.projectAssignment.findUnique({
-             where: { projectId_internId: { projectId: currentProject.id, internId: intern.id } }
-           });
-           if (currentAssignment) alreadyAssigned = true;
+          const currentAssignment = await prisma.projectAssignment.findUnique({
+            where: { projectId_internId: { projectId: currentProject.id, internId: intern.id } }
+          });
+          if (currentAssignment) alreadyAssigned = true;
         }
 
         if (!prevCompleted && !alreadyAssigned) {
@@ -1099,7 +1200,7 @@ app.post('/api/project-templates/assign', authenticateToken, async (req, res) =>
     }
 
     const result = await assignProjectTemplateToIntern(intern.id, template.key, req.user.id);
-    
+
     if (!result) {
       return res.status(500).json({ error: 'Failed to assign project template' });
     }
@@ -1153,7 +1254,7 @@ const autoSubmitOverdueProjects = async () => {
           }
         });
       }
-      
+
       const proj = assignment.project;
       if (proj) {
         const officialTemplate = PROJECT_TEMPLATES.find(t => t.name === proj.name);
@@ -1166,6 +1267,280 @@ const autoSubmitOverdueProjects = async () => {
     console.error('Failed to auto-submit overdue projects:', err);
   }
 };
+
+// --- TAKSHA HR ROUTES ---
+app.post('/api/applications/:id/generate-offer', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'SUPER_ADMIN') {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    const application = await prisma.application.findUnique({
+      where: { id: req.params.id }
+    });
+
+    if (!application) {
+      return res.status(404).json({ error: 'Application not found' });
+    }
+
+    // Call the takshaHR PDF generator
+    const offerUrl = await takshaHR.generateOfferPDF(application);
+
+    // Update the application record
+    const updatedApp = await prisma.application.update({
+      where: { id: req.params.id },
+      data: {
+        offerUrl,
+        offerStatus: 'Generated',
+        offerGeneratedAt: new Date(),
+        status: 'Selected'
+      }
+    });
+
+    await takshaHR.logSystemAction('Offer Generated', application.name, `PDF created at ${offerUrl}`, 'Super Admin');
+
+    res.json(updatedApp);
+  } catch (err) {
+    console.error('Error generating offer:', err);
+    res.status(500).json({ error: 'Failed to generate offer letter' });
+  }
+});
+
+app.post('/api/applications/:id/send-offer', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'SUPER_ADMIN') {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+    
+    const application = await prisma.application.findUnique({
+      where: { id: req.params.id }
+    });
+
+    if (!application || !application.offerUrl) {
+      return res.status(400).json({ error: 'No offer generated yet' });
+    }
+
+    // Update status
+    const updatedApp = await prisma.application.update({
+      where: { id: req.params.id },
+      data: {
+        offerStatus: 'Sent'
+      }
+    });
+
+    await takshaHR.logSystemAction('Offer Sent', application.name, `Email sent to ${application.email}`, 'Super Admin');
+
+    res.json(updatedApp);
+  } catch (err) {
+    console.error('Error sending offer:', err);
+    res.status(500).json({ error: 'Failed to send offer letter' });
+  }
+});
+
+// --- TAKSHA HR & SUPER ADMIN ENDPOINTS ---
+
+app.post('/api/auth/change-password', async (req, res) => {
+  try {
+    const { tempToken, newPassword } = req.body;
+    
+    let decoded;
+    try {
+      decoded = jwt.verify(tempToken, process.env.JWT_SECRET);
+    } catch (e) {
+      return res.status(401).json({ error: 'Token expired or invalid' });
+    }
+    
+    if (!decoded.requirePasswordChange) {
+      return res.status(400).json({ error: 'Invalid token type' });
+    }
+    
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    const user = await prisma.user.update({
+      where: { id: decoded.id },
+      data: { passwordHash, mustChangePassword: false }
+    });
+    
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    
+    await takshaHR.logSystemAction('Forced password change completed', user.name, 'Success', 'Intern');
+    
+    res.json({
+      token,
+      user: { id: user.id, name: user.name, email: user.email, role: user.role, track: user.track, initials: user.name.substring(0, 2).toUpperCase() }
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to change password' });
+  }
+});
+
+app.put('/api/applications/:id/approve-offer', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'SUPER_ADMIN') return res.status(403).json({ error: 'Only Super Admins can approve offers' });
+    const { id } = req.params;
+    
+    const application = await prisma.application.update({
+      where: { id },
+      data: { offerStatus: 'Sent' }
+    });
+    
+    // Send email with PDF attachment
+    const pdfPath = path.join(__dirname, application.offerUrl);
+    let attachments = [];
+    if (fs.existsSync(pdfPath)) {
+      attachments.push({ filename: path.basename(pdfPath), path: pdfPath });
+    }
+    
+    const acceptLink = `\${process.env.CLIENT_URL || 'http://localhost:5173'}/offer-response/\${id}`;
+    
+    await takshaHR.sendEmail({
+      to: application.email,
+      subject: `Offer Letter: \${application.roleTitle} at Taksha Nexus`,
+      html: `
+        <h2>Congratulations \${application.name}!</h2>
+        <p>We are thrilled to offer you the internship position of <strong>\${application.roleTitle}</strong>.</p>
+        <p>Please find your official offer letter attached.</p>
+        <p>To accept or decline the offer, please visit your secure portal:</p>
+        <a href="\${acceptLink}" style="padding: 10px 20px; background: #000; color: #fff; text-decoration: none; border-radius: 5px;">View Offer Decision Portal</a>
+        <br/><br/>
+        <p>Best Regards,</p>
+        <p>Taksha HR System</p>
+      `,
+      attachments
+    });
+    
+    await takshaHR.logSystemAction('Offer Approved & Sent', application.name, 'Status: Sent', 'Super Admin');
+    
+    res.json(application);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to approve offer' });
+  }
+});
+
+app.get('/api/applications/:id/offer-details', async (req, res) => {
+  try {
+    // Public route for candidates to view offer status (without JWT, but using unique application ID as pseudo-auth)
+    const { id } = req.params;
+    const application = await prisma.application.findUnique({ where: { id } });
+    
+    if (!application || !application.offerStatus || application.offerStatus === 'Awaiting Approval') {
+      return res.status(404).json({ error: 'Offer not found or not yet approved' });
+    }
+    
+    res.json(application);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to get offer' });
+  }
+});
+
+app.post('/api/applications/:id/offer-response', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { action } = req.body; // 'accept' or 'decline'
+    
+    const application = await prisma.application.findUnique({ where: { id } });
+    if (!application || application.offerStatus !== 'Sent') {
+      return res.status(400).json({ error: 'Invalid offer state' });
+    }
+    
+    if (action === 'decline') {
+      const updated = await prisma.application.update({
+        where: { id },
+        data: { offerStatus: 'Declined', offerRespondedAt: new Date(), status: 'Rejected' }
+      });
+      await takshaHR.logSystemAction('Offer Declined', application.name, 'Candidate declined offer', 'Candidate');
+      return res.json(updated);
+    }
+    
+    if (action === 'accept') {
+      // 1. Update Application
+      const updated = await prisma.application.update({
+        where: { id },
+        data: { offerStatus: 'Accepted', offerRespondedAt: new Date(), status: 'Onboarded' }
+      });
+      
+      await takshaHR.logSystemAction('Offer Accepted', application.name, 'Candidate accepted offer', 'Candidate');
+      
+      // 2. Prevent Duplicates
+      const existingUser = await prisma.user.findUnique({ where: { email: application.email } });
+      if (existingUser) {
+         return res.json({ success: true, message: 'Account already exists' });
+      }
+      
+      // 3. Generate Intern ID
+      const year = new Date().getFullYear();
+      const count = await prisma.user.count({ where: { role: 'INTERN', id: { startsWith: `TN-INT-\${year}-` } } });
+      const seq = String(count + 1).padStart(3, '0');
+      const internId = `TN-INT-\${year}-\${seq}`;
+      
+      // 4. Generate Temporary Password: Taksha Nexus@26DD
+      // We don't have DOB explicitly in the application fields except potentially in resume. 
+      // For testing, we'll use '01' if DOB is missing. If the user provides a dob parameter in the accept request, we use it.
+      let dd = req.body.dob ? String(new Date(req.body.dob).getDate()).padStart(2, '0') : '01';
+      const tempPassword = `Taksha Nexus@26\${dd}`;
+      const passwordHash = await bcrypt.hash(tempPassword, 10);
+      
+      // Track
+      let track = 'Frontend';
+      if (application.roleTitle.toLowerCase().includes('design')) track = 'Design';
+      else if (application.roleTitle.toLowerCase().includes('backend') || application.roleTitle.toLowerCase().includes('full')) track = 'Backend';
+      
+      // Assign arbitrary mentor (first one)
+      const mentor = await prisma.user.findFirst({ where: { role: 'MENTOR' } });
+      const mentorId = mentor ? mentor.id : null;
+      
+      // 5. Create Account
+      const user = await prisma.user.create({
+        data: {
+          id: internId,
+          name: application.name,
+          email: application.email,
+          passwordHash,
+          role: 'INTERN',
+          track,
+          progress: 0,
+          status: 'On Track',
+          mentorId,
+          mustChangePassword: true,
+          dob: req.body.dob || null,
+          phone: application.phone,
+          location: application.location,
+          college: application.college,
+          degree: application.degree,
+          skills: application.skills,
+          experience: application.experience,
+          githubUrl: application.githubUrl,
+          linkedinUrl: application.linkedinUrl,
+          resumeUrl: application.resumeUrl,
+        }
+      });
+      
+      await takshaHR.logSystemAction('Intern Account Created', application.name, `Intern ID: \${internId}`, 'Taksha HR');
+      
+      // 6. Send Onboarding Email
+      await takshaHR.sendEmail({
+        to: application.email,
+        subject: `Welcome to Taksha Nexus 🎉 — Your Intern Account`,
+        html: `
+          <h2>Welcome aboard, \${application.name}!</h2>
+          <p>Your official intern account has been created.</p>
+          <p><strong>Intern ID:</strong> \${internId}</p>
+          <p><strong>Login Email:</strong> \${application.email}</p>
+          <p><strong>Temporary Password:</strong> \${tempPassword}</p>
+          <p>Please log in to your portal immediately to change your password and begin your onboarding.</p>
+          <a href="\${process.env.CLIENT_URL || 'http://localhost:5173'}/login" style="padding: 10px 20px; background: #000; color: #fff; text-decoration: none; border-radius: 5px;">Go to Portal</a>
+          <br/><br/>
+          <p>Best Regards,</p>
+          <p>Taksha HR System</p>
+        `
+      });
+      
+      return res.json({ success: true, user });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to process offer response' });
+  }
+});
 
 autoSubmitOverdueProjects();
 setInterval(autoSubmitOverdueProjects, 60 * 60 * 1000);

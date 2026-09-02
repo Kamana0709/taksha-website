@@ -18,6 +18,7 @@ const NAV_ITEMS = [
   { label: 'Process', path: '/process' },
   { label: 'About', path: '/about' },
   { label: 'Journal', path: '/journal' },
+  { label: 'Careers', path: '/careers' },
 ];
 
 export default function Navbar() {

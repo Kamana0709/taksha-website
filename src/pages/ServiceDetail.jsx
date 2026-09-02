@@ -1,6 +1,6 @@
-import { useParams, Navigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, CheckCircle2, Clock } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Clock, ArrowLeft } from 'lucide-react';
 import SEO from '../components/SEO/SEO';
 import StructuredData, { serviceSchema } from '../components/StructuredData/StructuredData';
 import SectionHeading from '../components/SectionHeading/SectionHeading';
@@ -19,7 +19,15 @@ export default function ServiceDetail() {
   const service = getServiceBySlug(slug);
 
   if (!service) {
-    return <Navigate to="/404" replace />;
+    return (
+      <section className="section section--lg" style={{ textAlign: 'center', paddingTop: 'calc(var(--space-24) + 64px)' }}>
+        <div className="container">
+          <h1 className="h2">Service not found</h1>
+          <p style={{ marginBlock: 'var(--space-6)' }}>This service page doesn't exist.</p>
+          <Button to="/services" variant="primary" icon={<ArrowLeft />} iconPosition="left">Back to Services</Button>
+        </div>
+      </section>
+    );
   }
 
   // Find related projects (just match first category or string match for simplicity)

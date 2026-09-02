@@ -20,9 +20,13 @@ export default function Login() {
     if (result.success) {
       if (result.role === 'MENTOR') {
         navigate('/mentor/dashboard');
+      } else if (result.role === 'SUPER_ADMIN') {
+        navigate('/superadmin/dashboard');
       } else {
         navigate('/intern/dashboard');
       }
+    } else if (result.requirePasswordChange) {
+      navigate('/change-password', { state: { tempToken: result.tempToken, email: result.email } });
     } else {
       setError(result.error || 'Invalid credentials');
       setIsLoading(false);

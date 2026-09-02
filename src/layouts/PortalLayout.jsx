@@ -21,13 +21,18 @@ const INTERN_NAV_LINKS = [
 const MENTOR_NAV_LINKS = [
   { path: '/mentor/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/mentor/interns', label: 'My Interns', icon: Users },
-  { path: '/mentor/applications', label: 'Applications', icon: Briefcase },
   { path: '/mentor/tasks', label: 'Tasks', icon: CheckSquare },
   { path: '/mentor/kanban', label: 'Kanban Board', icon: FolderKanban },
   { path: '/mentor/submissions', label: 'Submissions', icon: UploadCloud },
   { path: '/mentor/reviews', label: 'Reviews', icon: FileCheck },
   { path: '/mentor/messages', label: 'Messages', icon: MessageSquare },
   { path: '/mentor/reports', label: 'Reports', icon: BarChart2 }
+];
+
+const SUPERADMIN_NAV_LINKS = [
+  { path: '/superadmin/dashboard', label: 'Taksha HR', icon: BarChart2 },
+  { path: '/superadmin/applications', label: 'Applications Pipeline', icon: Briefcase },
+  { path: '/mentor/dashboard', label: 'Mentor Portal View', icon: LayoutDashboard },
 ];
 
 const INTERN_BOTTOM_LINKS = [
@@ -84,7 +89,7 @@ export default function PortalLayout({ role = 'intern' }) {
   }, [role, location.pathname]); // Refresh when navigating
 
 
-  const NAV_LINKS = role === 'mentor' ? MENTOR_NAV_LINKS : INTERN_NAV_LINKS;
+  const NAV_LINKS = role === 'superadmin' ? SUPERADMIN_NAV_LINKS : role === 'mentor' ? MENTOR_NAV_LINKS : INTERN_NAV_LINKS;
   
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
@@ -186,10 +191,10 @@ export default function PortalLayout({ role = 'intern' }) {
             </div>
             <div className="portal-user__info">
               <span className="portal-user__name">
-                {user?.name || (role === 'mentor' ? 'Mentor Kamana' : 'Kamana Agrawal')}
+                {user?.name || (role === 'superadmin' ? 'Super Admin' : role === 'mentor' ? 'Mentor Kamana' : 'Kamana Agrawal')}
               </span>
               <span className="portal-user__role">
-                {role === 'mentor' ? 'Lead Mentor' : 'Frontend Intern'}
+                {role === 'superadmin' ? 'Super Admin' : role === 'mentor' ? 'Lead Mentor' : 'Frontend Intern'}
               </span>
             </div>
           </div>
