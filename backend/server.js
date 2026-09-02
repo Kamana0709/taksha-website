@@ -1394,12 +1394,44 @@ app.post('/api/applications/:id/send-offer', authenticateToken, async (req, res)
       }
     });
 
-    await takshaHR.logSystemAction('Offer Sent', application.name, `Email sent to ${application.email}`, 'Super Admin');
+    // Prepare attachments
+    const pdfPath = path.join(__dirname, application.offerUrl);
+    let attachments = [];
+    if (fs.existsSync(pdfPath)) {
+      attachments.push({ filename: path.basename(pdfPath), path: pdfPath });
+    }
 
-    res.json(updatedApp);
+    const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://taksha-website.vercel.app';
+    const acceptLink = `${clientUrl}/offer-response/${application.id}`;
+
+    // Send the email with offer letter
+    const emailRes = await takshaHR.sendEmail({
+      to: application.email,
+      subject: `Official Offer Letter: ${application.roleTitle} at Taksha Nexus`,
+      html: `
+        <h2>Congratulations ${application.name}!</h2>
+        <p>We are delighted to extend an offer for the <strong>${application.roleTitle}</strong> internship at <strong>Taksha Nexus</strong>.</p>
+        <p>Your official offer letter is attached to this email.</p>
+        <p>Please review and record your decision on your secure offer portal:</p>
+        <p style="margin: 25px 0;">
+          <a href="${acceptLink}" style="padding: 12px 24px; background: #000000; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+            Review & Respond to Offer &rarr;
+          </a>
+        </p>
+        <p style="color: #666; font-size: 13px;">If the button above does not work, copy and paste this URL into your browser:<br/>${acceptLink}</p>
+        <br/>
+        <p>Best regards,</p>
+        <p><strong>Taksha HR Team</strong><br/>Taksha Nexus</p>
+      `,
+      attachments
+    });
+
+    await takshaHR.logSystemAction('Offer Sent', application.name, `Email sent to ${application.email} (Success: ${emailRes.success})`, 'Super Admin');
+
+    res.json({ ...updatedApp, emailSent: emailRes.success });
   } catch (err) {
     console.error('Error sending offer:', err);
-    res.status(500).json({ error: 'Failed to send offer letter' });
+    res.status(500).json({ error: 'Failed to send offer letter: ' + (err.message || err.toString()) });
   }
 });
 

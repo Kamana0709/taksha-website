@@ -447,14 +447,12 @@ export default function SuperAdminApplications() {
                       <Eye size={16} /> Preview Offer Letter
                     </a>
                     
-                    {selectedApp.offerStatus !== 'Sent' && (
-                      <button 
-                        onClick={() => sendOffer(selectedApp.id)}
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--color-ink)', color: 'var(--color-bg)', border: '2px solid var(--color-ink)', padding: '8px 16px', fontWeight: 'bold', cursor: 'pointer' }}
-                      >
-                        <Mail size={16} /> Send Email & Create Account
-                      </button>
-                    )}
+                    <button 
+                      onClick={() => sendOffer(selectedApp.id)}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--color-ink)', color: 'var(--color-bg)', border: '2px solid var(--color-ink)', padding: '8px 16px', fontWeight: 'bold', cursor: 'pointer' }}
+                    >
+                      <Mail size={16} /> {selectedApp.offerStatus === 'Sent' ? 'Resend Offer Email' : 'Send Offer Email'}
+                    </button>
                   </>
                 )}
               </div>
