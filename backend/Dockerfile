@@ -1,4 +1,4 @@
-FROM node:20-bullseye-slim
+FROM node:22-bookworm-slim
 # Install TeX Live and required fonts for PDF generation
 # We need xetex, latex-extra (for standalone, etc.), fonts-extra (for fontspec dependencies), and fonts-liberation
 RUN apt-get update && apt-get install -y --no-install-recommends \
