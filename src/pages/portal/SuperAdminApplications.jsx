@@ -3,6 +3,8 @@ import { Briefcase, Clock, Eye, CheckCircle, XCircle, Search, Filter, X, FileTex
 import SectionHeading from '../../components/SectionHeading/SectionHeading';
 import './MentorInternDetail.css'; // Reusing some modal styles if necessary
 
+const API_URL = import.meta.env.VITE_API_URL || '/api';
+
 export default function SuperAdminApplications() {
   const [applications, setApplications] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -25,7 +27,7 @@ export default function SuperAdminApplications() {
   const fetchApplications = async () => {
     try {
       const token = localStorage.getItem('taksha_token');
-      const response = await fetch('/api/applications', {
+      const response = await fetch(`${API_URL}/applications`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -46,7 +48,7 @@ export default function SuperAdminApplications() {
   const fetchSummary = async () => {
     try {
       const token = localStorage.getItem('taksha_token');
-      const response = await fetch('/api/reports/applications-summary', {
+      const response = await fetch(`${API_URL}/reports/applications-summary`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -61,7 +63,7 @@ export default function SuperAdminApplications() {
   const updateStatus = async (id, newStatus) => {
     try {
       const token = localStorage.getItem('taksha_token');
-      const response = await fetch(`/api/applications/${id}/status`, {
+      const response = await fetch(`${API_URL}/applications/${id}/status`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -88,7 +90,7 @@ export default function SuperAdminApplications() {
   const generateOffer = async (id) => {
     try {
       const token = localStorage.getItem('taksha_token');
-      const response = await fetch(`/api/applications/${id}/generate-offer`, {
+      const response = await fetch(`${API_URL}/applications/${id}/generate-offer`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -110,7 +112,7 @@ export default function SuperAdminApplications() {
   const sendOffer = async (id) => {
     try {
       const token = localStorage.getItem('taksha_token');
-      const response = await fetch(`/api/applications/${id}/send-offer`, {
+      const response = await fetch(`${API_URL}/applications/${id}/send-offer`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });

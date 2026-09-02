@@ -8,6 +8,8 @@ import {
 import { useAuth } from '../context/AuthContext';
 import './PortalLayout.css';
 
+const API_URL = import.meta.env.VITE_API_URL || '/api';
+
 const INTERN_NAV_LINKS = [
   { path: '/intern/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/intern/tasks', label: 'My Tasks', icon: CheckSquare },
@@ -56,7 +58,7 @@ export default function PortalLayout({ role = 'intern' }) {
       try {
         const token = localStorage.getItem('taksha_token');
         if (!token) return;
-        const res = await fetch('/api/messages/unread-count', {
+        const res = await fetch(`${API_URL}/messages/unread-count`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
@@ -73,7 +75,7 @@ export default function PortalLayout({ role = 'intern' }) {
       const fetchApps = async () => {
         try {
           const token = localStorage.getItem('taksha_token');
-          const res = await fetch('/api/applications', {
+          const res = await fetch(`${API_URL}/applications`, {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (res.ok) {

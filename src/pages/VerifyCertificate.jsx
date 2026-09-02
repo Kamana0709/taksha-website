@@ -20,7 +20,8 @@ const VerifyCertificate = () => {
   const verifyCertificate = async (id) => {
     setStatus('loading');
     try {
-      const response = await fetch(`/api/certificates/verify/${encodeURIComponent(id)}`);
+      const API_URL = import.meta.env.VITE_API_URL || '/api';
+      const response = await fetch(`${API_URL}/certificates/verify/${encodeURIComponent(id)}`);
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error('No certificate found with this number.');
