@@ -15,7 +15,8 @@ export default function OfferResponse() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/applications/${id}/offer-details`)
+    const API_URL = import.meta.env.VITE_API_URL || '';
+    fetch(`${API_URL}/api/applications/${id}/offer-details`)
       .then(res => {
         if (!res.ok) throw new Error('Offer not found or invalid');
         return res.json();
@@ -36,7 +37,8 @@ export default function OfferResponse() {
   const handleAction = async (action) => {
     setActioning(true);
     try {
-      const res = await fetch(`/api/applications/${id}/offer-response`, {
+      const API_URL = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${API_URL}/api/applications/${id}/offer-response`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action })

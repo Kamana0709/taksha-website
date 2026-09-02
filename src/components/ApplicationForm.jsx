@@ -23,7 +23,8 @@ export default function ApplicationForm({ role, onCancel }) {
     formData.append('roleTitle', role.title);
 
     try {
-      const response = await fetch('/api/applications', {
+      const API_URL = import.meta.env.VITE_API_URL || '';
+      const response = await fetch(`${API_URL}/api/applications`, {
         method: 'POST',
         body: formData, // Sending as multipart/form-data
       });
