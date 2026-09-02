@@ -101,7 +101,8 @@ export default function SuperAdminApplications() {
         fetchSummary();
         alert('Offer letter generated successfully!');
       } else {
-        alert('Failed to generate offer letter.');
+        const errText = await response.text();
+        alert(`Failed to generate offer letter. Server response: ${errText}`);
       }
     } catch (err) {
       console.error(err);

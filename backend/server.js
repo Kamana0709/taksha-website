@@ -1353,13 +1353,13 @@ app.post('/api/applications/:id/generate-offer', authenticateToken, async (req, 
     const localPdfPath = await takshaHR.generateOfferPDF(application);
 
     // Upload to Supabase to make it permanent and previewable
-    const { uploadFile, getSignedUrl } = require('./storage');
+    const { uploadFile, getPublicUrl } = require('./storage');
     const fileBuffer = fs.readFileSync(localPdfPath);
     const objectPath = `offer_${application.id}.pdf`;
     
     // Using submissions bucket since it's an application document
     await uploadFile('submissions', objectPath, fileBuffer, 'application/pdf');
-    const offerUrl = await getSignedUrl('submissions', objectPath, 315360000); // 10 years valid
+    const offerUrl = getPublicUrl('submissions', objectPath);
 
     // Update the application record
     const updatedApp = await prisma.application.update({
@@ -1377,7 +1377,7 @@ app.post('/api/applications/:id/generate-offer', authenticateToken, async (req, 
     res.json(updatedApp);
   } catch (err) {
     console.error('Error generating offer:', err);
-    res.status(500).json({ error: 'Failed to generate offer letter' });
+    res.status(500).json({ error: 'Failed to generate offer letter', details: err.message || err.toString() });
   }
 });
 
