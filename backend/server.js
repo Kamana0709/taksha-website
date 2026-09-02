@@ -640,14 +640,19 @@ app.post('/api/applications', upload.single('resume'), async (req, res) => {
 
     let resumeUrl = null;
     if (req.file) {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      const ext = path.extname(req.file.originalname);
-      const objectPath = `${uniqueSuffix}${ext}`;
-      
-      await uploadFile('submissions', objectPath, req.file.buffer, req.file.mimetype);
-      
-      const { getSignedUrl } = require('./storage');
-      resumeUrl = await getSignedUrl('submissions', objectPath, 315360000); // 10 years
+      try {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(req.file.originalname);
+        const objectPath = `${uniqueSuffix}${ext}`;
+        
+        await uploadFile('submissions', objectPath, req.file.buffer, req.file.mimetype);
+        
+        const { getSignedUrl } = require('./storage');
+        resumeUrl = await getSignedUrl('submissions', objectPath, 315360000); // 10 years
+      } catch (uploadErr) {
+        console.error('Resume upload failed (non-blocking):', uploadErr.message);
+        // Continue without resume — application data is more important
+      }
     }
 
     // 1. Save to Database
@@ -662,11 +667,11 @@ app.post('/api/applications', upload.single('resume'), async (req, res) => {
       }
     });
 
-    // 2. Taksha HR: Log Application Receipt
-    await takshaHR.logSystemAction('Received new application', name, `Role: ${roleTitle}`, 'Taksha HR');
+    // 2. Taksha HR: Log Application Receipt (fire-and-forget)
+    takshaHR.logSystemAction('Received new application', name, `Role: ${roleTitle}`, 'Taksha HR').catch(e => console.error('HR log failed:', e.message));
 
-    // 3. Taksha HR: Send Confirmation Email to Candidate
-    await takshaHR.sendEmail({
+    // 3. Taksha HR: Send Confirmation Email to Candidate (fire-and-forget)
+    takshaHR.sendEmail({
       to: email,
       subject: `Application Received: ${roleTitle} at Taksha Nexus`,
       html: `
@@ -677,10 +682,9 @@ app.post('/api/applications', upload.single('resume'), async (req, res) => {
         <p>Best Regards,</p>
         <p>Taksha HR System<br/>Taksha Nexus</p>
       `
-    });
+    }).catch(e => console.error('Email send failed:', e.message));
 
     // 4. Taksha HR: Async AI Evaluation
-    // We don't await this so the user gets a fast response
     takshaHR.evaluateApplication(application.id).catch(console.error);
 
     res.status(201).json({ success: true, application });

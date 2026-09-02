@@ -27,7 +27,8 @@ export default function SuperAdminDashboard() {
   const fetchSummary = async () => {
     try {
       const token = localStorage.getItem('taksha_token');
-      const response = await fetch('/api/reports/applications-summary', {
+      const API_URL = import.meta.env.VITE_API_URL || '/api';
+      const response = await fetch(`${API_URL}/reports/applications-summary`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
