@@ -32,10 +32,12 @@ export default function ApplicationForm({ role, onCancel }) {
       if (response.ok) {
         setIsApplied(true);
       } else {
-        setErrorMsg('Failed to submit application. Please try again later.');
+        let errData = {};
+        try { errData = await response.json(); } catch(e) {}
+        setErrorMsg(`Failed to submit application. ${errData.details ? 'Error: ' + errData.details : 'Please try again later.'}`);
       }
     } catch (err) {
-      setErrorMsg('Network error. Please try again.');
+      setErrorMsg(`Network error. ${err.message}`);
     } finally {
       setIsSubmitting(false);
     }

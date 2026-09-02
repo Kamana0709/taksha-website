@@ -624,7 +624,7 @@ app.post('/api/applications', upload.single('resume'), async (req, res) => {
     res.status(201).json({ success: true, application });
   } catch (err) {
     console.error('Failed to submit application:', err);
-    res.status(500).json({ error: 'Failed to submit application' });
+    res.status(500).json({ error: 'Failed to submit application', details: err.message || err.toString() });
   }
 });
 
