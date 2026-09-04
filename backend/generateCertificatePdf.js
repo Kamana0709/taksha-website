@@ -61,10 +61,11 @@ function generateCertificatePdf(data, destPath) {
       fs.writeFileSync(texFile, newContent, 'utf8');
 
       // Copy assets
-      const logoSrc = path.join(__dirname, 'assets', 'certificate', 'logo.png');
-      const stampSrc = path.join(__dirname, 'assets', 'certificate', 'stamp.png');
-      fs.copyFileSync(logoSrc, path.join(tmpDir, 'logo.png'));
-      fs.copyFileSync(stampSrc, path.join(tmpDir, 'stamp.png'));
+      // (Logo and stamp copy logic removed; provide images when ready)
+      // const logoSrc = path.join(__dirname, 'assets', 'certificate', 'logo.png');
+      // const stampSrc = path.join(__dirname, 'assets', 'certificate', 'stamp.png');
+      // fs.copyFileSync(logoSrc, path.join(tmpDir, 'logo.png'));
+      // fs.copyFileSync(stampSrc, path.join(tmpDir, 'stamp.png'));
 
       // Copy fonts folder too, since the .tex template loads Poppins via a
       // path relative to the xelatex working directory (this tmpDir)

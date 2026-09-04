@@ -46,7 +46,7 @@ export default function Process() {
           </div>
         </header>
 
-        <section className="section" style={{ background: 'var(--color-surface)', position: 'relative' }}>
+        <section className="section" style={{ background: 'var(--color-surface-inset)', position: 'relative', borderTop: 'var(--border-width) solid var(--color-ink)', borderBottom: 'var(--border-width) solid var(--color-ink)' }}>
           <div className="container">
             <div className="timeline-container" ref={containerRef}>
               <div className="timeline-line-bg" aria-hidden="true" />

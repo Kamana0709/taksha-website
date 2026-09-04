@@ -1,5 +1,5 @@
 /* ==========================================================================
-   BUTTON — Neo-Brutalist Theme
+   BUTTON — Tactile Premium Hybrid
    Variants: primary, secondary, ghost, icon
    Sizes: sm, md, lg
    ========================================================================== */
@@ -16,30 +16,30 @@
   cursor: pointer;
   text-decoration: none;
   white-space: nowrap;
-  transition: 
-    transform 100ms var(--ease-out-quart), 
-    background-color var(--duration-fast) ease, 
-    color var(--duration-fast) ease,
-    box-shadow 100ms var(--ease-out-quart);
   position: relative;
-  box-shadow: var(--shadow-sm);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  
+  /* Skeuomorphic tactile transition */
+  transition: 
+    transform var(--duration-fast) var(--ease-tactile), 
+    box-shadow var(--duration-fast) var(--ease-tactile),
+    background-color var(--duration-fast) ease;
 }
 
 /* Sizes */
 .btn--sm {
-  padding: var(--space-2) var(--space-6);
+  padding: var(--space-2) var(--space-4);
   font-size: var(--text-xs);
 }
 
 .btn--md {
-  padding: var(--space-3) var(--space-8);
+  padding: var(--space-3) var(--space-6);
   font-size: var(--text-sm);
 }
 
 .btn--lg {
-  padding: var(--space-4) var(--space-12);
+  padding: var(--space-4) var(--space-8);
   font-size: var(--text-base);
 }
 
@@ -47,39 +47,43 @@
 .btn--primary {
   background: var(--color-accent);
   color: var(--color-ink);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-neo-md);
 }
 
 .btn--primary:hover {
   background: var(--color-accent-hover);
   transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-neo-lg);
 }
 
 .btn--primary:active {
-  transform: translate(4px, 4px);
-  box-shadow: none;
+  background: var(--color-accent-active);
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-neo-active);
+  transition: transform var(--duration-snap) var(--ease-smooth), box-shadow var(--duration-snap) var(--ease-smooth);
 }
 
 /* Secondary variant */
 .btn--secondary {
   background: var(--color-surface);
   color: var(--color-ink);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-neo-sm);
 }
 
 .btn--secondary:hover {
-  background: var(--color-accent-soft);
-  transform: translate(-2px, -2px);
-  box-shadow: var(--shadow-md);
+  background: var(--color-surface-inset);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-neo-md);
 }
 
 .btn--secondary:active {
-  transform: translate(2px, 2px);
-  box-shadow: none;
+  background: var(--color-surface-inset);
+  transform: translate(1px, 1px);
+  box-shadow: var(--shadow-neo-active);
+  transition: transform var(--duration-snap) var(--ease-smooth), box-shadow var(--duration-snap) var(--ease-smooth);
 }
 
-/* Ghost variant (No shadow until hover in neo-brutalism) */
+/* Ghost variant */
 .btn--ghost {
   background: transparent;
   color: var(--color-ink);
@@ -91,19 +95,34 @@
 .btn--ghost:hover {
   background: var(--color-accent-soft);
   border-color: var(--color-ink);
-  box-shadow: var(--shadow-sm);
-  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-neo-sm);
+  transform: translate(-1px, -1px);
 }
 
 .btn--ghost:active {
-  transform: translate(0, 0);
+  background: var(--color-accent-soft);
+  transform: translate(1px, 1px);
   box-shadow: none;
+  transition: transform var(--duration-snap) var(--ease-smooth), box-shadow var(--duration-snap) var(--ease-smooth);
 }
 
 /* Icon variant */
 .btn--icon {
   padding: var(--space-3);
   border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-neo-sm);
+  background: var(--color-surface);
+}
+
+.btn--icon:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-neo-md);
+}
+
+.btn--icon:active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-neo-active);
+  transition: transform var(--duration-snap) var(--ease-smooth), box-shadow var(--duration-snap) var(--ease-smooth);
 }
 
 .btn--icon.btn--sm {
@@ -116,18 +135,21 @@
 
 /* Focus state */
 .btn:focus-visible {
-  outline: 4px solid var(--color-accent-soft);
-  outline-offset: 2px;
+  outline: 4px solid var(--color-accent);
+  outline-offset: 4px;
 }
 
 /* Disabled state */
 .btn:disabled,
 .btn--disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
   pointer-events: none;
   box-shadow: none;
   transform: none;
+  background: var(--color-surface-inset);
+  color: var(--color-text-tertiary);
+  border-color: var(--color-text-tertiary);
 }
 
 /* Loading state */
@@ -156,18 +178,18 @@
 
 /* Icon inside button */
 .btn__icon {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
   stroke-width: 2.5px;
 }
 
 .btn--sm .btn__icon {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
 }
 
 .btn--lg .btn__icon {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
 }

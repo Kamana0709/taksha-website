@@ -40,10 +40,10 @@ export default function ServicesIndex() {
           </div>
         </div>
       </section>
-      <section className="section section--lg" style={{ textAlign: 'center', background: 'var(--color-surface)' }}>
-        <div className="container">
-          <h2 className="h2" style={{ marginBottom: 'var(--space-4)' }}>Not sure which service you need?</h2>
-          <p style={{ marginBottom: 'var(--space-8)', color: 'var(--color-text-secondary)' }}>Tell us about your project and we'll recommend the right approach.</p>
+      <section className="cta-section-services">
+        <div className="cta-section-services__inner">
+          <h2>Not sure which service you need?</h2>
+          <p style={{ marginBottom: 'var(--space-8)', color: 'var(--color-text-secondary)', fontSize: 'var(--text-lg)' }}>Tell us about your project and we'll recommend the right approach.</p>
           <Button to="/contact" variant="primary" size="lg" icon={<ArrowRight />}>Start a Conversation</Button>
         </div>
       </section>

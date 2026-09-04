@@ -3,7 +3,7 @@ const { createClient } = require('@supabase/supabase-js');
 // These must be provided in the environment:
 // SUPABASE_URL: e.g. https://mgynwbcqmzpbcwdxnlsm.supabase.co
 // SUPABASE_SERVICE_ROLE_KEY: Service role key for backend-only usage to bypass RLS
-const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseUrl = process.env.SUPABASE_URL?.replace(/\/$/, '');
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Create a single supabase client for interacting with your database

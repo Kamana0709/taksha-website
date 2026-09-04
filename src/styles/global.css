@@ -52,29 +52,29 @@
 }
 
 /* -----------------------------------------------------------------------
-   Section Spacing
+   Section Spacing (Efficient Layout)
    ----------------------------------------------------------------------- */
 .section {
-  padding-block: var(--space-24);
+  padding-block: var(--space-12);
 }
 
 .section--lg {
-  padding-block: var(--space-32);
+  padding-block: var(--space-16);
 }
 
 .section--sm {
-  padding-block: var(--space-16);
+  padding-block: var(--space-8);
 }
 
 @media (max-width: 767px) {
   .section {
-    padding-block: var(--space-16);
+    padding-block: var(--space-8);
   }
   .section--lg {
-    padding-block: var(--space-24);
+    padding-block: var(--space-12);
   }
   .section--sm {
-    padding-block: var(--space-12);
+    padding-block: var(--space-6);
   }
 }
 
@@ -145,10 +145,79 @@
 }
 
 /* -----------------------------------------------------------------------
+   Tactile & Hybrid UI Utility Classes
+   ----------------------------------------------------------------------- */
+   
+/* Base Neo-Brutalist Surface */
+.tactile-surface {
+  background: var(--color-surface);
+  border: var(--border-thick) solid var(--color-ink);
+  box-shadow: var(--shadow-neo-md);
+  border-radius: var(--radius-sm);
+  transition: transform var(--duration-fast) var(--ease-tactile), box-shadow var(--duration-fast) var(--ease-tactile);
+}
+
+.tactile-surface:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-neo-lg);
+}
+
+/* Tactile Press (Skeuomorphic Interaction) */
+.tactile-press {
+  cursor: pointer;
+  user-select: none;
+}
+
+.tactile-press:active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-neo-active);
+  transition: transform var(--duration-snap) var(--ease-smooth), box-shadow var(--duration-snap) var(--ease-smooth);
+}
+
+/* Claymorphic Panel (Soft, 3D volume) */
+.clay-panel {
+  background: var(--color-surface);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-clay-light);
+  border: var(--border-width) solid rgba(0,0,0,0.05); /* Very subtle border for clay */
+  transition: transform var(--duration-base) var(--ease-spring);
+}
+
+.clay-panel--yellow {
+  background: var(--color-accent);
+  box-shadow: var(--shadow-clay-yellow);
+  border-color: rgba(0,0,0,0.1);
+}
+
+/* Neumorphic Inset (For inputs, recessed areas) */
+.neu-inset {
+  background: var(--color-surface-inset);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-neu-recessed);
+  border: 1px solid rgba(255,255,255,0.5);
+}
+
+/* Highlight Block for Editorial Typography */
+.highlight-block {
+  display: inline-block;
+  background: var(--color-accent);
+  color: var(--color-ink);
+  padding: 0 var(--space-2);
+  border: var(--border-thick) solid var(--color-ink);
+  box-shadow: var(--shadow-neo-sm);
+  transform: rotate(-2deg);
+  border-radius: var(--radius-sm);
+}
+
+/* -----------------------------------------------------------------------
    App Root
    ----------------------------------------------------------------------- */
 body {
   position: relative;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  /* The font family is applied in typography.css, this is a fallback */
+  font-family: var(--font-body);
 }
 
 body::before {
@@ -157,9 +226,10 @@ body::before {
   inset: 0;
   pointer-events: none;
   z-index: -1;
-  background-image: radial-gradient(var(--color-border) 1.5px, transparent 1.5px);
+  /* Very subtle drafting-paper dot pattern to give a crafted feel */
+  background-image: radial-gradient(var(--color-text-tertiary) 1px, transparent 1px);
   background-size: 24px 24px;
-  opacity: 0.2;
+  opacity: 0.15;
 }
 
 #root {
@@ -176,32 +246,34 @@ main {
    Selection Color
    ----------------------------------------------------------------------- */
 ::selection {
-  background-color: var(--color-accent-soft);
-  color: var(--color-text-primary);
+  background-color: var(--color-accent);
+  color: var(--color-ink);
 }
 
 /* -----------------------------------------------------------------------
-   Scrollbar Styling (subtle, branded)
+   Scrollbar Styling (Tactile and Bold)
    ----------------------------------------------------------------------- */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 12px;
 }
 
 ::-webkit-scrollbar-track {
   background: var(--color-bg);
+  border-left: 2px solid var(--color-ink);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border-strong);
+  background: var(--color-ink);
+  border: 2px solid var(--color-bg);
   border-radius: var(--radius-full);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-tertiary);
+  background: var(--color-text-secondary);
 }
 
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-border-strong) var(--color-bg);
+  scrollbar-color: var(--color-ink) var(--color-bg);
 }

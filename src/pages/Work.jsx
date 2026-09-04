@@ -117,14 +117,18 @@ function WorkProjectCard({ project }) {
           {project.name.charAt(0)}
         </div>
         <div className="work-card__overlay">
-          <ArrowUpRight size={24} />
         </div>
         <ConceptBadge className="work-card__badge" />
       </div>
       <div className="work-card__info">
         <h3 className="work-card__name">{project.name}</h3>
         <p className="work-card__tagline">{project.tagline}</p>
-        <span className="work-card__category">{project.industry}</span>
+        <div className="work-card__footer">
+          <span className="work-card__category">{project.industry}</span>
+          <div className="work-card__arrow">
+            <ArrowUpRight size={16} />
+          </div>
+        </div>
       </div>
     </Link>
   );

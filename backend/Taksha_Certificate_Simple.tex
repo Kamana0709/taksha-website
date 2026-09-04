@@ -66,8 +66,18 @@
  % ---------- CONTENT ----------
  % Center is at x = 4.135
 
+ % Cert ID (Top Left)
+ \node[anchor=north west, text=bodycol] at (0.8, 11.1) {%
+  {\fontsize{9}{11}\selectfont\bfseries ID:} {\fontsize{9}{11}\selectfont \certID}
+ };
+
+ % Udyam Number (Top Right)
+ \node[anchor=north east, text=bodycol] at (7.47, 11.1) {%
+  {\fontsize{9}{11}\selectfont\bfseries REG:} {\fontsize{9}{11}\selectfont \udyamNumber}
+ };
+
  % Logo
- \node[anchor=north] at (4.135, 11.1) {\includegraphics[height=0.9in]{\logoFile}};
+ % \node[anchor=north] at (4.135, 11.1) {\includegraphics[height=0.9in]{\logoFile}};
 
  % Title
  \node[anchor=north, text=navy] at (4.135, 9.7) {%
@@ -125,7 +135,7 @@
  % --- BOTTOM SECTION ---
  
  % Stamp (Center)
- \node[anchor=south] at (4.135, 1.25) {\includegraphics[width=2.5in]{\stampFile}};
+ % \node[anchor=south] at (4.135, 1.25) {\includegraphics[width=2.5in]{\stampFile}};
 
  % Date (Left)
  \node[anchor=south] at (2.0, 1.8) {%

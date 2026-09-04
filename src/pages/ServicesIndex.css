@@ -1,6 +1,94 @@
-.services-list { display: flex; flex-direction: column; gap: var(--space-16); }
-.service-row { display: grid; grid-template-columns: 1fr; gap: var(--space-8); align-items: center; }
-@media (min-width: 768px) { .service-row { grid-template-columns: 1fr 1fr; } .service-row--reverse { direction: rtl; } .service-row--reverse > * { direction: ltr; } }
-.service-row__visual { aspect-ratio: 4/3; border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; }
-.service-row__content { display: flex; flex-direction: column; gap: var(--space-4); }
-.service-row__content h2 { margin-bottom: var(--space-2); }
+/* ==========================================================================
+   SERVICES INDEX PAGE
+   Tactile Premium Hybrid
+   ========================================================================== */
+
+.services-list { 
+  display: flex; 
+  flex-direction: column; 
+  gap: var(--space-8); 
+  margin-top: var(--space-12);
+}
+
+.service-row { 
+  display: grid; 
+  grid-template-columns: 1fr; 
+  gap: var(--space-8); 
+  align-items: center; 
+  padding: var(--space-8);
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-ink);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-neo-md);
+  transition: transform var(--duration-base) var(--ease-tactile),
+              box-shadow var(--duration-base) var(--ease-tactile);
+}
+
+.service-row:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-neo-lg);
+}
+
+@media (min-width: 768px) { 
+  .service-row { 
+    grid-template-columns: 1fr 1fr; 
+  } 
+  .service-row--reverse { 
+    direction: rtl; 
+  } 
+  .service-row--reverse > * { 
+    direction: ltr; 
+  } 
+}
+
+.service-row__visual { 
+  aspect-ratio: 4/3; 
+  border-radius: var(--radius-lg); 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  border: var(--border-thick) solid var(--color-ink);
+  background: var(--color-surface-inset);
+}
+
+.service-row__content { 
+  display: flex; 
+  flex-direction: column; 
+  gap: var(--space-4); 
+}
+
+.service-row__content h2 { 
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 800;
+  color: var(--color-ink);
+  margin-bottom: var(--space-2); 
+  letter-spacing: var(--tracking-tight);
+}
+
+.service-row__content p {
+  color: var(--color-text-secondary);
+  font-size: var(--text-lg);
+  line-height: var(--line-height-relaxed);
+}
+
+.cta-section-services {
+  text-align: center; 
+  background: var(--color-surface-inset);
+  padding: var(--space-24) var(--space-4);
+  border-top: var(--border-width) solid var(--color-ink);
+  border-bottom: var(--border-width) solid var(--color-ink);
+}
+
+.cta-section-services__inner {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.cta-section-services h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-4xl);
+  font-weight: 800;
+  color: var(--color-ink);
+  margin-bottom: var(--space-4);
+}

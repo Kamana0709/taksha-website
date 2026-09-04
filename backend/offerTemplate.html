@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Internship Offer Letter - Taksha Nexus</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+    color: #1c2b39;
+    background: #ffffff;
+  }
+  .page {
+    width: 100%;
+    padding: 8mm 16mm 8mm 16mm;
+  }
+  .topbar {
+    height: 6px;
+    background: linear-gradient(90deg, #0d2438 0%, #0d2438 60%, #f5a623 60%, #f5a623 100%);
+    margin: 0 -16mm 5mm -16mm;
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #0d2438;
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+  }
+  .header img.logo {
+    height: 52px;
+  }
+  .header .company-meta {
+    text-align: right;
+    font-size: 9.5px;
+    line-height: 1.45;
+    color: #445565;
+  }
+  .header .company-meta strong {
+    color: #0d2438;
+    font-size: 10.5px;
+  }
+  .doc-title {
+    text-align: center;
+    margin: 0 0 14px 0;
+  }
+  .doc-title h1 {
+    font-size: 17px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #0d2438;
+    margin: 0;
+    border-bottom: 2px solid #f5a623;
+    display: inline-block;
+    padding-bottom: 3px;
+  }
+  .ref-date {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11.5px;
+    margin-bottom: 12px;
+    color: #33455a;
+  }
+  .placeholder {
+    /* background: #fff4de; border-bottom: 1px dashed #f5a623; color: #8a5a00; */
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .letter-body {
+    font-size: 11.5px;
+    line-height: 1.55;
+    text-align: justify;
+    color: #1c2b39;
+  }
+  .letter-body p {
+    margin: 0 0 8px 0;
+  }
+  .salutation {
+    margin-bottom: 10px;
+    font-size: 11.5px;
+    line-height: 1.5;
+  }
+  table.terms {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 12px 0;
+    font-size: 11px;
+  }
+  table.terms td {
+    border: 1px solid #d6dee5;
+    padding: 4px 8px;
+    vertical-align: top;
+  }
+  table.terms td.label {
+    background: #f4f7f9;
+    font-weight: 600;
+    width: 32%;
+    color: #0d2438;
+  }
+  ul.conditions {
+    margin: 4px 0 10px 20px;
+    padding: 0;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  ul.conditions li {
+    margin-bottom: 4px;
+  }
+  .closing {
+    margin-top: 10px;
+    font-size: 11.5px;
+    line-height: 1.55;
+  }
+  .signoff {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 18px;
+  }
+  .signoff .from {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .signoff .from strong {
+    color: #0d2438;
+    font-size: 12px;
+  }
+  .sig-stamp-group {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+  }
+  .stamp-wrap img {
+    width: 78px;
+    display: block;
+    opacity: 0.95;
+  }
+  .sig-block {
+    text-align: center;
+    width: 170px;
+  }
+  .sig-block img.signature {
+    height: 46px;
+    display: block;
+    margin: 0 auto -4px auto;
+  }
+  .sig-block .sig-line {
+    border-top: 1px solid #33455a;
+    margin-top: 4px;
+    padding-top: 3px;
+    font-size: 10.5px;
+    color: #33455a;
+  }
+  .acknowledgement {
+    margin-top: 22px;
+    border-top: 1px dashed #b9c3cc;
+    padding-top: 10px;
+    font-size: 11px;
+    color: #445565;
+    line-height: 1.5;
+  }
+  .ack-sign-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    font-size: 11px;
+  }
+  .ack-sign-row div {
+    width: 45%;
+    border-top: 1px solid #445565;
+    padding-top: 3px;
+  }
+  .footer {
+    text-align: center;
+    font-size: 9px;
+    color: #8496a4;
+    border-top: 1px solid #e2e8ed;
+    padding-top: 5px;
+    margin-top: 16px;
+  }
+  .tagline {
+    font-size: 9px;
+    color: #f5a623;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="topbar"></div>
+
+  <div class="header">
+    <img class="logo" src="{{LOGO_SRC}}" alt="Taksha Nexus Logo">
+    <div class="company-meta">
+      <strong>Taksha Nexus</strong><br>
+      Crafting Digital Excellence<br>
+      UDYAM Reg. No.: UDYAM-OD-19-0177339<br>
+      Email: {{COMPANY_EMAIL}} &nbsp;|&nbsp; Phone: {{COMPANY_PHONE}}<br>
+      Web: {{COMPANY_WEBSITE}}
+    </div>
+  </div>
+
+  <div class="doc-title">
+    <h1>Internship Offer Letter</h1>
+  </div>
+
+  <div class="ref-date">
+    <span>Ref No.: <span class="placeholder">{{REF_NUMBER}}</span></span>
+    <span>Date: <span class="placeholder">{{CURRENT_DATE}}</span></span>
+  </div>
+
+  <div class="salutation">
+    To,<br>
+    <strong><span class="placeholder">{{INTERN_FULL_NAME}}</span></strong><br>
+    <span class="placeholder">{{INTERN_ADDRESS}}</span><br>
+    <span class="placeholder">{{INTERN_CONTACT}}</span>
+  </div>
+
+  <div class="letter-body">
+    <p><strong>Subject: Offer of Internship &ndash; <span class="placeholder">{{ROLE_TITLE}}</span></strong></p>
+
+    <p>Dear <span class="placeholder">{{INTERN_FIRST_NAME}}</span>,</p>
+
+    <p>We are pleased to offer you an internship position as <strong><span class="placeholder">{{ROLE_TITLE}}</span></strong> at <strong>Taksha Nexus</strong>. We were impressed with your background and enthusiasm during the selection process, and we believe your skills will be a valuable addition to our team.</p>
+
+    <p>This letter outlines the terms and conditions of your internship. Please review them carefully and sign a copy of this letter to indicate your acceptance.</p>
+
+    <table class="terms">
+      <tr>
+        <td class="label">Internship Role</td>
+        <td><span class="placeholder">{{ROLE_TITLE}}</span></td>
+      </tr>
+      <tr>
+        <td class="label">Department / Team</td>
+        <td><span class="placeholder">{{DEPARTMENT}}</span></td>
+      </tr>
+      <tr>
+        <td class="label">Duration</td>
+        <td><span class="placeholder">{{START_DATE}}</span> to <span class="placeholder">{{END_DATE}}</span> (<span class="placeholder">{{DURATION}}</span> months)</td>
+      </tr>
+      <tr>
+        <td class="label">Work Location</td>
+        <td><span class="placeholder">{{LOCATION}}</span></td>
+      </tr>
+      <tr>
+        <td class="label">Working Hours</td>
+        <td><span class="placeholder">{{WORKING_DAYS}}</span>, <span class="placeholder">{{WORKING_HOURS}}</span></td>
+      </tr>
+      <tr>
+        <td class="label">Stipend</td>
+        <td><span class="placeholder">{{STIPEND}}</span></td>
+      </tr>
+      <tr>
+        <td class="label">Reporting Manager</td>
+        <td><span class="placeholder">{{REPORTING_MANAGER}}</span></td>
+      </tr>
+    </table>
+
+    <p><strong>Terms &amp; Conditions:</strong></p>
+    <ul class="conditions">
+      <li>This internship is for a fixed duration as mentioned above and does not guarantee any full-time employment offer upon completion.</li>
+      <li>You are expected to maintain confidentiality regarding all proprietary information, client data, and business processes of Taksha Nexus, both during and after the internship period.</li>
+      <li>You will be required to comply with the company&rsquo;s code of conduct, policies, and reporting structure as communicated by your reporting manager.</li>
+      <li>Either party may terminate this internship agreement by providing <span class="placeholder">{{NOTICE_PERIOD}}</span> written notice.</li>
+      <li>Upon successful completion, you will be issued an internship completion certificate and a letter of recommendation, subject to satisfactory performance.</li>
+    </ul>
+
+    <p class="closing">Please confirm your acceptance of this offer by signing and returning a copy of this letter on or before <span class="placeholder">{{ACCEPTANCE_DEADLINE}}</span>. We look forward to having you on board and are confident this internship will be a mutually rewarding experience.</p>
+
+    <p>If you have any questions regarding this offer, please feel free to reach out to us at <span class="placeholder">{{COMPANY_EMAIL}}</span>.</p>
+
+    <p style="margin-bottom:0;">Warm regards,</p>
+  </div>
+
+  <div class="signoff">
+    <div class="from">
+      <strong>For Taksha Nexus</strong><br>
+      <span class="placeholder">{{AUTH_SIGNATORY}}</span><br>
+      <span class="placeholder">{{AUTH_DESIGNATION}}</span><br>
+      Taksha Nexus &ndash; Crafting Digital Excellence
+    </div>
+    <div class="sig-stamp-group">
+      <div class="sig-block">
+        <img class="signature" src="{{SIGNATURE_SRC}}" alt="Authorized Signature">
+        <div class="sig-line">Authorized Signatory</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acknowledgement">
+    <strong>Acceptance of Offer</strong><br>
+    I, <span class="placeholder">{{INTERN_FULL_NAME}}</span>, accept the internship offer as per the terms and conditions mentioned above.
+    <div class="ack-sign-row">
+      <div>Signature of Intern</div>
+      <div>Date</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Taksha Nexus &nbsp;&bull;&nbsp; UDYAM-OD-19-0177339 &nbsp;&bull;&nbsp; <span class="tagline">CRAFTING DIGITAL EXCELLENCE</span>
+  </div>
+</div>
+</body>
+</html>

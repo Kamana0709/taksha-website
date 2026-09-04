@@ -1,9 +1,7 @@
-/**
- * Home Page — Primary landing page
- * PRD §9 — 8 sections: Hero, Craft Philosophy, Featured Projects,
- * Services Overview, Process Preview, Why Taksha Nexus, Brand Manifesto, Final CTA
- */
-import { useEffect, useRef, useState } from 'react';
+/* =======================================================================
+   Home Page — Tactile Premium Hybrid Redesign
+   ======================================================================= */
+import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useInView } from 'framer-motion';
 import { ArrowRight, ArrowDown, Palette, Layout, Code, Bot } from 'lucide-react';
@@ -15,36 +13,39 @@ import ConceptBadge from '../components/ConceptBadge/ConceptBadge';
 import { usePrefersReducedMotion } from '../context/MotionPreferenceContext';
 import './Home.css';
 
+// Lazy load ThreeHero to avoid blocking initial render
+const ThreeHero = lazy(() => import('../components/ThreeHero/ThreeHero'));
+
 /* -----------------------------------------------------------------------
-   Featured project data (subset for home page)
+   Featured project data
    ----------------------------------------------------------------------- */
 const FEATURED_PROJECTS = [
   {
     slug: 'novacare',
     name: 'NovaCare',
     tagline: 'Patient-first healthcare platform',
-    category: 'HEALTHCARE · UI/UX · BRAND',
+    category: 'HEALTHCARE · UI/UX',
     color: 'var(--color-card-mint)',
   },
   {
     slug: 'flowos',
     name: 'FlowOS',
     tagline: 'Workflow automation SaaS dashboard',
-    category: 'SAAS · DASHBOARD · UI/UX',
+    category: 'SAAS · DASHBOARD',
     color: 'var(--color-card-lilac)',
   },
   {
     slug: 'aure-home',
     name: 'Aure Home',
     tagline: 'Boutique hotel booking experience',
-    category: 'HOSPITALITY · WEBSITE · BRAND',
-    color: 'var(--color-card-yellow)',
+    category: 'HOSPITALITY · BRAND',
+    color: 'var(--color-accent)',
   },
   {
     slug: 'finora',
     name: 'Finora',
     tagline: 'Personal finance & budgeting app',
-    category: 'FINTECH · APP · UI/UX',
+    category: 'FINTECH · APP',
     color: 'var(--color-card-blue)',
   },
 ];
@@ -64,7 +65,7 @@ const SERVICES = [
   },
   {
     icon: Code,
-    title: 'Website Development',
+    title: 'Engineering',
     description: 'Fast, accessible, precision-built React frontends.',
     path: '/services/website-design',
   },
@@ -78,9 +79,9 @@ const SERVICES = [
 
 const PROCESS_STEPS = [
   { number: '01', label: 'Discover' },
-  { number: '02', label: 'Design' },
-  { number: '03', label: 'Prototype' },
-  { number: '04', label: 'Develop' },
+  { number: '02', label: 'Shape' },
+  { number: '03', label: 'Build' },
+  { number: '04', label: 'Refine' },
   { number: '05', label: 'Launch' },
 ];
 
@@ -100,7 +101,7 @@ const fadeUp = {
   visible: (i = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, delay: i * 0.08, ease: [0.25, 1, 0.5, 1] },
+    transition: { duration: 0.5, delay: i * 0.08, ease: [0.34, 1.56, 0.64, 1] }, // tactile ease
   }),
 };
 
@@ -124,28 +125,13 @@ export default function Home() {
       />
       <StructuredData schema={localBusinessSchema()} />
 
-      {/* 9.1.1 Hero */}
       <HeroSection prefersReducedMotion={prefersReducedMotion} />
-
-      {/* 9.1.2 Craft Philosophy */}
       <CraftPhilosophy />
-
-      {/* 9.1.3 Featured Projects */}
       <FeaturedProjects />
-
-      {/* 9.1.4 Services Overview */}
       <ServicesOverview />
-
-      {/* 9.1.5 Process Preview */}
       <ProcessPreview />
-
-      {/* 9.1.6 Why Taksha Nexus */}
       <WhyTaksha />
-
-      {/* 9.1.7 Brand Manifesto */}
       <BrandManifesto prefersReducedMotion={prefersReducedMotion} />
-
-      {/* 9.1.8 Final CTA */}
       <FinalCTA />
     </>
   );
@@ -170,17 +156,16 @@ function HeroSection({ prefersReducedMotion }) {
             animate="visible"
             variants={staggerContainer}
           >
-            <motion.span className="hero__eyebrow" variants={fadeUp} custom={0}>
-              Digital Craft Studio
-            </motion.span>
-            <motion.h1 className="hero__headline" variants={fadeUp} custom={1}>
-              Crafting Digital Excellence.
+            <motion.h1 className="hero__headline" variants={fadeUp} custom={0}>
+              <span className="hero__headline-top">CRAFTING</span><br/>
+              <span className="hero__headline-bottom highlight-block">DIGITAL</span><br/>
+              <span className="hero__headline-top">EXCELLENCE.</span>
             </motion.h1>
-            <motion.p className="hero__subhead" variants={fadeUp} custom={2}>
+            <motion.p className="hero__subhead" variants={fadeUp} custom={1}>
               Taksha Nexus blends branding, design, engineering, and AI to build digital
               experiences ambitious businesses are proud to own.
             </motion.p>
-            <motion.div className="hero__ctas" variants={fadeUp} custom={3}>
+            <motion.div className="hero__ctas" variants={fadeUp} custom={2}>
               <Button to="/work" variant="primary" size="lg" icon={<ArrowRight />}>
                 View Our Work
               </Button>
@@ -192,19 +177,21 @@ function HeroSection({ prefersReducedMotion }) {
 
           <motion.div
             className="hero__visual"
-            initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 1, 0.5, 1] }}
+            initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.9, y: 50 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2, ease: [0.34, 1.56, 0.64, 1] }}
             aria-hidden="true"
           >
-            <div className="hero__visual-shape">
-              <HeroVisualSVG prefersReducedMotion={prefersReducedMotion} />
+            <div className="hero__visual-canvas-container">
+               <Suspense fallback={null}>
+                 <ThreeHero prefersReducedMotion={prefersReducedMotion} />
+               </Suspense>
             </div>
           </motion.div>
         </div>
       </div>
 
-      <button className="hero__scroll-cue" onClick={scrollToNext} aria-label="Scroll to next section">
+      <button className="hero__scroll-cue tactile-press" onClick={scrollToNext} aria-label="Scroll to next section">
         <span>Scroll to explore</span>
         <ArrowDown className="hero__scroll-cue-arrow" />
       </button>
@@ -212,92 +199,27 @@ function HeroSection({ prefersReducedMotion }) {
   );
 }
 
-/* Abstract geometric SVG — neo-brutalist decorative hero visual */
-function HeroVisualSVG({ prefersReducedMotion }) {
-  return (
-    <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ overflow: 'visible' }}>
-      {/* Background shadow layer (black hexagon) */}
-      <polygon
-        points="220,40 380,120 380,300 220,380 60,300 60,120"
-        fill="var(--color-ink)"
-      />
-      
-      {/* Foreground layer (yellow hexagon with thick border) */}
-      <motion.polygon
-        points="200,20 360,100 360,280 200,360 40,280 40,100"
-        stroke="var(--color-ink)"
-        strokeWidth="6"
-        fill="var(--color-accent)"
-        animate={prefersReducedMotion ? {} : { y: [-5, 5, -5] }}
-        transition={prefersReducedMotion ? {} : { duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      
-      {/* Inner geometric shape */}
-      <motion.polygon
-        points="200,60 320,120 320,240 200,300 80,240 80,120"
-        stroke="var(--color-ink)"
-        strokeWidth="3"
-        fill="var(--color-surface)"
-        animate={prefersReducedMotion ? {} : { y: [5, -5, 5] }}
-        transition={prefersReducedMotion ? {} : { duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-      />
-
-      {/* Center dot/eye */}
-      <circle cx="200" cy="180" r="16" fill="var(--color-ink)" />
-      
-      {/* Decorative neo-brutalist crosses */}
-      <path d="M20 20 L40 20 M30 10 L30 30" stroke="var(--color-ink)" strokeWidth="3" />
-      <path d="M360 360 L380 360 M370 350 L370 370" stroke="var(--color-ink)" strokeWidth="3" />
-      
-      {/* Decorative lines sticking out */}
-      <line x1="200" y1="20" x2="200" y2="-20" stroke="var(--color-ink)" strokeWidth="3" />
-      <line x1="40" y1="280" x2="-10" y2="280" stroke="var(--color-ink)" strokeWidth="3" />
-    </svg>
-  );
-}
-
 /* =======================================================================
-   CRAFT PHILOSOPHY
+   CRAFT PHILOSOPHY (The Meaning Section)
    ======================================================================= */
 function CraftPhilosophy() {
-  const pillars = [
-    { icon: Palette, title: 'Branding', description: 'Identity systems built to last, not trend-chase.' },
-    { icon: Layout, title: 'Design', description: 'Interfaces shaped around real user behavior.' },
-    { icon: Code, title: 'Engineering', description: 'Fast, accessible, precisely built frontends.' },
-    { icon: Bot, title: 'AI', description: 'Automation that removes friction, not adds noise.' },
-  ];
-
   return (
     <section className="section section--lg craft-section">
-      <div className="container">
-        <SectionHeading
-          eyebrow="The Meaning Behind Taksha Nexus"
-          title="To carve. To shape. To craft — with precision."
-          subtitle={
-            <>
-              Taksha Nexus comes from the Sanskrit "<span lang="sa">Takṣ</span>" — the act of shaping
-              something with intention and skill. We apply that same philosophy to digital products:
-              nothing is default, nothing is templated. Every interface, every interaction, every
-              line of code is considered.
-            </>
-          }
-          align="center"
-        />
-
-        <motion.div
-          className="craft__pillars"
-          variants={staggerContainer}
+      <div className="container content-medium">
+        <motion.div 
+          className="meaning-panel neu-inset"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-80px' }}
+          variants={fadeUp}
         >
-          {pillars.map((pillar, i) => (
-            <motion.div key={pillar.title} className="card card--value" variants={fadeUp} custom={i}>
-              <pillar.icon className="card__icon" aria-hidden="true" />
-              <h3 className="card__title">{pillar.title}</h3>
-              <p className="card__description">{pillar.description}</p>
-            </motion.div>
-          ))}
+          <div className="meaning-panel__inner clay-panel">
+            <span className="text-eyebrow meaning-panel__eyebrow">The Meaning Behind Taksha Nexus</span>
+            <h2 className="meaning-panel__title">To carve. To shape. To craft &mdash; with precision.</h2>
+            <p className="meaning-panel__text">
+              Taksha Nexus comes from the Sanskrit '<span lang="sa">Takṣa</span>' — the act of shaping something with intention and skill. We apply that same philosophy to digital products: nothing is default, nothing is templated. Every interface, every interaction, every line of code is considered.
+            </p>
+          </div>
         </motion.div>
       </div>
     </section>
@@ -318,14 +240,14 @@ function FeaturedProjects() {
         />
 
         <motion.div
-          className="featured-projects__grid"
+          className="featured-projects__asymmetric-grid"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-80px' }}
         >
           {FEATURED_PROJECTS.map((project, i) => (
-            <motion.div key={project.slug} variants={fadeUp} custom={i}>
+            <motion.div key={project.slug} className={`featured-item featured-item--${i}`} variants={fadeUp} custom={i}>
               <ProjectCardHome project={project} />
             </motion.div>
           ))}
@@ -338,7 +260,7 @@ function FeaturedProjects() {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          <Button to="/work" variant="secondary" size="md" icon={<ArrowRight />}>
+          <Button to="/work" variant="primary" size="lg" icon={<ArrowRight />}>
             View All Work
           </Button>
         </motion.div>
@@ -347,24 +269,23 @@ function FeaturedProjects() {
   );
 }
 
-/* Simplified project card for home page featured grid */
+/* Tactile Editorial Project Card */
 function ProjectCardHome({ project }) {
   return (
-    <Link to={`/work/${project.slug}`} className="card card--clickable project-card-home" aria-label={`View ${project.name} case study`}>
-      <div className="project-card-home__image" style={{ background: project.color, borderBottom: 'var(--border-thick) solid var(--color-ink)' }}>
-        <div className="project-card-home__header">
-          <ConceptBadge className="project-card-home__badge" />
-        </div>
-        <div className="project-card-home__image-inner" style={{ background: 'transparent' }}>
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: '100px', color: 'var(--color-ink)', fontWeight: 600 }}>
-            {project.name.charAt(0)}
-          </span>
+    <Link to={`/work/${project.slug}`} className="project-card-tactile tactile-surface tactile-press" aria-label={`View ${project.name} case study`}>
+      <div className="project-card-tactile__image" style={{ background: project.color }}>
+        <ConceptBadge className="project-card-tactile__badge" />
+        <div className="project-card-tactile__initial">
+          {project.name.charAt(0)}
         </div>
       </div>
-      <div className="project-card-home__info" style={{ padding: 'var(--space-4)', background: 'var(--color-surface)' }}>
-        <h3 className="project-card-home__name" style={{ fontSize: 'var(--text-xl)', fontWeight: 700, marginBottom: 'var(--space-2)' }}>{project.name}</h3>
-        <p className="project-card-home__tagline" style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink)', marginBottom: 'var(--space-4)' }}>{project.tagline}</p>
-        <span className="project-card-home__category" style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: 600, color: 'var(--color-text-secondary)' }}>{project.category}</span>
+      <div className="project-card-tactile__info">
+        <h3 className="project-card-tactile__name">{project.name}</h3>
+        <p className="project-card-tactile__tagline">{project.tagline}</p>
+        <div className="project-card-tactile__footer">
+          <span className="project-card-tactile__category">{project.category}</span>
+          <div className="project-card-tactile__arrow"><ArrowRight size={16} /></div>
+        </div>
       </div>
     </Link>
   );
@@ -392,11 +313,13 @@ function ServicesOverview() {
         >
           {SERVICES.map((service, i) => (
             <motion.div key={service.title} variants={fadeUp} custom={i}>
-              <Link to={service.path} className="service-card">
-                <service.icon className="service-card__icon" aria-hidden="true" />
+              <Link to={service.path} className="service-card tactile-surface tactile-press">
+                <div className="service-card__icon-wrapper neu-inset">
+                  <service.icon className="service-card__icon" aria-hidden="true" />
+                </div>
                 <h3 className="service-card__title">{service.title}</h3>
                 <p className="service-card__description">{service.description}</p>
-                <ArrowRight className="service-card__arrow" size={18} />
+                <div className="service-card__arrow-btn"><ArrowRight size={18} /></div>
               </Link>
             </motion.div>
           ))}
@@ -409,7 +332,7 @@ function ServicesOverview() {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          <Button to="/services" variant="secondary" size="md" icon={<ArrowRight />}>
+          <Button to="/services" variant="secondary" size="lg" icon={<ArrowRight />}>
             Explore All Services
           </Button>
         </motion.div>
@@ -431,22 +354,21 @@ function ProcessPreview() {
           align="center"
         />
 
-        <div style={{ position: 'relative' }}>
-          <div className="process-preview__line" aria-hidden="true" />
-          <motion.ol
-            className="process-preview__steps"
+        <div className="process-tactile__container">
+          <motion.div
+            className="process-tactile__grid"
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-80px' }}
           >
             {PROCESS_STEPS.map((step, i) => (
-              <motion.li key={step.number} className="process-preview__step" variants={fadeUp} custom={i}>
-                <span className="process-preview__step-number">{step.number}</span>
-                <span className="process-preview__step-label">{step.label}</span>
-              </motion.li>
+              <motion.div key={step.number} className="process-tactile__step tactile-surface" variants={fadeUp} custom={i}>
+                <div className="process-tactile__number clay-panel clay-panel--yellow">{step.number}</div>
+                <div className="process-tactile__label">{step.label}</div>
+              </motion.div>
             ))}
-          </motion.ol>
+          </motion.div>
         </div>
 
         <motion.div
@@ -456,7 +378,7 @@ function ProcessPreview() {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          <Button to="/process" variant="secondary" size="md" icon={<ArrowRight />}>
+          <Button to="/process" variant="primary" size="lg" icon={<ArrowRight />}>
             See Our Full Process
           </Button>
         </motion.div>
@@ -470,9 +392,9 @@ function ProcessPreview() {
    ======================================================================= */
 function WhyTaksha() {
   return (
-    <section className="section section--lg" style={{ background: 'var(--color-surface)' }}>
+    <section className="section section--lg" style={{ background: 'var(--color-surface-inset)' }}>
       <div className="container">
-        <div className="why-taksha__inner">
+        <div className="why-taksha__inner clay-panel" style={{ padding: 'var(--space-8)' }}>
           <motion.div
             className="why-taksha__body"
             initial="hidden"
@@ -486,12 +408,12 @@ function WhyTaksha() {
             <motion.h2 className="h2" variants={fadeUp} style={{ marginBottom: 'var(--space-6)' }}>
               A new studio. An honest one.
             </motion.h2>
-            <motion.p variants={fadeUp}>
+            <motion.p variants={fadeUp} style={{ fontSize: 'var(--text-lg)', marginBottom: 'var(--space-4)' }}>
               We won't show you fabricated testimonials or invented client logos — because we don't
               have any yet, and pretending otherwise isn't craftsmanship. What we do have is original,
               self-initiated work built to the same standard we'd bring to yours.
             </motion.p>
-            <motion.p variants={fadeUp}>
+            <motion.p variants={fadeUp} style={{ fontSize: 'var(--text-lg)' }}>
               Taksha Nexus isn't a web development agency. We're a Digital Craft Studio — branding, design,
               engineering, and AI, combined with intention.
             </motion.p>
@@ -504,19 +426,19 @@ function WhyTaksha() {
             whileInView="visible"
             viewport={{ once: true, margin: '-80px' }}
           >
-            <motion.div className="stat-callout" variants={fadeUp} custom={0}>
+            <motion.div className="stat-callout tactile-surface" variants={fadeUp} custom={0}>
               <CountUp target={9} className="stat-callout__number" />
               <p className="stat-callout__label">
-                Self-initiated concept projects across healthcare, SaaS, hospitality, real estate, and fintech
+                Self-initiated concept projects across multiple domains
               </p>
             </motion.div>
-            <motion.div className="stat-callout" variants={fadeUp} custom={1}>
+            <motion.div className="stat-callout tactile-surface" variants={fadeUp} custom={1}>
               <CountUp target={95} suffix="+" className="stat-callout__number" />
               <p className="stat-callout__label">
                 Target Lighthouse score on every build we ship
               </p>
             </motion.div>
-            <motion.div className="stat-callout" variants={fadeUp} custom={2}>
+            <motion.div className="stat-callout tactile-surface" variants={fadeUp} custom={2}>
               <span className="stat-callout__number" style={{ fontSize: 'var(--text-2xl)' }}>WCAG 2.2</span>
               <p className="stat-callout__label">
                 AA accessibility as a baseline, not an afterthought
@@ -549,7 +471,6 @@ function CountUp({ target, suffix = '', className }) {
     const step = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // ease-out-quart
       const eased = 1 - Math.pow(1 - progress, 4);
       setCount(Math.round(eased * target));
 
@@ -601,7 +522,7 @@ function BrandManifesto({ prefersReducedMotion }) {
 
   return (
     <section className="manifesto" ref={sectionRef}>
-      <div className="container">
+      <div className="container content-medium">
         <div className="manifesto__lines">
           {MANIFESTO_LINES.map((line, i) => (
             <p
@@ -622,28 +543,20 @@ function BrandManifesto({ prefersReducedMotion }) {
    ======================================================================= */
 function FinalCTA() {
   return (
-    <section className="section section--lg final-cta">
-      <div className="final-cta__bg-pattern" aria-hidden="true">
-        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-          <pattern id="cta-pattern" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
-            <line x1="0" y1="30" x2="60" y2="30" stroke="var(--color-border)" strokeWidth="0.5" />
-            <line x1="30" y1="0" x2="30" y2="60" stroke="var(--color-border)" strokeWidth="0.5" />
-          </pattern>
-          <rect width="100%" height="100%" fill="url(#cta-pattern)" />
-        </svg>
-      </div>
+    <section className="section section--lg final-cta" style={{ background: 'var(--color-ink)', color: 'var(--color-bg)' }}>
       <div className="container">
         <motion.div
-          className="final-cta__content"
+          className="final-cta__content tactile-surface"
+          style={{ background: 'var(--color-accent)', color: 'var(--color-ink)', padding: 'var(--space-12)' }}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-80px' }}
           variants={staggerContainer}
         >
-          <motion.h2 className="final-cta__heading" variants={fadeUp}>
+          <motion.h2 className="final-cta__heading" variants={fadeUp} style={{ fontSize: 'var(--text-4xl)' }}>
             Have a project worth crafting well?
           </motion.h2>
-          <motion.p className="final-cta__subhead" variants={fadeUp}>
+          <motion.p className="final-cta__subhead" variants={fadeUp} style={{ fontSize: 'var(--text-xl)' }}>
             Tell us what you're building. We'll tell you how we'd approach it.
           </motion.p>
           <motion.div variants={fadeUp}>

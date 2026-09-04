@@ -1357,9 +1357,16 @@ app.post('/api/applications/:id/generate-offer', authenticateToken, async (req, 
     const fileBuffer = fs.readFileSync(localPdfPath);
     const objectPath = `offer_${application.id}.pdf`;
     
-    // Using submissions bucket since it's an application document
-    await uploadFile('submissions', objectPath, fileBuffer, 'application/pdf');
-    const offerUrl = getPublicUrl('submissions', objectPath);
+    let offerUrl;
+    try {
+      // Using submissions bucket since it's an application document
+      await uploadFile('submissions', objectPath, fileBuffer, 'application/pdf');
+      offerUrl = getPublicUrl('submissions', objectPath);
+    } catch (uploadErr) {
+      console.warn("Supabase upload failed, falling back to local URL:", uploadErr.message);
+      const filename = require('path').basename(localPdfPath);
+      offerUrl = `/uploads/offers/${filename}`;
+    }
 
     // Update the application record
     const updatedApp = await prisma.application.update({
@@ -1415,9 +1422,17 @@ app.post('/api/applications/:id/send-offer', authenticateToken, async (req, res)
         }
       }
     }
-
     const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://taksha-website.vercel.app';
     const acceptLink = `${clientUrl}/offer-response/${application.id}`;
+
+    // offerUrl is either a Supabase URL (http...) or a local relative path (/uploads/offers/...)
+    let attachments = [];
+    if (application.offerUrl && application.offerUrl.startsWith('/uploads')) {
+      const pdfPath = path.join(__dirname, '..', application.offerUrl);
+      if (fs.existsSync(pdfPath)) {
+        attachments.push({ filename: path.basename(pdfPath), path: pdfPath });
+      }
+    }
 
     // Send the email with offer letter
     const emailRes = await takshaHR.sendEmail({
@@ -1497,23 +1512,25 @@ app.put('/api/applications/:id/approve-offer', authenticateToken, async (req, re
     });
     
     // Send email with PDF attachment
-    const pdfPath = path.join(__dirname, application.offerUrl);
     let attachments = [];
-    if (fs.existsSync(pdfPath)) {
-      attachments.push({ filename: path.basename(pdfPath), path: pdfPath });
+    if (application.offerUrl && application.offerUrl.startsWith('/uploads')) {
+      const pdfPath = path.join(__dirname, application.offerUrl);
+      if (fs.existsSync(pdfPath)) {
+        attachments.push({ filename: path.basename(pdfPath), path: pdfPath });
+      }
     }
     
-    const acceptLink = `\${process.env.CLIENT_URL || 'http://localhost:5173'}/offer-response/\${id}`;
+    const acceptLink = `${process.env.CLIENT_URL || 'http://localhost:5173'}/offer-response/${id}`;
     
     await takshaHR.sendEmail({
       to: application.email,
-      subject: `Offer Letter: \${application.roleTitle} at Taksha Nexus`,
+      subject: `Offer Letter: ${application.roleTitle} at Taksha Nexus`,
       html: `
-        <h2>Congratulations \${application.name}!</h2>
-        <p>We are thrilled to offer you the internship position of <strong>\${application.roleTitle}</strong>.</p>
+        <h2>Congratulations ${application.name}!</h2>
+        <p>We are thrilled to offer you the internship position of <strong>${application.roleTitle}</strong>.</p>
         <p>Please find your official offer letter attached.</p>
         <p>To accept or decline the offer, please visit your secure portal:</p>
-        <a href="\${acceptLink}" style="padding: 10px 20px; background: #000; color: #fff; text-decoration: none; border-radius: 5px;">View Offer Decision Portal</a>
+        <a href="${acceptLink}" style="padding: 10px 20px; background: #000; color: #fff; text-decoration: none; border-radius: 5px;">View Offer Decision Portal</a>
         <br/><br/>
         <p>Best Regards,</p>
         <p>Taksha HR System</p>
@@ -1581,15 +1598,15 @@ app.post('/api/applications/:id/offer-response', async (req, res) => {
       
       // 3. Generate Intern ID
       const year = new Date().getFullYear();
-      const count = await prisma.user.count({ where: { role: 'INTERN', id: { startsWith: `TN-INT-\${year}-` } } });
+      const count = await prisma.user.count({ where: { role: 'INTERN', id: { startsWith: `TN-INT-${year}-` } } });
       const seq = String(count + 1).padStart(3, '0');
-      const internId = `TN-INT-\${year}-\${seq}`;
+      const internId = `TN-INT-${year}-${seq}`;
       
       // 4. Generate Temporary Password: Taksha Nexus@26DD
       // We don't have DOB explicitly in the application fields except potentially in resume. 
       // For testing, we'll use '01' if DOB is missing. If the user provides a dob parameter in the accept request, we use it.
       let dd = req.body.dob ? String(new Date(req.body.dob).getDate()).padStart(2, '0') : '01';
-      const tempPassword = `Taksha Nexus@26\${dd}`;
+      const tempPassword = `Taksha Nexus@26${dd}`;
       const passwordHash = await bcrypt.hash(tempPassword, 10);
       
       // Track
@@ -1627,20 +1644,20 @@ app.post('/api/applications/:id/offer-response', async (req, res) => {
         }
       });
       
-      await takshaHR.logSystemAction('Intern Account Created', application.name, `Intern ID: \${internId}`, 'Taksha HR');
+      await takshaHR.logSystemAction('Intern Account Created', application.name, `Intern ID: ${internId}`, 'Taksha HR');
       
       // 6. Send Onboarding Email
       await takshaHR.sendEmail({
         to: application.email,
         subject: `Welcome to Taksha Nexus 🎉 — Your Intern Account`,
         html: `
-          <h2>Welcome aboard, \${application.name}!</h2>
+          <h2>Welcome aboard, ${application.name}!</h2>
           <p>Your official intern account has been created.</p>
-          <p><strong>Intern ID:</strong> \${internId}</p>
-          <p><strong>Login Email:</strong> \${application.email}</p>
-          <p><strong>Temporary Password:</strong> \${tempPassword}</p>
+          <p><strong>Intern ID:</strong> ${internId}</p>
+          <p><strong>Login Email:</strong> ${application.email}</p>
+          <p><strong>Temporary Password:</strong> ${tempPassword}</p>
           <p>Please log in to your portal immediately to change your password and begin your onboarding.</p>
-          <a href="\${process.env.CLIENT_URL || 'http://localhost:5173'}/login" style="padding: 10px 20px; background: #000; color: #fff; text-decoration: none; border-radius: 5px;">Go to Portal</a>
+          <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/login" style="padding: 10px 20px; background: #000; color: #fff; text-decoration: none; border-radius: 5px;">Go to Portal</a>
           <br/><br/>
           <p>Best Regards,</p>
           <p>Taksha HR System</p>
