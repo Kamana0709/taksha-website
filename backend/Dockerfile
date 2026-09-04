@@ -28,27 +28,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Copy package files AND the puppeteer cache config BEFORE installing,
-# so `npm ci`'s postinstall (which downloads Chrome) uses the SAME
-# cache path the app will look in at runtime.
-COPY package*.json ./
-COPY .puppeteerrc.cjs ./
+# Pin the Puppeteer cache path via ENV so it's identical at build time
+# (npm ci's postinstall downloads Chrome here) and at runtime (the app
+# looks for Chrome here). This makes .puppeteerrc.cjs redundant/backup.
+ENV PUPPETEER_CACHE_DIR=/app/.cache/puppeteer
 
-# Install Node dependencies (postinstall -> `npx puppeteer install` runs now,
-# correctly honoring .puppeteerrc.cjs)
+COPY package*.json ./
 RUN npm ci --omit=dev
 
-# Copy the rest of the backend source code
+# Fail the BUILD (not silently fail later at runtime) if Chrome
+# didn't actually get installed where we expect it.
+RUN node -e "const p=require('puppeteer'); const fp=p.executablePath(); const fs=require('fs'); console.log('Puppeteer expects Chrome at:', fp); if(!fs.existsSync(fp)){console.error('CHROME BINARY MISSING AT BUILD TIME'); process.exit(1);} console.log('Chrome binary verified present.');"
+
 COPY . .
 
-# Generate Prisma Client now that schema.prisma is present
 RUN npx prisma generate
-
-# Run the font download script to ensure Poppins is available locally
 RUN node scripts/download-fonts.js
 
-# Expose the Express port
 EXPOSE 5000
-
-# Start the server
 CMD ["node", "server.js"]
