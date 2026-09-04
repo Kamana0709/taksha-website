@@ -38,9 +38,7 @@ RUN npm ci --omit=dev
 
 # Fail the BUILD (not silently fail later at runtime) if Chrome
 # didn't actually get installed where we expect it.
-RUN node -e "const p=require('puppeteer'); const fp=p.executablePath(); const fs=require('fs'); console.log('Puppeteer expects Chrome at:', fp); if(!fs.existsSync(fp)){console.error('CHROME BINARY MISSING AT BUILD TIME'); process.exit(1);} console.log('Chrome binary verified present.');"
-
-COPY . .
+RUN node -e "(async()=>{const p=require('puppeteer'); const fp=await p.executablePath(); const fs=require('fs'); console.log('Puppeteer expects Chrome at:', fp); if(!fs.existsSync(fp)){console.error('CHROME BINARY MISSING AT BUILD TIME'); process.exit(1);} console.log('Chrome binary verified present.');})();"
 
 RUN npx prisma generate
 RUN node scripts/download-fonts.js
