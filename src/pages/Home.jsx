@@ -9,7 +9,6 @@ import SEO from '../components/SEO/SEO';
 import StructuredData, { localBusinessSchema } from '../components/StructuredData/StructuredData';
 import SectionHeading from '../components/SectionHeading/SectionHeading';
 import Button from '../components/Button/Button';
-import ConceptBadge from '../components/ConceptBadge/ConceptBadge';
 import { usePrefersReducedMotion } from '../context/MotionPreferenceContext';
 import './Home.css';
 
@@ -17,40 +16,8 @@ import './Home.css';
 const ThreeHero = lazy(() => import('../components/ThreeHero/ThreeHero'));
 
 /* -----------------------------------------------------------------------
-   Featured project data
-   ----------------------------------------------------------------------- */
-const FEATURED_PROJECTS = [
-  {
-    slug: 'novacare',
-    name: 'NovaCare',
-    tagline: 'Patient-first healthcare platform',
-    category: 'HEALTHCARE · UI/UX',
-    color: 'var(--color-card-mint)',
-  },
-  {
-    slug: 'flowos',
-    name: 'FlowOS',
-    tagline: 'Workflow automation SaaS dashboard',
-    category: 'SAAS · DASHBOARD',
-    color: 'var(--color-card-lilac)',
-  },
-  {
-    slug: 'aure-home',
-    name: 'Aure Home',
-    tagline: 'Boutique hotel booking experience',
-    category: 'HOSPITALITY · BRAND',
-    color: 'var(--color-accent)',
-  },
-  {
-    slug: 'finora',
-    name: 'Finora',
-    tagline: 'Personal finance & budgeting app',
-    category: 'FINTECH · APP',
-    color: 'var(--color-card-blue)',
-  },
-];
-
-const SERVICES = [
+   Services data
+   ----------------------------------------------------------------------- */const SERVICES = [
   {
     icon: Palette,
     title: 'Brand Identity',
@@ -127,7 +94,6 @@ export default function Home() {
 
       <HeroSection prefersReducedMotion={prefersReducedMotion} />
       <CraftPhilosophy />
-      <FeaturedProjects />
       <ServicesOverview />
       <ProcessPreview />
       <WhyTaksha />
@@ -223,71 +189,6 @@ function CraftPhilosophy() {
         </motion.div>
       </div>
     </section>
-  );
-}
-
-/* =======================================================================
-   FEATURED PROJECTS
-   ======================================================================= */
-function FeaturedProjects() {
-  return (
-    <section className="section section--lg">
-      <div className="container">
-        <SectionHeading
-          eyebrow="Studio Originals"
-          title="Concept work. Real craft."
-          subtitle="Taksha Nexus is a new studio — every project below is a self-initiated exploration, not a client engagement. It's how we prove our craft before we're hired for yours."
-        />
-
-        <motion.div
-          className="featured-projects__asymmetric-grid"
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-        >
-          {FEATURED_PROJECTS.map((project, i) => (
-            <motion.div key={project.slug} className={`featured-item featured-item--${i}`} variants={fadeUp} custom={i}>
-              <ProjectCardHome project={project} />
-            </motion.div>
-          ))}
-        </motion.div>
-
-        <motion.div
-          style={{ textAlign: 'center', marginTop: 'var(--space-12)' }}
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          <Button to="/work" variant="primary" size="lg" icon={<ArrowRight />}>
-            View All Work
-          </Button>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
-
-/* Tactile Editorial Project Card */
-function ProjectCardHome({ project }) {
-  return (
-    <Link to={`/work/${project.slug}`} className="project-card-tactile tactile-surface tactile-press" aria-label={`View ${project.name} case study`}>
-      <div className="project-card-tactile__image" style={{ background: project.color }}>
-        <ConceptBadge className="project-card-tactile__badge" />
-        <div className="project-card-tactile__initial">
-          {project.name.charAt(0)}
-        </div>
-      </div>
-      <div className="project-card-tactile__info">
-        <h3 className="project-card-tactile__name">{project.name}</h3>
-        <p className="project-card-tactile__tagline">{project.tagline}</p>
-        <div className="project-card-tactile__footer">
-          <span className="project-card-tactile__category">{project.category}</span>
-          <div className="project-card-tactile__arrow"><ArrowRight size={16} /></div>
-        </div>
-      </div>
-    </Link>
   );
 }
 
