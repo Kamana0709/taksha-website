@@ -1425,14 +1425,6 @@ app.post('/api/applications/:id/send-offer', authenticateToken, async (req, res)
     const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || 'https://taksha-website.vercel.app';
     const acceptLink = `${clientUrl}/offer-response/${application.id}`;
 
-    // offerUrl is either a Supabase URL (http...) or a local relative path (/uploads/offers/...)
-    let attachments = [];
-    if (application.offerUrl && application.offerUrl.startsWith('/uploads')) {
-      const pdfPath = path.join(__dirname, '..', application.offerUrl);
-      if (fs.existsSync(pdfPath)) {
-        attachments.push({ filename: path.basename(pdfPath), path: pdfPath });
-      }
-    }
 
     // Send the email with offer letter
     const emailRes = await takshaHR.sendEmail({
