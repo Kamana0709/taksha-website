@@ -37,7 +37,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 # Explicitly install the browser because npm postinstall often drops privileges or skips downloads in Docker
-RUN npx puppeteer browsers install chrome
+RUN npx puppeteer browsers clear && npx puppeteer browsers install chrome
 
 # Fail the BUILD (not silently fail later at runtime) if Chrome
 # didn't actually get installed where we expect it.
