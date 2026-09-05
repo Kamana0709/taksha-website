@@ -10,8 +10,8 @@
   z-index: 1000;
   padding: var(--space-4) 0;
   transition: padding var(--duration-base) var(--ease-tactile),
-              background-color var(--duration-base) ease,
-              box-shadow var(--duration-base) ease;
+    background-color var(--duration-base) ease,
+    box-shadow var(--duration-base) ease;
 }
 
 .navbar--scrolled {
@@ -30,8 +30,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-8);
-  
-  /* Neumorphic base for the navbar content on desktop */
+
   background: var(--color-surface-inset);
   border-radius: var(--radius-xl);
   border: var(--border-width) solid var(--color-ink);
@@ -45,7 +44,6 @@
   }
 }
 
-/* Logo */
 .navbar__logo {
   display: flex;
   align-items: center;
@@ -72,7 +70,6 @@
   box-shadow: var(--shadow-neo-sm);
 }
 
-/* Desktop nav links */
 .navbar__links {
   display: none;
   align-items: center;
@@ -101,7 +98,6 @@
   letter-spacing: 0.5px;
 }
 
-/* Tactile Hover */
 .navbar__link:hover {
   color: var(--color-ink);
   background: var(--color-surface);
@@ -110,7 +106,6 @@
   transform: translateY(-2px);
 }
 
-/* Physical Active/Pressed State */
 .navbar__link:active {
   transform: translateY(2px);
   box-shadow: none;
@@ -118,7 +113,6 @@
   transition: all var(--duration-snap) var(--ease-smooth);
 }
 
-/* Active Route */
 .navbar__link--active {
   color: var(--color-ink);
   background: var(--color-accent);
@@ -132,19 +126,12 @@
   box-shadow: var(--shadow-neo-md);
 }
 
-/* We don't use the framer motion underline anymore because we have tactile pills */
-.navbar__link-underline {
-  display: none;
-}
-
-/* Right actions */
 .navbar__actions {
   display: flex;
   align-items: center;
   gap: var(--space-4);
 }
 
-/* Theme toggle */
 .navbar__theme-toggle {
   display: flex;
   align-items: center;
@@ -171,7 +158,6 @@
   transition: all var(--duration-snap) var(--ease-smooth);
 }
 
-/* CTA button */
 .navbar__cta {
   display: none;
 }
@@ -182,7 +168,6 @@
   }
 }
 
-/* Hamburger */
 .navbar__hamburger {
   display: flex;
   flex-direction: column;
@@ -238,9 +223,6 @@
   transform: translateY(-8px) rotate(-45deg);
 }
 
-/* -----------------------------------------------------------------------
-   Mobile Menu — Dropdown
-   ----------------------------------------------------------------------- */
 .mobile-menu-backdrop {
   position: fixed;
   inset: 0;
@@ -249,7 +231,7 @@
 
 .mobile-menu {
   position: fixed;
-  top: 80px; 
+  top: 80px;
   right: var(--space-4);
   width: 260px;
   background: var(--color-bg);
@@ -310,7 +292,7 @@
   border-top: 2px dashed var(--color-ink);
 }
 
-.mobile-menu__cta > * {
+.mobile-menu__cta>* {
   width: 100%;
   justify-content: center;
 }

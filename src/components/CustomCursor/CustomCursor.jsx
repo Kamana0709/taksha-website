@@ -5,16 +5,15 @@ import './CustomCursor.css';
 export default function CustomCursor() {
   const [isHovering, setIsHovering] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
-  
+
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
-  
+
   const springConfig = { damping: 25, stiffness: 300, mass: 0.5 };
   const cursorXSpring = useSpring(cursorX, springConfig);
   const cursorYSpring = useSpring(cursorY, springConfig);
 
   useEffect(() => {
-    // Only show custom cursor on fine-pointer devices (desktops)
     if (window.matchMedia('(pointer: fine)').matches) {
       const moveCursor = (e) => {
         cursorX.set(e.clientX);
@@ -23,7 +22,6 @@ export default function CustomCursor() {
 
       const handleMouseOver = (e) => {
         const target = e.target;
-        // Elements that should trigger the expanded cursor state
         if (
           target.tagName.toLowerCase() === 'a' ||
           target.tagName.toLowerCase() === 'button' ||
@@ -52,7 +50,7 @@ export default function CustomCursor() {
         document.body.removeEventListener('mouseenter', handleMouseEnter);
       };
     } else {
-      setIsHidden(true); // Hide on touch devices
+      setIsHidden(true);
     }
   }, [cursorX, cursorY]);
 
@@ -61,14 +59,11 @@ export default function CustomCursor() {
   return (
     <motion.div
       className="custom-cursor"
-      style={{
-        x: cursorXSpring,
-        y: cursorYSpring,
-      }}
+      style={{ x: cursorXSpring, y: cursorYSpring }}
       animate={{
         scale: isHovering ? 1.5 : 1,
         opacity: isHovering ? 0.5 : 1,
-        backgroundColor: isHovering ? 'var(--color-accent)' : 'var(--color-text)',
+        backgroundColor: isHovering ? 'var(--color-accent)' : 'var(--color-text-primary)',
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
     />

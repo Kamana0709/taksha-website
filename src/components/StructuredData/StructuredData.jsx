@@ -1,7 +1,5 @@
 /**
  * StructuredData — JSON-LD Schema.org renderer
- * Renders <script type="application/ld+json"> for structured data
- * PRD §21.8
  */
 import { Helmet } from 'react-helmet-async';
 
@@ -17,19 +15,15 @@ export default function StructuredData({ schema }) {
   );
 }
 
-/* -----------------------------------------------------------------------
-   Pre-built schema helpers
-   ----------------------------------------------------------------------- */
-
 export function organizationSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Taksha Nexus',
-    legalName: 'TAKSHA NEXUS',
+    name: 'Taksha',
+    legalName: 'TAKSHA',
     url: 'https://www.taksha.studio',
     logo: 'https://www.taksha.studio/logo.png',
-    description: 'Taksha Nexus is a digital craft studio blending branding, design, engineering, and AI.',
+    description: 'Taksha is a digital craft studio blending branding, design, engineering, and AI.',
     sameAs: [
       'https://www.linkedin.com/company/taksha',
       'https://www.instagram.com/taksha.studio',
@@ -37,8 +31,8 @@ export function organizationSchema() {
     identifier: {
       '@type': 'PropertyValue',
       propertyID: 'Udyam Registration Number',
-      value: 'UDYAM-OD-19-0177339'
-    }
+      value: 'UDYAM-OD-19-0177339',
+    },
   };
 }
 
@@ -62,10 +56,7 @@ export function faqSchema(faqs) {
     mainEntity: faqs.map((faq) => ({
       '@type': 'Question',
       name: faq.question,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: faq.answer,
-      },
+      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
     })),
   };
 }
@@ -74,14 +65,11 @@ export function localBusinessSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    name: 'Taksha Nexus',
+    name: 'Taksha',
     image: 'https://www.taksha.studio/og-image.jpg',
     url: 'https://www.taksha.studio',
     priceRange: '$$$$',
-    address: {
-      '@type': 'PostalAddress',
-      addressCountry: 'US'
-    }
+    address: { '@type': 'PostalAddress', addressCountry: 'US' },
   };
 }
 
@@ -90,11 +78,8 @@ export function serviceSchema(serviceName, description, path) {
     '@context': 'https://schema.org',
     '@type': 'Service',
     name: serviceName,
-    provider: {
-      '@type': 'Organization',
-      name: 'Taksha Nexus',
-    },
-    description: description,
+    provider: { '@type': 'Organization', name: 'Taksha' },
+    description,
     url: `https://www.taksha.studio${path}`,
   };
 }
@@ -104,11 +89,8 @@ export function creativeWorkSchema(projectName, description, path) {
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
     name: projectName,
-    creator: {
-      '@type': 'Organization',
-      name: 'Taksha Nexus',
-    },
-    description: description,
+    creator: { '@type': 'Organization', name: 'Taksha' },
+    description,
     url: `https://www.taksha.studio${path}`,
   };
 }

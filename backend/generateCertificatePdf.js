@@ -87,7 +87,7 @@ function generateCertificatePdf(data, destPath) {
       // The template uses remember picture, so usually two runs are needed for proper alignment.
       const runXelatex = () => {
         return new Promise((res, rej) => {
-          execFile('xelatex', args, { timeout: 20000, cwd: tmpDir }, (error, stdout, stderr) => {
+          execFile('xelatex', args, { timeout: 20000, cwd: tmpDir }, (error, _stdout, _stderr) => {
             if (error) {
               const logFile = path.join(tmpDir, 'certificate.log');
               let logContent = 'No log file generated.';

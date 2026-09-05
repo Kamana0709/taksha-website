@@ -1,7 +1,6 @@
 /**
- * MotionPreferenceContext — Central reduced motion detection
- * Uses Framer Motion's useReducedMotion hook, propagated via context
- * PRD §8.2, §22.5
+ * MotionPreferenceContext — Central reduced-motion detection
+ * Wraps Framer Motion's useReducedMotion, exposed via context
  */
 import { createContext, useContext } from 'react';
 import { useReducedMotion } from 'framer-motion';

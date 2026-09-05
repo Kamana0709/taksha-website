@@ -2,7 +2,6 @@
  * Button — Primary action element
  * Variants: primary, secondary, ghost, icon
  * Sizes: sm, md, lg
- * PRD §7.9, §7.10
  */
 import { forwardRef } from 'react';
 import { Link } from 'react-router-dom';
@@ -56,7 +55,6 @@ const Button = forwardRef(function Button(
     </>
   );
 
-  // Render as React Router Link
   if (to) {
     return (
       <Link ref={ref} to={to} className={classes} {...props}>
@@ -65,7 +63,6 @@ const Button = forwardRef(function Button(
     );
   }
 
-  // Render as external anchor
   if (href) {
     return (
       <a ref={ref} href={href} className={classes} target="_blank" rel="noopener noreferrer" {...props}>
@@ -74,7 +71,6 @@ const Button = forwardRef(function Button(
     );
   }
 
-  // Render as button
   return (
     <button ref={ref} type={type} className={classes} disabled={disabled || loading} {...props}>
       {content}

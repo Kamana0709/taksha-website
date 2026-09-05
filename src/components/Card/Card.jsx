@@ -1,6 +1,6 @@
 /**
  * Card — Base surface container
- * PRD §7.9 — project, service, value variants
+ * Variants: service, value, borderless
  */
 import { forwardRef } from 'react';
 import { motion } from 'framer-motion';

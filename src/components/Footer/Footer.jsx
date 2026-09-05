@@ -1,32 +1,66 @@
+
 /**
  * Footer — Global site footer
- * PRD §6.2 — 4-column: Brand, Sitemap, Services, Contact
- * Responsive: 4→2→1 column collapse
+ * 4-column: Brand, Company, Services, Contact — collapses 4→2→1
  */
+
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Button from '../Button/Button';
 import './Footer.css';
 
 const LinkedinIcon = ({ size = 24, ...props }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
-    <rect x="2" y="9" width="4" height="12"></rect>
-    <circle cx="4" cy="4" r="2"></circle>
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+    {...props}
+  >
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+    <rect x="2" y="9" width="4" height="12" />
+    <circle cx="4" cy="4" r="2" />
   </svg>
 );
 
 const InstagramIcon = ({ size = 24, ...props }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+    {...props}
+  >
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
   </svg>
 );
 
 const TwitterIcon = ({ size = 24, ...props }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+    {...props}
+  >
+    <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
   </svg>
 );
 
@@ -48,13 +82,29 @@ const SERVICE_LINKS = [
 ];
 
 const SOCIAL_LINKS = [
-  { label: 'LinkedIn', icon: LinkedinIcon, href: 'https://www.linkedin.com/company/taksha' },
-  { label: 'Instagram', icon: InstagramIcon, href: 'https://www.instagram.com/taksha.studio' },
-  { label: 'X / Twitter', icon: TwitterIcon, href: 'https://twitter.com/taksha_studio' },
+  {
+    label: 'LinkedIn',
+    icon: LinkedinIcon,
+    href: 'https://www.linkedin.com/company/taksha',
+  },
+  {
+    label: 'Instagram',
+    icon: InstagramIcon,
+    href: 'https://www.instagram.com/taksha.studio',
+  },
+  {
+    label: 'X / Twitter',
+    icon: TwitterIcon,
+    href: 'https://twitter.com/taksha_studio',
+  },
 ];
 
 const fadeUpVariants = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: {
+    opacity: 0,
+    y: 24,
+  },
+
   visible: (i) => ({
     opacity: 1,
     y: 0,
@@ -73,7 +123,8 @@ export default function Footer() {
     <footer className="footer" role="contentinfo">
       <div className="container">
         <div className="footer__grid">
-          {/* Column 1: Brand */}
+
+          {/* Brand */}
           <motion.div
             className="footer__column footer__brand"
             variants={fadeUpVariants}
@@ -82,30 +133,48 @@ export default function Footer() {
             whileInView="visible"
             viewport={{ once: true, margin: '-40px' }}
           >
-            <Link to="/" className="footer__brand-logo" aria-label="Taksha Nexus — Home">
-              <img src="/taksha-nexus-logo.png" alt="Taksha Nexus" className="footer__logo-image" style={{ background: '#fff', borderRadius: '4px', padding: '2px' }} />
+            <Link
+              to="/"
+              className="footer__brand-logo"
+              aria-label="Taksha — Home"
+            >
+              <img
+                src="/taksha-nexus-logo.png"
+                alt="Taksha"
+                className="footer__logo-image"
+              />
             </Link>
-            <p className="footer__tagline">Crafting Digital Excellence.</p>
-            <p className="footer__mission">
-              Helping ambitious businesses communicate their value through thoughtful digital experiences.
+
+            <p className="footer__tagline">
+              Crafting Digital Excellence.
             </p>
+
+            <p className="footer__mission">
+              Helping ambitious businesses communicate their value through
+              thoughtful digital experiences.
+            </p>
+
             <div className="footer__social">
-              {SOCIAL_LINKS.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  className="footer__social-link"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.label}
-                >
-                  <social.icon size={16} />
-                </a>
-              ))}
+              {SOCIAL_LINKS.map((social) => {
+                const Icon = social.icon;
+
+                return (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    className="footer__social-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.label}
+                  >
+                    <Icon size={16} />
+                  </a>
+                );
+              })}
             </div>
           </motion.div>
 
-          {/* Column 2: Company */}
+          {/* Company */}
           <motion.div
             className="footer__column"
             variants={fadeUpVariants}
@@ -114,14 +183,23 @@ export default function Footer() {
             whileInView="visible"
             viewport={{ once: true, margin: '-40px' }}
           >
-            <h3 className="footer__column-title">Company</h3>
+            <h3 className="footer__column-title">
+              Company
+            </h3>
+
             <ul className="footer__links">
               {COMPANY_LINKS.map((link) => (
                 <li key={link.path}>
-                  <Link to={link.path} className="footer__link" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                    {link.label}
+                  <Link
+                    to={link.path}
+                    className="footer__link"
+                  >
+                    <span>{link.label}</span>
+
                     {link.badge && (
-                      <span className="footer__badge">{link.badge}</span>
+                      <span className="footer__badge">
+                        {link.badge}
+                      </span>
                     )}
                   </Link>
                 </li>
@@ -129,7 +207,7 @@ export default function Footer() {
             </ul>
           </motion.div>
 
-          {/* Column 3: Services */}
+          {/* Services */}
           <motion.div
             className="footer__column"
             variants={fadeUpVariants}
@@ -138,17 +216,25 @@ export default function Footer() {
             whileInView="visible"
             viewport={{ once: true, margin: '-40px' }}
           >
-            <h3 className="footer__column-title">Services</h3>
+            <h3 className="footer__column-title">
+              Services
+            </h3>
+
             <ul className="footer__links">
               {SERVICE_LINKS.map((link) => (
                 <li key={link.path}>
-                  <Link to={link.path} className="footer__link">{link.label}</Link>
+                  <Link
+                    to={link.path}
+                    className="footer__link"
+                  >
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>
           </motion.div>
 
-          {/* Column 4: Contact */}
+          {/* Contact */}
           <motion.div
             className="footer__column"
             variants={fadeUpVariants}
@@ -157,33 +243,62 @@ export default function Footer() {
             whileInView="visible"
             viewport={{ once: true, margin: '-40px' }}
           >
-            <h3 className="footer__column-title">Contact</h3>
-            <a href="mailto:hello@taksha.studio" className="footer__email">
+            <h3 className="footer__column-title">
+              Contact
+            </h3>
+
+            <a
+              href="mailto:hello@taksha.studio"
+              className="footer__email"
+            >
               hello@taksha.studio
             </a>
-            <Button to="/contact" variant="secondary" size="sm">
+
+            <Button
+              to="/contact"
+              variant="secondary"
+              size="sm"
+            >
               Start a Project
             </Button>
+
             <p className="footer__response-note">
               We reply within 1–2 business days.
             </p>
           </motion.div>
+
         </div>
 
-        {/* Bottom bar */}
+        {/* Footer Bottom */}
         <div className="footer__bottom">
+
           <div className="footer__copyright-container">
             <p className="footer__copyright">
-              © {currentYear} Taksha Nexus. All rights reserved.
+              © {currentYear} Taksha. All rights reserved.
             </p>
-            <p className="footer__udyam" style={{ fontSize: '11px', color: 'var(--color-muted)', marginTop: '4px', margin: '4px 0 0 0' }}>
-              Udyam Registered Micro Enterprise (Services) · UDYAM-OD-19-0177339
+
+            <p className="footer__udyam">
+              Udyam Registered Micro Enterprise (Services) ·
+              UDYAM-OD-19-0177339
             </p>
           </div>
+
           <div className="footer__legal">
-            <Link to="/privacy-policy" className="footer__legal-link">Privacy Policy</Link>
-            <Link to="/terms-and-conditions" className="footer__legal-link">Terms & Conditions</Link>
+            <Link
+              to="/privacy-policy"
+              className="footer__legal-link"
+            >
+              Privacy Policy
+            </Link>
+
+            <Link
+              to="/terms-and-conditions"
+              className="footer__legal-link"
+            >
+              Terms &amp; Conditions
+            </Link>
           </div>
+
         </div>
       </div>
     </footer>

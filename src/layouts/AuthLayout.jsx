@@ -4,13 +4,12 @@ import './AuthLayout.css';
 export default function AuthLayout() {
   return (
     <div className="auth-layout">
-      {/* Absolute positioned logo for the auth screens */}
       <header className="auth-layout__header">
-        <Link to="/" className="auth-layout__logo-link" aria-label="Taksha Nexus — Home" style={{ textDecoration: 'none' }}>
-          <div className="auth-layout__logo-text">TAKSHA NEXUS <span>WORKSPACE</span></div>
+        <Link to="/" className="auth-layout__logo-link" aria-label="Taksha — Home" style={{ textDecoration: 'none' }}>
+          <div className="auth-layout__logo-text">TAKSHA <span>WORKSPACE</span></div>
         </Link>
       </header>
-      
+
       <main className="auth-layout__main">
         <Outlet />
       </main>

@@ -1,8 +1,7 @@
 /**
  * Navbar — Global persistent navigation
- * PRD §6.1 — Sticky, transparent over hero, solid on scroll
- * Desktop: logo + nav links + theme toggle + CTA
- * Mobile: logo + hamburger → full-screen overlay
+ * Sticky, transparent over hero, solid on scroll.
+ * Desktop: logo + nav links + theme toggle + CTA. Mobile: logo + hamburger → dropdown.
  */
 import { useState, useEffect, useCallback } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
@@ -27,37 +26,25 @@ export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
 
-  // Scroll detection — transition at 80px per PRD
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 80);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 80);
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
-  // Prevent body scroll when mobile menu is open
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [isMobileMenuOpen]);
 
-  // Close mobile menu on Escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && isMobileMenuOpen) {
-        setIsMobileMenuOpen(false);
-      }
+      if (e.key === 'Escape' && isMobileMenuOpen) setIsMobileMenuOpen(false);
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
@@ -69,17 +56,17 @@ export default function Navbar() {
 
   return (
     <>
-      <nav
-        className={`navbar ${isScrolled ? 'navbar--scrolled' : ''}`}
-        aria-label="Primary"
-      >
+      <nav className={`navbar ${isScrolled ? 'navbar--scrolled' : ''}`} aria-label="Primary">
         <div className="navbar__inner">
-          {/* Logo */}
-          <Link to="/" className="navbar__logo" aria-label="Taksha Nexus — Home">
-            <img src="/taksha-nexus-logo.png" alt="Taksha Nexus" className="navbar__logo-image" style={{ background: '#fff', borderRadius: '4px', padding: '2px' }} />
+          <Link to="/" className="navbar__logo" aria-label="Taksha — Home">
+            <img
+              src="/taksha-nexus-logo.png"
+              alt="Taksha"
+              className="navbar__logo-image"
+              style={{ background: '#fff', borderRadius: '4px', padding: '2px' }}
+            />
           </Link>
 
-          {/* Desktop nav links */}
           <ul className="navbar__links">
             {NAV_ITEMS.map((item) => (
               <li key={item.path}>
@@ -89,19 +76,13 @@ export default function Navbar() {
                     `navbar__link ${isActive ? 'navbar__link--active' : ''}`
                   }
                 >
-                  {({ isActive }) => (
-                    <>
-                      {item.label}
-                    </>
-                  )}
+                  {item.label}
                 </NavLink>
               </li>
             ))}
           </ul>
 
-          {/* Actions */}
           <div className="navbar__actions">
-            {/* Theme toggle */}
             <button
               className="navbar__theme-toggle"
               onClick={toggleTheme}
@@ -120,12 +101,10 @@ export default function Navbar() {
               </AnimatePresence>
             </button>
 
-            {/* Desktop CTA */}
             <Button to="/contact" variant="primary" size="sm" className="navbar__cta">
               Start a Project
             </Button>
 
-            {/* Mobile hamburger */}
             <button
               className={`navbar__hamburger ${isMobileMenuOpen ? 'navbar__hamburger--open' : ''}`}
               onClick={toggleMobileMenu}
@@ -141,7 +120,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <>
@@ -168,11 +146,7 @@ export default function Navbar() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -10 }}
-                    transition={{
-                      duration: 0.2,
-                      delay: index * 0.04,
-                      ease: [0.25, 1, 0.5, 1],
-                    }}
+                    transition={{ duration: 0.2, delay: index * 0.04, ease: [0.25, 1, 0.5, 1] }}
                   >
                     <NavLink
                       to={item.path}
@@ -190,11 +164,7 @@ export default function Navbar() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                transition={{
-                  duration: 0.2,
-                  delay: NAV_ITEMS.length * 0.04,
-                  ease: [0.25, 1, 0.5, 1],
-                }}
+                transition={{ duration: 0.2, delay: NAV_ITEMS.length * 0.04, ease: [0.25, 1, 0.5, 1] }}
               >
                 <Button to="/contact" variant="primary" size="md">
                   Start a Project

@@ -1,5 +1,4 @@
 const { generateCertificatePdf } = require('./generateCertificatePdf');
-const fs = require('fs');
 
 async function main() {
   const destPath = './uploads/test.pdf';

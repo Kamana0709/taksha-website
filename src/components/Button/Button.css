@@ -1,7 +1,6 @@
 /* ==========================================================================
    BUTTON — Tactile Premium Hybrid
-   Variants: primary, secondary, ghost, icon
-   Sizes: sm, md, lg
+   Variants: primary, secondary, ghost, icon | Sizes: sm, md, lg
    ========================================================================== */
 
 .btn {
@@ -19,15 +18,12 @@
   position: relative;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  
-  /* Skeuomorphic tactile transition */
-  transition: 
-    transform var(--duration-fast) var(--ease-tactile), 
+  transition:
+    transform var(--duration-fast) var(--ease-tactile),
     box-shadow var(--duration-fast) var(--ease-tactile),
     background-color var(--duration-fast) ease;
 }
 
-/* Sizes */
 .btn--sm {
   padding: var(--space-2) var(--space-4);
   font-size: var(--text-xs);
@@ -43,7 +39,6 @@
   font-size: var(--text-base);
 }
 
-/* Primary variant */
 .btn--primary {
   background: var(--color-accent);
   color: var(--color-ink);
@@ -63,7 +58,6 @@
   transition: transform var(--duration-snap) var(--ease-smooth), box-shadow var(--duration-snap) var(--ease-smooth);
 }
 
-/* Secondary variant */
 .btn--secondary {
   background: var(--color-surface);
   color: var(--color-ink);
@@ -83,7 +77,6 @@
   transition: transform var(--duration-snap) var(--ease-smooth), box-shadow var(--duration-snap) var(--ease-smooth);
 }
 
-/* Ghost variant */
 .btn--ghost {
   background: transparent;
   color: var(--color-ink);
@@ -106,7 +99,6 @@
   transition: transform var(--duration-snap) var(--ease-smooth), box-shadow var(--duration-snap) var(--ease-smooth);
 }
 
-/* Icon variant */
 .btn--icon {
   padding: var(--space-3);
   border-radius: var(--radius-sm);
@@ -133,13 +125,11 @@
   padding: var(--space-4);
 }
 
-/* Focus state */
 .btn:focus-visible {
   outline: 4px solid var(--color-accent);
   outline-offset: 4px;
 }
 
-/* Disabled state */
 .btn:disabled,
 .btn--disabled {
   opacity: 0.6;
@@ -152,7 +142,6 @@
   border-color: var(--color-text-tertiary);
 }
 
-/* Loading state */
 .btn--loading {
   color: transparent;
   pointer-events: none;
@@ -173,10 +162,11 @@
 }
 
 @keyframes btn-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* Icon inside button */
 .btn__icon {
   width: 20px;
   height: 20px;

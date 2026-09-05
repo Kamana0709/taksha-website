@@ -4,7 +4,6 @@ const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { PrismaClient } = require('@prisma/client');
-const { Resend } = require('resend');
 const path = require('path');
 const { addDays, differenceInCalendarDays } = require('date-fns');
 const multer = require('multer');
@@ -18,7 +17,6 @@ dotenv.config();
 
 const app = express();
 const prisma = new PrismaClient();
-const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_123');
 app.use(cors());
 app.use(express.json());
 
@@ -95,7 +93,7 @@ app.post('/api/auth/login', async (req, res) => {
       token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role, track: user.track, initials: user.name.substring(0, 2).toUpperCase() }
     });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Login failed' });
   }
 });
@@ -112,7 +110,7 @@ app.get('/api/users/interns', authenticateToken, async (req, res) => {
       where: whereClause
     });
     res.json(interns);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to fetch interns' });
   }
 });
@@ -353,7 +351,7 @@ app.get('/api/projects', authenticateToken, async (req, res) => {
       return { ...p, daysRemaining, assignments: undefined };
     });
     res.json(enhancedProjects);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to fetch projects' });
   }
 });
@@ -367,7 +365,7 @@ app.post('/api/projects', authenticateToken, async (req, res) => {
     });
     // Add empty tasks array for immediate frontend state
     res.json({ ...project, tasks: [] });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to create project' });
   }
 });
@@ -402,7 +400,7 @@ app.get('/api/tasks', authenticateToken, async (req, res) => {
       }
       return { ...t, assignee: t.assigneeId, project };
     }));
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to fetch tasks' });
   }
 });
@@ -459,7 +457,7 @@ app.put('/api/tasks/:id/status', authenticateToken, async (req, res) => {
       include: { project: true }
     });
     res.json({ ...task, assignee: task.assigneeId });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to update task status' });
   }
 });
@@ -482,7 +480,7 @@ app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
       include: { project: true }
     });
     res.json({ ...task, assignee: task.assigneeId });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to update task' });
   }
 });
@@ -493,7 +491,7 @@ app.delete('/api/tasks/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     await prisma.task.delete({ where: { id } });
     res.json({ success: true, id });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to delete task' });
   }
 });
@@ -610,7 +608,7 @@ app.get('/api/announcements', authenticateToken, async (req, res) => {
   try {
     const announcements = await prisma.announcement.findMany({ orderBy: { date: 'desc' } });
     res.json(announcements);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to fetch announcements' });
   }
 });
@@ -622,7 +620,7 @@ app.post('/api/announcements', authenticateToken, async (req, res) => {
       data: { ...req.body, authorId: req.user.id }
     });
     res.json(announcement);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to create announcement' });
   }
 });
@@ -699,7 +697,7 @@ app.get('/api/applications', authenticateToken, async (req, res) => {
     if (req.user.role !== 'SUPER_ADMIN') return res.status(403).json({ error: 'Only Super Admins can view applications' });
     const applications = await prisma.application.findMany({ orderBy: { createdAt: 'desc' } });
     res.json(applications);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to fetch applications' });
   }
 });
@@ -1466,7 +1464,7 @@ app.post('/api/auth/change-password', async (req, res) => {
     let decoded;
     try {
       decoded = jwt.verify(tempToken, process.env.JWT_SECRET);
-    } catch (e) {
+    } catch {
       return res.status(401).json({ error: 'Token expired or invalid' });
     }
     
@@ -1488,7 +1486,7 @@ app.post('/api/auth/change-password', async (req, res) => {
       token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role, track: user.track, initials: user.name.substring(0, 2).toUpperCase() }
     });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to change password' });
   }
 });
@@ -1533,7 +1531,7 @@ app.put('/api/applications/:id/approve-offer', authenticateToken, async (req, re
     await takshaHR.logSystemAction('Offer Approved & Sent', application.name, 'Status: Sent', 'Super Admin');
     
     res.json(application);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to approve offer' });
   }
 });
@@ -1549,7 +1547,7 @@ app.get('/api/applications/:id/offer-details', async (req, res) => {
     }
     
     res.json(application);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to get offer' });
   }
 });
@@ -1575,7 +1573,7 @@ app.post('/api/applications/:id/offer-response', async (req, res) => {
     
     if (action === 'accept') {
       // 1. Update Application
-      const updated = await prisma.application.update({
+      await prisma.application.update({
         where: { id },
         data: { offerStatus: 'Accepted', offerRespondedAt: new Date(), status: 'Onboarded' }
       });

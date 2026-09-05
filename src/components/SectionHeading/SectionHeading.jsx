@@ -1,7 +1,5 @@
 /**
  * SectionHeading — Reusable eyebrow + heading + optional subhead
- * Used consistently across all page sections
- * PRD §7.9
  */
 import { motion } from 'framer-motion';
 import './SectionHeading.css';
@@ -16,9 +14,7 @@ export default function SectionHeading({
 }) {
   const containerVariants = {
     hidden: {},
-    visible: {
-      transition: { staggerChildren: 0.1 },
-    },
+    visible: { transition: { staggerChildren: 0.1 } },
   };
 
   const childVariants = {

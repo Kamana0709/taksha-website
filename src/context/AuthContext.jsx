@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
@@ -10,7 +10,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load from local storage on mount
   useEffect(() => {
     const stored = localStorage.getItem('taksha_user');
     const token = localStorage.getItem('taksha_token');
@@ -19,7 +18,7 @@ export const AuthProvider = ({ children }) => {
         setUser(JSON.parse(stored));
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       } catch (e) {
-        console.error("Failed to parse stored user", e);
+        console.error('Failed to parse stored user', e);
       }
     }
     setIsLoading(false);
@@ -28,14 +27,24 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const res = await axios.post(`${API_URL}/auth/login`, { email, password });
+
+      // Backend can respond with a forced password-change flow instead of a session
+      if (res.data.requirePasswordChange) {
+        return {
+          success: false,
+          requirePasswordChange: true,
+          tempToken: res.data.tempToken,
+          email: res.data.email,
+        };
+      }
+
       const { token, user: userData } = res.data;
-      
+
       setUser(userData);
       localStorage.setItem('taksha_user', JSON.stringify(userData));
       localStorage.setItem('taksha_token', token);
-      
-      // Setup default auth header for future requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
       return { success: true, role: userData.role };
     } catch (err) {
       console.error('Login failed', err.response?.data?.error || err.message);
@@ -47,10 +56,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await axios.put(`${API_URL}/users/profile`, profileData);
       const updatedUser = res.data;
-      
+
       setUser(updatedUser);
       localStorage.setItem('taksha_user', JSON.stringify(updatedUser));
-      
+
       return { success: true, user: updatedUser };
     } catch (err) {
       console.error('Update profile failed', err.response?.data?.error || err.message);

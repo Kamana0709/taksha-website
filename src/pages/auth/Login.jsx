@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../../components/SEO/SEO';
 import { useAuth } from '../../context/AuthContext';
@@ -15,7 +15,7 @@ export default function Login() {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    
+
     const result = await login(email, password);
     if (result.success) {
       if (result.role === 'MENTOR') {
@@ -35,43 +35,45 @@ export default function Login() {
 
   return (
     <>
-      <SEO title="Taksha Nexus Workspace | Login" />
+      <SEO title="Taksha Workspace | Login" />
       <div className="auth-card" style={{ padding: 0 }}>
-        <div className="auth-banner">
-          AUTHORIZED PERSONNEL ONLY
-        </div>
+        <div className="auth-banner">AUTHORIZED PERSONNEL ONLY</div>
 
         <div style={{ padding: 'var(--space-8)' }}>
-          {error && <div style={{ color: 'var(--color-card-pink)', marginBottom: 'var(--space-4)', fontWeight: 800, textAlign: 'center' }}>{error}</div>}
+          {error && (
+            <div style={{ color: '#e5484d', marginBottom: 'var(--space-4)', fontWeight: 800, textAlign: 'center' }}>
+              {error}
+            </div>
+          )}
           <form className="auth-form" onSubmit={handleLogin}>
             <div className="auth-form__group">
               <label className="auth-form__label" htmlFor="email">EMAIL</label>
-              <input 
+              <input
                 id="email"
-                type="text" 
-                className="auth-form__input" 
+                type="text"
+                className="auth-form__input"
                 placeholder="you@taksha.in"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required 
+                required
               />
             </div>
 
             <div className="auth-form__group" style={{ marginTop: 'var(--space-4)' }}>
               <label className="auth-form__label" htmlFor="password">PASSWORD</label>
-              <input 
+              <input
                 id="password"
-                type="password" 
-                className="auth-form__input" 
+                type="password"
+                className="auth-form__input"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required 
+                required
               />
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="auth-form__submit"
               disabled={isLoading}
               style={{ marginTop: 'var(--space-8)' }}

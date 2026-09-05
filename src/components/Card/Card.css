@@ -7,21 +7,20 @@
   border: var(--border-thick) solid var(--color-ink);
   border-radius: var(--radius-sm);
   position: relative;
-  transition: 
-    transform 200ms var(--ease-out-quart),
-    box-shadow 200ms var(--ease-out-quart);
-  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--duration-fast) var(--ease-smooth),
+    box-shadow var(--duration-fast) var(--ease-smooth);
+  box-shadow: var(--shadow-neo-sm);
   overflow: hidden;
 }
 
-/* Allow overflow for the dog-ear if it's placed outside, but we place it inside */
 .card--dog-ear {
   overflow: visible;
 }
 
 .card:hover {
   transform: translate(-4px, -4px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-neo-lg);
 }
 
 .card--clickable {
